@@ -3,6 +3,7 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import create_engine
+from sqlalchemy_utils import create_database, database_exists
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,8 +24,13 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# assemble the database url
 hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
 url = f'postgresql://postgres:postgres@{hostname}/insta_save'
+
+# create database
+if not database_exists(url):
+    create_database(url)
 
 
 def run_migrations_offline():
