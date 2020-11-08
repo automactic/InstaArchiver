@@ -1,9 +1,8 @@
+import os
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import create_engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,7 +23,8 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-url = 'postgresql://postgres:postgres@postgres/insta_save'
+hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
+url = f'postgresql://postgres:postgres@{hostname}/insta_save'
 
 
 def run_migrations_offline():
