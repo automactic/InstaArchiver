@@ -1,5 +1,7 @@
 import asyncio
 import mimetypes
+import os
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -13,6 +15,15 @@ class PostService:
     def __init__(self):
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
+
+        try:
+            self.user_id = int(os.getenv('USER_ID'))
+        except ValueError:
+            self.user_id = None
+        try:
+            self.group_id = int(os.getenv('GROUP_ID'))
+        except ValueError:
+            self.group_id = None
 
     async def create(self, shortcodes: [str]):
         loop = asyncio.get_running_loop()
@@ -82,11 +93,22 @@ class PostService:
                         return
 
                     # assemble post item file path
-                    owner_dir = self.data_dir.joinpath(post.owner_username)
-                    file_path = owner_dir.joinpath(post_item_filename).with_suffix(extension)
+                    profile_dir = self.data_dir.joinpath(post.owner_username)
+                    file_path = profile_dir.joinpath(post_item_filename).with_suffix(extension)
 
                     # save file
-                    owner_dir.mkdir(parents=True, exist_ok=True)
+                    profile_dir.mkdir(parents=True, exist_ok=True)
+                    self._change_file_ownership(profile_dir)
                     with open(file_path, 'wb') as file:
                         data = await response.read()
                         file.write(data)
+                        self._change_file_ownership(file_path)
+
+    def _change_file_ownership(self, path):
+        """Change ownership of the directory or file to a specific user id or group id.
+
+        :param path: the directory or file path to change the ownership
+        """
+
+        if self.user_id or self.group_id:
+            shutil.chown(path, self.user_id, self.group_id)
