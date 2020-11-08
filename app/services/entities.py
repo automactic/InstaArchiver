@@ -37,7 +37,7 @@ class PostItem:
 class Post:
     shortcode: str
     owner_username: str
-    created: datetime
+    creation_time: datetime
     type: PostType
     caption: Optional[str]
     items: List[PostItem]
