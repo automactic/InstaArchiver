@@ -7,10 +7,12 @@ import aiohttp
 import instaloader
 
 from services import Post, PostItem, PostItemType, PostType
+from .base import BaseService
 
 
-class PostService:
+class PostService(BaseService):
     def __init__(self):
+        super(PostService, self).__init__()
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
 
@@ -82,11 +84,13 @@ class PostService:
                         return
 
                     # assemble post item file path
-                    owner_dir = self.data_dir.joinpath(post.owner_username)
-                    file_path = owner_dir.joinpath(post_item_filename).with_suffix(extension)
+                    profile_dir = self.data_dir.joinpath(post.owner_username)
+                    file_path = profile_dir.joinpath(post_item_filename).with_suffix(extension)
 
                     # save file
-                    owner_dir.mkdir(parents=True, exist_ok=True)
+                    profile_dir.mkdir(parents=True, exist_ok=True)
+                    self._change_file_ownership(profile_dir)
                     with open(file_path, 'wb') as file:
                         data = await response.read()
                         file.write(data)
+                        self._change_file_ownership(file_path)
