@@ -72,7 +72,7 @@ class PostService:
                 async with session.get(item.url) as response:
                     # get post item filename
                     if len(post.items) > 1:
-                        post_item_filename = f'{post_item_filename}_{index}'
+                        post_item_filename = f'{post_filename}_{index}'
                     else:
                         post_item_filename = post_filename
 
