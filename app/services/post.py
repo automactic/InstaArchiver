@@ -14,14 +14,14 @@ class PostService:
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
 
-    async def create(self, shortcode: str):
+    async def create(self, shortcodes: [str]):
         loop = asyncio.get_running_loop()
-        post = await loop.run_in_executor(None, self.get_post, shortcode)
-        if not post:
-            return
-
-        await self.download_post(post)
-        print(post)
+        for shortcode in shortcodes:
+            post = await loop.run_in_executor(None, self.get_post, shortcode)
+            if not post:
+                continue
+            await self.download_post(post)
+            print(post)
 
     def get_post(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single Instagram post from the Internet.
