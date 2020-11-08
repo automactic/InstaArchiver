@@ -39,7 +39,7 @@ class PostService(BaseService):
             if post_type == PostType.IMAGE:
                 items = [PostItem(PostItemType.IMAGE, post.url)]
             elif post_type == PostType.VIDEO:
-                items = [PostItem(PostItemType.VIDEO, post.url)]
+                items = [PostItem(PostItemType.VIDEO, post.video_url)]
             elif post_type == PostType.SIDECAR:
                 items = [
                     PostItem(
