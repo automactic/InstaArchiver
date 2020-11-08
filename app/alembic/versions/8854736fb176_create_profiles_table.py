@@ -6,7 +6,7 @@ Create Date: 2020-11-08 16:46:40.601392
 
 """
 from alembic import op
-from sqlalchemy import Column, String
+from sqlalchemy import Boolean, Column, DateTime, String
 
 
 # revision identifiers, used by Alembic.
@@ -20,8 +20,10 @@ def upgrade():
     op.create_table(
         'profiles',
         Column('username', String, primary_key=True),
-        Column('full_name', String, nullable=False),
-        Column('biography', String, nullable=True),
+        Column('full_name', String, index=True, nullable=False),
+        Column('biography', String, index=True, nullable=True),
+        Column('auto_update', Boolean, index=True, default=False),
+        Column('last_update', DateTime, index=True, nullable=True),
     )
 
 
