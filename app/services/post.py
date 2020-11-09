@@ -1,7 +1,6 @@
 import asyncio
 import mimetypes
 from logging import getLogger
-from pathlib import Path
 from typing import Optional
 
 import aiohttp
@@ -16,11 +15,6 @@ logger = getLogger(__name__)
 
 
 class PostService(BaseService):
-    def __init__(self):
-        super(PostService, self).__init__()
-        self.instaloader_context = instaloader.InstaloaderContext()
-        self.data_dir = Path('/data')
-
     async def create(self, shortcodes: [str], connection: sa.engine.Connection):
         """Create posts from shortcodes.
 
@@ -43,14 +37,14 @@ class PostService(BaseService):
 
             # save post images and videos
             await self.download_post(post)
+
             logger.info(
                 f'Saved post {post.shortcode} of user {post.owner_username} '
                 f'which contains {len(post.items)} item(s).'
             )
-            print(post)
 
     def get_post(self, shortcode: str) -> Optional[Post]:
-        """Retrieve info about a single Instagram post from the Internet.
+        """Retrieve info about a single post from the Internet.
 
         :param shortcode: shortcode of the Instagram post
         :return: post metadata
