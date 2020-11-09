@@ -1,9 +1,10 @@
 from typing import List
 
-from fastapi import BackgroundTasks, FastAPI, Response
+import sqlalchemy
+from fastapi import BackgroundTasks, Depends, FastAPI, Response
 from pydantic import BaseModel
 
-from services import PostService
+from services import create_connection, PostService
 
 app = FastAPI()
 
@@ -18,6 +19,10 @@ def read_root():
 
 
 @app.post('/api/posts/')
-async def create_post(request: PostCreationRequest, background_tasks: BackgroundTasks):
-    background_tasks.add_task(PostService().create, request.shortcodes)
+async def create_post(
+        request: PostCreationRequest,
+        background_tasks: BackgroundTasks,
+        connection: sqlalchemy.engine.Connection = Depends(create_connection),
+):
+    background_tasks.add_task(PostService().create, request.shortcodes, connection)
     return Response(status_code=202)

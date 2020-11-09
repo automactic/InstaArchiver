@@ -5,9 +5,11 @@ from typing import Optional
 
 import aiohttp
 import instaloader
+import sqlalchemy as sa
 
-from services import Post, PostItem, PostItemType, PostType
 from .base import BaseService
+from .entities import Post, PostItem, PostItemType, PostType
+from .profile import ProfileService
 
 
 class PostService(BaseService):
@@ -16,12 +18,17 @@ class PostService(BaseService):
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
 
-    async def create(self, shortcodes: [str]):
+    async def create(self, shortcodes: [str], connection: sa.engine.Connection):
         loop = asyncio.get_running_loop()
         for shortcode in shortcodes:
             post = await loop.run_in_executor(None, self.get_post, shortcode)
             if not post:
                 continue
+
+            profile_service = ProfileService()
+            if not profile_service.exists(post.owner_username, connection):
+                print('not exist')
+
             await self.download_post(post)
             print(post)
 
