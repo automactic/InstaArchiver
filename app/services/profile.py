@@ -29,7 +29,7 @@ class ProfileService(BaseService):
             return
 
         # save profile metadata
-        await loop.run_in_executor(self.upsert, profile, connection)
+        await loop.run_in_executor(None, self.upsert, profile, connection)
 
         logger.info(f'Saved profile info {profile.username}.')
 
