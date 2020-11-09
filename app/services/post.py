@@ -1,34 +1,52 @@
 import asyncio
 import mimetypes
-from pathlib import Path
+from logging import getLogger
 from typing import Optional
 
 import aiohttp
 import instaloader
+import sqlalchemy as sa
 
-from services import Post, PostItem, PostItemType, PostType
 from .base import BaseService
+from .entities import Post, PostItem, PostItemType, PostType
+from .profile import ProfileService
+
+logger = getLogger(__name__)
 
 
 class PostService(BaseService):
-    def __init__(self):
-        super(PostService, self).__init__()
-        self.instaloader_context = instaloader.InstaloaderContext()
-        self.data_dir = Path('/data')
+    async def create(self, shortcodes: [str], connection: sa.engine.Connection):
+        """Create posts from shortcodes.
 
-    async def create(self, shortcodes: [str]):
+        :param shortcodes: shortcodes of the post to create
+        :param connection: a database connection
+        """
+
         loop = asyncio.get_running_loop()
+        profile_service = ProfileService()
         for shortcode in shortcodes:
+            # fetch post metadata
             post = await loop.run_in_executor(None, self.get_post, shortcode)
             if not post:
                 continue
+
+            # make sure profile exists
+            profile_exists = await loop.run_in_executor(None, profile_service.exists, post.owner_username, connection)
+            if not profile_exists:
+                await profile_service.create(post.owner_username, connection)
+
+            # save post images and videos
             await self.download_post(post)
-            print(post)
+
+            logger.info(
+                f'Saved post {post.shortcode} of user {post.owner_username} '
+                f'which contains {len(post.items)} item(s).'
+            )
 
     def get_post(self, shortcode: str) -> Optional[Post]:
-        """Retrieve info about a single Instagram post from the Internet.
+        """Retrieve info about a single post from the Internet.
 
-        :param shortcode: shortcode of the Instagram post
+        :param shortcode: shortcode of a single post
         :return: post metadata
         """
 
@@ -39,7 +57,7 @@ class PostService(BaseService):
             if post_type == PostType.IMAGE:
                 items = [PostItem(PostItemType.IMAGE, post.url)]
             elif post_type == PostType.VIDEO:
-                items = [PostItem(PostItemType.VIDEO, post.url)]
+                items = [PostItem(PostItemType.VIDEO, post.video_url)]
             elif post_type == PostType.SIDECAR:
                 items = [
                     PostItem(
@@ -65,7 +83,7 @@ class PostService(BaseService):
     async def download_post(self, post: Post):
         """Download images and videos of a post.
 
-        :param post: the post to download
+        :param post: post metadata
         """
 
         post_filename = f'{post.creation_time.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'

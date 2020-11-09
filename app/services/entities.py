@@ -41,3 +41,12 @@ class Post:
     type: PostType
     caption: Optional[str]
     items: List[PostItem]
+
+
+@dataclass
+class Profile:
+    username: str
+    full_name: str
+    biography: Optional[str] = None
+    auto_update: bool = False
+    last_update: Optional[datetime] = None

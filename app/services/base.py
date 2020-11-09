@@ -1,9 +1,15 @@
 import os
 import shutil
+from pathlib import Path
+
+import instaloader
 
 
 class BaseService:
     def __init__(self):
+        self.instaloader_context = instaloader.InstaloaderContext()
+        self.data_dir = Path('/data')
+
         try:
             self.user_id = int(os.getenv('USER_ID'))
         except ValueError:
