@@ -1,5 +1,6 @@
 import asyncio
 import mimetypes
+from logging import getLogger
 from pathlib import Path
 from typing import Optional
 
@@ -11,6 +12,8 @@ from .base import BaseService
 from .entities import Post, PostItem, PostItemType, PostType
 from .profile import ProfileService
 
+logger = getLogger(__name__)
+
 
 class PostService(BaseService):
     def __init__(self):
@@ -19,17 +22,31 @@ class PostService(BaseService):
         self.data_dir = Path('/data')
 
     async def create(self, shortcodes: [str], connection: sa.engine.Connection):
+        """Create posts from shortcodes.
+
+        :param shortcodes:
+        :param connection:
+        """
+
         loop = asyncio.get_running_loop()
+        profile_service = ProfileService()
         for shortcode in shortcodes:
+            # fetch post metadata
             post = await loop.run_in_executor(None, self.get_post, shortcode)
             if not post:
                 continue
 
-            profile_service = ProfileService()
-            if not profile_service.exists(post.owner_username, connection):
-                print('not exist')
+            # make sure profile exists
+            profile_exists = await loop.run_in_executor(None, profile_service.exists, post.owner_username, connection)
+            if not profile_exists:
+                await profile_service.create(post.owner_username, connection)
 
+            # save post images and videos
             await self.download_post(post)
+            logger.info(
+                f'Saved post {post.shortcode} of user {post.owner_username} '
+                f'which contains {len(post.items)} item(s).'
+            )
             print(post)
 
     def get_post(self, shortcode: str) -> Optional[Post]:

@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import sqlalchemy
@@ -7,6 +8,8 @@ from pydantic import BaseModel
 from services import create_connection, PostService
 
 app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
 
 
 class PostCreationRequest(BaseModel):
