@@ -18,8 +18,8 @@ class PostService(BaseService):
     async def create(self, shortcodes: [str], connection: sa.engine.Connection):
         """Create posts from shortcodes.
 
-        :param shortcodes:
-        :param connection:
+        :param shortcodes: shortcodes of the post to create
+        :param connection: a database connection
         """
 
         loop = asyncio.get_running_loop()
@@ -46,7 +46,7 @@ class PostService(BaseService):
     def get_post(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
 
-        :param shortcode: shortcode of the Instagram post
+        :param shortcode: shortcode of a single post
         :return: post metadata
         """
 
@@ -83,7 +83,7 @@ class PostService(BaseService):
     async def download_post(self, post: Post):
         """Download images and videos of a post.
 
-        :param post: the post to download
+        :param post: post metadata
         """
 
         post_filename = f'{post.creation_time.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
