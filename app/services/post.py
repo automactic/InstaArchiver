@@ -6,7 +6,9 @@ from typing import Optional
 import aiohttp
 import instaloader
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
 
+from . import schema
 from .base import BaseService
 from .entities import Post, PostItem, PostItemType, PostType
 from .profile import ProfileService
@@ -81,13 +83,27 @@ class PostService(BaseService):
         except Exception:
             return None
 
-    async def save_metadata(self, post: Post):
+    @staticmethod
+    async def save_metadata(post: Post, connection: sa.engine.Connection):
         """Save metadata of a post.
 
         :param post: post metadata
+        :param connection: a database connection
         """
 
-        pass
+        with connection.begin():
+            values = {
+                'shortcode': post.shortcode,
+                'owner_username': post.owner_username,
+                'creation_time': post.creation_time,
+                'type': post.type.value,
+                'caption': post.caption,
+            }
+            updates = values.copy()
+            updates.pop('shortcode')
+            statement = insert(schema.posts, bind=connection.engine).values(**values)
+            statement = statement.on_conflict_do_update(index_elements=[schema.posts.c.shortcode], set_=updates)
+            connection.execute(statement)
 
     async def download_image_video(self, post: Post):
         """Download images and videos of a post.

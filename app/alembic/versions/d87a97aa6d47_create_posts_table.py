@@ -21,7 +21,7 @@ def upgrade():
         'posts',
         Column('shortcode', String, primary_key=True),
         Column('owner_username', ForeignKey('profiles.username')),
-        Column('created_time', DateTime, index=True),
+        Column('creation_time', DateTime, index=True),
         Column('type', String, index=True),
         Column('caption', String, index=True, nullable=True),
     )
