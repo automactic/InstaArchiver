@@ -24,7 +24,7 @@ class ProfileService(BaseService):
         loop = asyncio.get_running_loop()
 
         # fetch profile metadata
-        profile = await loop.run_in_executor(None, self.get_profile, username)
+        profile = await loop.run_in_executor(None, self.retrieve, username)
         if not profile:
             return
 
@@ -52,7 +52,7 @@ class ProfileService(BaseService):
             .on_conflict_do_update(index_elements=[schema.profiles.c.username], set_=updates)
         connection.execute(statement)
 
-    def get_profile(self, username: str) -> Optional[Profile]:
+    def retrieve(self, username: str) -> Optional[Profile]:
         """Retrieve info about a single profile from the Internet.
 
         :param username: username of the profile to retrieve

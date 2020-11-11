@@ -29,8 +29,9 @@ class PostItemType(Enum):
 @dataclass
 class PostItem:
     type: PostItemType
-    url: str
     index: int = 0
+    url: Optional[str] = None
+    filename: Optional[str] = None
 
 
 @dataclass

@@ -6,7 +6,9 @@ from typing import Optional
 import aiohttp
 import instaloader
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
 
+from . import schema
 from .base import BaseService
 from .entities import Post, PostItem, PostItemType, PostType
 from .profile import ProfileService
@@ -26,7 +28,7 @@ class PostService(BaseService):
         profile_service = ProfileService()
         for shortcode in shortcodes:
             # fetch post metadata
-            post = await loop.run_in_executor(None, self.get_post, shortcode)
+            post = await loop.run_in_executor(None, self.retrieve, shortcode)
             if not post:
                 continue
 
@@ -35,15 +37,16 @@ class PostService(BaseService):
             if not profile_exists:
                 await profile_service.create(post.owner_username, connection)
 
-            # save post images and videos
-            await self.download_post(post)
+            # save post metadata and download images & videos
+            await self.download_image_video(post)
+            await self.save_metadata(post, connection)
 
             logger.info(
                 f'Saved post {post.shortcode} of user {post.owner_username} '
                 f'which contains {len(post.items)} item(s).'
             )
 
-    def get_post(self, shortcode: str) -> Optional[Post]:
+    def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
 
         :param shortcode: shortcode of a single post
@@ -55,16 +58,17 @@ class PostService(BaseService):
             post_type = PostType.from_instagram(post.typename)
 
             if post_type == PostType.IMAGE:
-                items = [PostItem(PostItemType.IMAGE, post.url)]
+                items = [PostItem(type=PostItemType.IMAGE, url=post.url)]
             elif post_type == PostType.VIDEO:
-                items = [PostItem(PostItemType.VIDEO, post.video_url)]
+                items = [PostItem(type=PostItemType.VIDEO, url=post.video_url)]
             elif post_type == PostType.SIDECAR:
                 items = [
                     PostItem(
-                        PostItemType.VIDEO if node.is_video else PostItemType.IMAGE,
-                        node.video_url if node.is_video else node.display_url
+                        type=PostItemType.VIDEO if node.is_video else PostItemType.IMAGE,
+                        index=index,
+                        url=node.video_url if node.is_video else node.display_url
                     )
-                    for node in post.get_sidecar_nodes()
+                    for index, node in enumerate(post.get_sidecar_nodes())
                 ]
             else:
                 items = []
@@ -80,7 +84,7 @@ class PostService(BaseService):
         except Exception:
             return None
 
-    async def download_post(self, post: Post):
+    async def download_image_video(self, post: Post):
         """Download images and videos of a post.
 
         :param post: post metadata
@@ -104,6 +108,7 @@ class PostService(BaseService):
                     # assemble post item file path
                     profile_dir = self.data_dir.joinpath(post.owner_username)
                     file_path = profile_dir.joinpath(post_item_filename).with_suffix(extension)
+                    item.filename = file_path.name
 
                     # save file
                     profile_dir.mkdir(parents=True, exist_ok=True)
@@ -112,3 +117,42 @@ class PostService(BaseService):
                         data = await response.read()
                         file.write(data)
                         self._change_file_ownership(file_path)
+
+    @staticmethod
+    async def save_metadata(post: Post, connection: sa.engine.Connection):
+        """Save metadata of a post.
+
+        :param post: post metadata
+        :param connection: a database connection
+        """
+
+        with connection.begin():
+            values = {
+                'shortcode': post.shortcode,
+                'owner_username': post.owner_username,
+                'creation_time': post.creation_time,
+                'type': post.type.value,
+                'caption': post.caption,
+            }
+            updates = values.copy()
+            updates.pop('shortcode')
+            statement = insert(schema.posts, bind=connection.engine).values(**values)
+            statement = statement.on_conflict_do_update(index_elements=[schema.posts.c.shortcode], set_=updates)
+            connection.execute(statement)
+
+            for item in post.items:
+                values = {
+                    'post_shortcode': post.shortcode,
+                    'index': item.index,
+                    'type': item.type.value,
+                    'filename': item.filename,
+                }
+                updates = values.copy()
+                updates.pop('post_shortcode')
+                updates.pop('index')
+                statement = insert(schema.post_items, bind=connection.engine).values(**values)
+                statement = statement.on_conflict_do_update(
+                    index_elements=[schema.post_items.c.post_shortcode, schema.post_items.c.index],
+                    set_=updates
+                )
+                connection.execute(statement)
