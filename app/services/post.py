@@ -38,7 +38,7 @@ class PostService(BaseService):
                 await profile_service.create(post.owner_username, connection)
 
             # save post metadata and download images & videos
-            await self.save_metadata(post)
+            await self.save_metadata(post, connection)
             await self.download_image_video(post)
 
             logger.info(
