@@ -1,7 +1,7 @@
 import os
 
 import sqlalchemy
-from sqlalchemy import MetaData, Table, Column, String, Boolean, DateTime
+from sqlalchemy import MetaData, Table, Column, ForeignKey, String, Boolean, DateTime
 
 
 def create_engine() -> sqlalchemy.engine.Engine:
@@ -26,4 +26,14 @@ profiles = Table(
     Column('biography', String, index=True, nullable=True),
     Column('auto_update', Boolean, index=True, default=False),
     Column('last_update', DateTime, index=True, nullable=True),
+)
+
+posts = Table(
+    'posts',
+    metadata,
+    Column('shortcode', String, primary_key=True),
+    Column('owner_username', ForeignKey('profiles.username')),
+    Column('created_time', DateTime, index=True),
+    Column('type', String, index=True),
+    Column('caption', String, index=True, nullable=True),
 )
