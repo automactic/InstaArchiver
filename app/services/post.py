@@ -26,7 +26,7 @@ class PostService(BaseService):
         profile_service = ProfileService()
         for shortcode in shortcodes:
             # fetch post metadata
-            post = await loop.run_in_executor(None, self.get_post, shortcode)
+            post = await loop.run_in_executor(None, self.retrieve, shortcode)
             if not post:
                 continue
 
@@ -35,15 +35,16 @@ class PostService(BaseService):
             if not profile_exists:
                 await profile_service.create(post.owner_username, connection)
 
-            # save post images and videos
-            await self.download_post(post)
+            # save post metadata and download images & videos
+            await self.save_metadata(post)
+            await self.download_image_video(post)
 
             logger.info(
                 f'Saved post {post.shortcode} of user {post.owner_username} '
                 f'which contains {len(post.items)} item(s).'
             )
 
-    def get_post(self, shortcode: str) -> Optional[Post]:
+    def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
 
         :param shortcode: shortcode of a single post
@@ -80,7 +81,15 @@ class PostService(BaseService):
         except Exception:
             return None
 
-    async def download_post(self, post: Post):
+    async def save_metadata(self, post: Post):
+        """Save metadata of a post.
+
+        :param post: post metadata
+        """
+
+        pass
+
+    async def download_image_video(self, post: Post):
         """Download images and videos of a post.
 
         :param post: post metadata
