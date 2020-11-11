@@ -1,5 +1,6 @@
 import asyncio
 import mimetypes
+from datetime import datetime
 from logging import getLogger
 from typing import Optional
 
@@ -17,7 +18,7 @@ logger = getLogger(__name__)
 
 
 class PostService(BaseService):
-    async def create(self, shortcodes: [str], connection: sa.engine.Connection):
+    async def create_from_shortcodes(self, shortcodes: [str], connection: sa.engine.Connection):
         """Create posts from shortcodes.
 
         :param shortcodes: shortcodes of the post to create
@@ -45,6 +46,28 @@ class PostService(BaseService):
                 f'Saved post {post.shortcode} of user {post.owner_username} '
                 f'which contains {len(post.items)} item(s).'
             )
+
+    async def create_from_time_range(
+            self, username: str, start_time: datetime, end_time: datetime, connection: sa.engine.Connection
+    ):
+        """Create posts from a username and a time range.
+
+        :param username:
+        :param start_time:
+        :param end_time:
+        :param connection: a database connection
+        """
+
+        loop = asyncio.get_running_loop()
+
+        # make sure profile exists
+        profile_service = ProfileService()
+        profile = await loop.run_in_executor(None, profile_service.get, username, connection)
+        if not profile:
+            profile = await profile_service.create(username, connection)
+        if not profile:
+            logger.error(f'Unable to create posts from time range: profile {username} does not exist.')
+            return
 
     def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.

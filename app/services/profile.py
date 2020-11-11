@@ -14,11 +14,12 @@ logger = getLogger(__name__)
 
 
 class ProfileService(BaseService):
-    async def create(self, username: str, connection: sa.engine.Connection):
+    async def create(self, username: str, connection: sa.engine.Connection) -> Optional[Profile]:
         """Create a profile from username.
 
         :param username: username of the profile
         :param connection: a database connection
+        :return: the profile that was created
         """
 
         loop = asyncio.get_running_loop()
@@ -26,14 +27,16 @@ class ProfileService(BaseService):
         # fetch profile metadata
         profile = await loop.run_in_executor(None, self.retrieve, username)
         if not profile:
-            return
+            return None
 
         # save profile metadata
         await loop.run_in_executor(None, self.upsert, profile, connection)
 
         logger.info(f'Saved profile info {profile.username}.')
+        return profile
 
-    def upsert(self, profile: Profile, connection: sa.engine.Connection):
+    @staticmethod
+    def upsert(profile: Profile, connection: sa.engine.Connection):
         """Create or update a profile.
 
         :param profile: profile metadata
@@ -67,6 +70,29 @@ class ProfileService(BaseService):
                 biography=profile.biography,
             )
         except instaloader.ProfileNotExistsException:
+            return None
+
+    @staticmethod
+    def get(username: str, connection: sa.engine.Connection) -> Optional[Profile]:
+        """Get a profile.
+
+        :param username: username of the profile to get
+        :param connection: a database connection
+        :return: a profile
+        """
+
+        statement = schema.profiles.select().where(schema.profiles.c.username == username)
+        row = connection.execute(statement).fetchone()
+
+        if row:
+            return Profile(
+                username=row.username,
+                full_name=row.full_name,
+                biography=row.biography,
+                auto_update=row.auto_update,
+                last_update=row.last_update,
+            )
+        else:
             return None
 
     @staticmethod
