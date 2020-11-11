@@ -32,7 +32,7 @@ posts = Table(
     'posts',
     metadata,
     Column('shortcode', String, primary_key=True),
-    Column('owner_username', ForeignKey('profiles.username')),
+    Column('owner_username', String, ForeignKey('profiles.username')),
     Column('creation_time', DateTime, index=True),
     Column('type', String, index=True),
     Column('caption', String, index=True, nullable=True),
