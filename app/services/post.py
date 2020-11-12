@@ -70,18 +70,29 @@ class PostService(BaseService):
             await loop.run_in_executor(None, profile_service.upsert, profile, connection)
 
         # save posts metadata and download images & videos
+        counter = 0
         while True:
             try:
-                post: instaloader.Post = next(profile.post_iterator)
+                post: instaloader.Post = await loop.run_in_executor(None, next, profile.post_iterator)
                 if post.date > end_time:
                     continue
                 elif post.date > start_time:
-                    post = Post.from_instaloader(post)
-                    print(post)
+                    post: Post = Post.from_instaloader(post)
+                    await self.download_image_video(post)
+                    await self.save_metadata(post, connection)
+                    counter += 1
+                    logger.info(
+                        f'Saved post {post.shortcode} of user {post.owner_username} '
+                        f'which contains {len(post.items)} item(s).'
+                    )
                 else:
                     break
             except StopIteration:
                 break
+        logger.info(
+            f'Saved {counter} post(s) of user {username} '
+            f'between {start_time.isoformat()} and {end_time.isoformat()}.'
+        )
 
     def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
