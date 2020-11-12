@@ -68,7 +68,7 @@ class Post:
             shortcode=post.shortcode,
             owner_username=post.owner_username,
             creation_time=post.date_utc,
-            type=PostType.from_instaloader(post.typename),
+            type=post_type,
             caption=post.caption,
             items=items,
         )
