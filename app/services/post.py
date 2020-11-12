@@ -8,6 +8,7 @@ import aiofiles
 import aiohttp
 import instaloader
 import sqlalchemy as sa
+import yarl
 from sqlalchemy.dialects.postgresql import insert
 
 from . import schema
@@ -117,7 +118,7 @@ class PostService(BaseService):
         post_filename = f'{post.creation_time.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
         async with aiohttp.ClientSession() as session:
             for index, item in enumerate(post.items):
-                async with session.get(item.url) as response:
+                async with session.get(yarl.URL(item.url, encoded=True)) as response:
                     # get post item filename
                     if len(post.items) > 1:
                         post_item_filename = f'{post_filename}_{index}'
