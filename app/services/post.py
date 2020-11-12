@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from . import schema
 from .base import BaseService
-from .entities import Post, PostItem, PostItemType, PostType
+from .entities import Post
 from .profile import ProfileService
 
 logger = getLogger(__name__)
@@ -62,12 +62,26 @@ class PostService(BaseService):
 
         # make sure profile exists
         profile_service = ProfileService()
-        profile = await loop.run_in_executor(None, profile_service.get, username, connection)
-        if not profile:
-            profile = await profile_service.create(username, connection)
+        profile = await loop.run_in_executor(None, profile_service.retrieve, username)
         if not profile:
             logger.error(f'Unable to create posts from time range: profile {username} does not exist.')
             return
+        if not await loop.run_in_executor(None, profile_service.exists, username, connection):
+            await loop.run_in_executor(None, profile_service.upsert, profile, connection)
+
+        # save posts metadata and download images & videos
+        while True:
+            try:
+                post: instaloader.Post = next(profile.post_iterator)
+                if post.date > end_time:
+                    continue
+                elif post.date > start_time:
+                    post = Post.from_instaloader(post)
+                    print(post)
+                else:
+                    break
+            except StopIteration:
+                break
 
     def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
@@ -78,32 +92,7 @@ class PostService(BaseService):
 
         try:
             post = instaloader.Post.from_shortcode(self.instaloader_context, shortcode)
-            post_type = PostType.from_instagram(post.typename)
-
-            if post_type == PostType.IMAGE:
-                items = [PostItem(type=PostItemType.IMAGE, url=post.url)]
-            elif post_type == PostType.VIDEO:
-                items = [PostItem(type=PostItemType.VIDEO, url=post.video_url)]
-            elif post_type == PostType.SIDECAR:
-                items = [
-                    PostItem(
-                        type=PostItemType.VIDEO if node.is_video else PostItemType.IMAGE,
-                        index=index,
-                        url=node.video_url if node.is_video else node.display_url
-                    )
-                    for index, node in enumerate(post.get_sidecar_nodes())
-                ]
-            else:
-                items = []
-
-            return Post(
-                shortcode=post.shortcode,
-                owner_username=post.owner_username,
-                creation_time=post.date_utc,
-                type=PostType.from_instagram(post.typename),
-                caption=post.caption,
-                items=items,
-            )
+            return Post.from_instaloader(post)
         except Exception:
             return None
 

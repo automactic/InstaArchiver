@@ -68,6 +68,7 @@ class ProfileService(BaseService):
                 username=profile.username,
                 full_name=profile.full_name,
                 biography=profile.biography,
+                post_iterator=profile.get_posts(),
             )
         except instaloader.ProfileNotExistsException:
             return None
