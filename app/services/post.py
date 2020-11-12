@@ -4,6 +4,7 @@ from datetime import datetime
 from logging import getLogger
 from typing import Optional
 
+import aiofiles
 import aiohttp
 import instaloader
 import sqlalchemy as sa
@@ -136,10 +137,11 @@ class PostService(BaseService):
                     # save file
                     profile_dir.mkdir(parents=True, exist_ok=True)
                     self._change_file_ownership(profile_dir)
-                    with open(file_path, 'wb') as file:
+                    async with aiofiles.open(file_path, 'wb') as file:
                         data = await response.read()
-                        file.write(data)
+                        await file.write(data)
                         self._change_file_ownership(file_path)
+                        self._set_file_access_modify_time(file_path, post.creation_time)
 
     @staticmethod
     async def save_metadata(post: Post, connection: sa.engine.Connection):
