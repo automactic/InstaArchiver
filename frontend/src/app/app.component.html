@@ -1,9 +1,12 @@
 <nb-layout>
-  <nb-layout-header fixed>Company Name</nb-layout-header>
-
+  <nb-layout-header fixed><h1>InstaSaver</h1></nb-layout-header>
   <nb-sidebar>Sidebar Content</nb-sidebar>
-
   <nb-layout-column>
-    Page Content <button nbButton>Hello World</button>
+    <nb-card>
+      <nb-card-body class="add-post">
+        <input type="text" nbInput fullWidth placeholder="Shortcode">
+        <button nbButton status="primary" style="margin-left: 1rem;">Save</button>
+      </nb-card-body>
+    </nb-card>
   </nb-layout-column>
 </nb-layout>
