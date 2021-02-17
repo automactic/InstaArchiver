@@ -3,6 +3,6 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get('/')
-def read_root():
+@app.post('/api/posts/from_url/')
+def create_post_from_url():
     return {'Hello': 'World'}
