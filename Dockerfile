@@ -1,4 +1,4 @@
-FROM node:14.15
+FROM node:14.15 AS web
 
 RUN npm install -g @angular/cli
 COPY web /web
@@ -9,7 +9,7 @@ RUN ng build --prod
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-COPY --from=0 /web/dist /web
+COPY --from=web /web/dist /web
 
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
