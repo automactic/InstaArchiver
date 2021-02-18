@@ -1,12 +1,15 @@
 import logging
 from http import HTTPStatus
 
+import sqlalchemy
 from fastapi import FastAPI, BackgroundTasks
+from fastapi.param_functions import Depends
 from fastapi.responses import Response, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from api.requests import PostCreationFromShortcode
 from services.post import PostService
+from services.schema import create_connection
 
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
@@ -24,6 +27,10 @@ def index():
 
 
 @app.post('/api/posts/from_url/')
-def create_post_from_url(request: PostCreationFromShortcode, background_tasks: BackgroundTasks):
-    background_tasks.add_task(PostService().create_from_shortcode, request.shortcode)
+def create_post_from_url(
+        request: PostCreationFromShortcode,
+        background_tasks: BackgroundTasks,
+        connection: sqlalchemy.engine.Connection = Depends(create_connection)
+):
+    background_tasks.add_task(PostService(connection).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)

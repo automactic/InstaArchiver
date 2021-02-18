@@ -3,6 +3,7 @@ import logging
 from typing import Optional
 
 import instaloader
+import sqlalchemy
 
 from services.entities import Post
 
@@ -10,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class PostService:
-    def __init__(self):
+    def __init__(self, connection: sqlalchemy.engine.Connection):
+        self.connection = connection
         self.instaloader_context = instaloader.InstaloaderContext()
 
     async def create_from_shortcode(self, shortcode: str):
