@@ -27,7 +27,8 @@ class PostService:
         try:
             func = instaloader.Post.from_shortcode
             post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-            logger.debug('Retrieved Post', extra={'shortcode': shortcode})
+            logger.debug(f'Retrieved Post: {shortcode}')
             return Post.from_instaloader(post)
         except Exception:
+            logger.warning(f'Failed to retrieved Post: {shortcode}')
             return None
