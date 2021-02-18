@@ -9,7 +9,7 @@ RUN ng build --prod
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-COPY --from=0 /web/dist/InstaSaver /web
+COPY --from=0 /web/dist /web
 
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
