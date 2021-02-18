@@ -26,7 +26,7 @@ def index():
     return RedirectResponse(url='web/index.html')
 
 
-@app.post('/api/posts/from_url/')
+@app.post('/api/posts/from_shortcode/')
 def create_post_from_url(
         request: PostCreationFromShortcode,
         background_tasks: BackgroundTasks,

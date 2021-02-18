@@ -10,7 +10,7 @@ export class APIService {
   constructor(private httpClient: HttpClient) { }
 
   savePost(shortcode: string) {
-    let url = environment.apiRoot + '/api/posts/from_url/'
+    let url = environment.apiRoot + '/api/posts/from_shortcode/'
     let payload = {'shortcode': shortcode}
     this.httpClient.post(url, payload).subscribe(data => {
       console.log(data);
