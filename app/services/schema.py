@@ -2,18 +2,17 @@ import os
 
 import sqlalchemy
 from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, String, Boolean, DateTime
-from sqlalchemy.ext.asyncio import create_async_engine
 
 
-def create_engine() -> sqlalchemy.ext.asyncio.engine.AsyncEngine:
+def create_engine() -> sqlalchemy.engine.Engine:
     hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-    url = f'postgresql+asyncpg://postgres:postgres@{hostname}/insta_saver'
-    return create_async_engine(url)
+    url = f'postgresql://postgres:postgres@{hostname}/insta_saver'
+    return sqlalchemy.create_engine(url)
 
 
-async def create_connection() -> sqlalchemy.ext.asyncio.AsyncConnection:
+async def create_connection() -> sqlalchemy.engine.Connection:
     engine = create_engine()
-    async with engine.connect() as connection:
+    with engine.connect() as connection:
         yield connection
 
 

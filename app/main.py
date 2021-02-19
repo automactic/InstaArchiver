@@ -1,7 +1,7 @@
 import logging
 from http import HTTPStatus
 
-import sqlalchemy.ext.asyncio
+import sqlalchemy
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.param_functions import Depends
 from fastapi.responses import Response, RedirectResponse
@@ -30,7 +30,7 @@ def index():
 def create_post_from_url(
         request: PostCreationFromShortcode,
         background_tasks: BackgroundTasks,
-        connection: sqlalchemy.ext.asyncio.AsyncConnection = Depends(create_connection)
+        connection: sqlalchemy.engine.Connection = Depends(create_connection)
 ):
     background_tasks.add_task(PostService(connection).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)

@@ -3,7 +3,7 @@ import logging
 from typing import Optional
 
 import instaloader
-import sqlalchemy.ext.asyncio
+import sqlalchemy
 
 from services.entities import Post
 from services.profile import ProfileService
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class PostService:
-    def __init__(self, connection: sqlalchemy.ext.asyncio.AsyncConnection):
+    def __init__(self, connection: sqlalchemy.engine.Connection):
         self.connection = connection
         self.instaloader_context = instaloader.InstaloaderContext()
 
@@ -21,8 +21,7 @@ class PostService:
 
         # create profile if not exist
         profile_service = ProfileService(self.connection)
-        profile_exists = await profile_service.exists(post.owner_username)
-        if not profile_exists:
+        if not await profile_service.exists(post.owner_username):
             await profile_service.upsert(post.owner_username)
 
     async def retrieve(self, shortcode: str) -> Optional[Post]:
