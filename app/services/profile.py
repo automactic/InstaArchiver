@@ -1,48 +1,37 @@
 import asyncio
-from logging import getLogger
-from typing import Optional
+import logging
 
 import instaloader
+import sqlalchemy
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from . import schema
-from .base import BaseService
-from .entities import Profile
+from services import schema
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
-class ProfileService(BaseService):
-    async def create(self, username: str, connection: sa.engine.Connection) -> Optional[Profile]:
-        """Create a profile from username.
+class ProfileService:
+    def __init__(self, connection: sqlalchemy.engine.Connection):
+        self.connection = connection
+        self.instaloader_context = instaloader.InstaloaderContext()
 
-        :param username: username of the profile
-        :param connection: a database connection
-        :return: the profile that was created
-        """
-
-        loop = asyncio.get_running_loop()
-
-        # fetch profile metadata
-        profile = await loop.run_in_executor(None, self.retrieve, username)
-        if not profile:
-            return None
-
-        # save profile metadata
-        await loop.run_in_executor(None, self.upsert, profile, connection)
-
-        logger.info(f'Saved profile info {profile.username}.')
-        return profile
-
-    @staticmethod
-    def upsert(profile: Profile, connection: sa.engine.Connection):
+    async def upsert(self, username: str):
         """Create or update a profile.
 
-        :param profile: profile metadata
-        :param connection: a database connection
+        :param username: username of the profile to create or update
         """
 
+        # fetch profile
+        loop = asyncio.get_running_loop()
+        try:
+            func = instaloader.Profile.from_username
+            profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+        except instaloader.ProfileNotExistsException:
+            logger.warning(f'Profile does not exist: {username}')
+            return
+
+        # upsert profile
         values = {
             'username': profile.username,
             'full_name': profile.full_name,
@@ -50,60 +39,24 @@ class ProfileService(BaseService):
         }
         updates = values.copy()
         updates.pop('username')
-        statement = insert(schema.profiles, bind=connection.engine) \
+        statement = insert(schema.profiles, bind=self.connection.engine) \
             .values(**values) \
             .on_conflict_do_update(index_elements=[schema.profiles.c.username], set_=updates)
-        connection.execute(statement)
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self.connection.execute, statement)
 
-    def retrieve(self, username: str) -> Optional[Profile]:
-        """Retrieve info about a single profile from the Internet.
+        logger.info(f'Created Profile: {username}')
 
-        :param username: username of the profile to retrieve
-        :return: profile metadata
-        """
-
-        try:
-            profile = instaloader.Profile.from_username(self.instaloader_context, username)
-            return Profile(
-                username=profile.username,
-                full_name=profile.full_name,
-                biography=profile.biography,
-                post_iterator=profile.get_posts(),
-            )
-        except instaloader.ProfileNotExistsException:
-            return None
-
-    @staticmethod
-    def get(username: str, connection: sa.engine.Connection) -> Optional[Profile]:
-        """Get a profile.
-
-        :param username: username of the profile to get
-        :param connection: a database connection
-        :return: a profile
-        """
-
-        statement = schema.profiles.select().where(schema.profiles.c.username == username)
-        row = connection.execute(statement).fetchone()
-
-        if row:
-            return Profile(
-                username=row.username,
-                full_name=row.full_name,
-                biography=row.biography,
-                auto_update=row.auto_update,
-                last_update=row.last_update,
-            )
-        else:
-            return None
-
-    @staticmethod
-    def exists(username: str, connection: sa.engine.Connection) -> bool:
+    async def exists(self, username: str) -> bool:
         """Check if a profile exists.
 
         :param username: username of the profile to check
-        :param connection: a database connection
+        :return: if the profile exists
         """
 
         statement = schema.profiles.select().where(schema.profiles.c.username == username)
         exists_statement = sa.select([sa.exists(statement)])
-        return connection.execute(exists_statement).scalar()
+
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, self.connection.execute, exists_statement)
+        return result.scalar()

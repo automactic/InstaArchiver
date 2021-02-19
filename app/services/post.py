@@ -1,115 +1,95 @@
 import asyncio
+import logging
 import mimetypes
+import os
+import shutil
 from datetime import datetime
-from logging import getLogger
+from pathlib import Path
 from typing import Optional
 
 import aiofiles
 import aiohttp
 import instaloader
-import sqlalchemy as sa
+import sqlalchemy
 import yarl
 from sqlalchemy.dialects.postgresql import insert
 
-from . import schema
-from .base import BaseService
-from .entities import Post
-from .profile import ProfileService
+from services import schema
+from services.entities import Post
+from services.profile import ProfileService
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
-class PostService(BaseService):
-    async def create_from_shortcodes(self, shortcodes: [str], connection: sa.engine.Connection):
-        """Create posts from shortcodes.
+class PostService:
+    def __init__(self, connection: sqlalchemy.engine.Connection):
+        self.connection = connection
+        self.instaloader_context = instaloader.InstaloaderContext()
+        self.data_dir = Path('/data')
 
-        :param shortcodes: shortcodes of the post to create
-        :param connection: a database connection
-        """
+        try:
+            self.user_id = int(os.getenv('USER_ID'))
+        except ValueError:
+            self.user_id = None
+        try:
+            self.group_id = int(os.getenv('GROUP_ID'))
+        except ValueError:
+            self.group_id = None
 
-        loop = asyncio.get_running_loop()
-        profile_service = ProfileService()
-        for shortcode in shortcodes:
-            # fetch post metadata
-            post = await loop.run_in_executor(None, self.retrieve, shortcode)
-            if not post:
-                continue
+    async def create_from_shortcode(self, shortcode: str):
+        post = await self.retrieve(shortcode)
 
-            # make sure profile exists
-            profile_exists = await loop.run_in_executor(None, profile_service.exists, post.owner_username, connection)
-            if not profile_exists:
-                await profile_service.create(post.owner_username, connection)
+        # create profile if not exist
+        profile_service = ProfileService(self.connection)
+        if not await profile_service.exists(post.owner_username):
+            await profile_service.upsert(post.owner_username)
 
-            # save post metadata and download images & videos
-            await self.download_image_video(post)
-            await self.save_metadata(post, connection)
+        await self._download_image_video(post)
+        await self._save_metadata(post)
 
-            logger.info(
-                f'Saved post {post.shortcode} of user {post.owner_username} '
-                f'which contains {len(post.items)} item(s).'
-            )
-
-    async def create_from_time_range(
-            self, username: str, start_time: datetime, end_time: datetime, connection: sa.engine.Connection
-    ):
-        """Create posts from a username and a time range.
-
-        :param username:
-        :param start_time:
-        :param end_time:
-        :param connection: a database connection
-        """
-
-        loop = asyncio.get_running_loop()
-
-        # make sure profile exists
-        profile_service = ProfileService()
-        profile = await loop.run_in_executor(None, profile_service.retrieve, username)
-        if not profile:
-            logger.error(f'Unable to create posts from time range: profile {username} does not exist.')
-            return
-        if not await loop.run_in_executor(None, profile_service.exists, username, connection):
-            await loop.run_in_executor(None, profile_service.upsert, profile, connection)
-
-        # save posts metadata and download images & videos
-        counter = 0
-        while True:
-            try:
-                post: instaloader.Post = await loop.run_in_executor(None, next, profile.post_iterator)
-                if post.date > end_time:
-                    continue
-                elif post.date > start_time:
-                    post: Post = Post.from_instaloader(post)
-                    await self.download_image_video(post)
-                    await self.save_metadata(post, connection)
-                    counter += 1
-                    logger.info(
-                        f'Saved post {post.shortcode} of user {post.owner_username} '
-                        f'which contains {len(post.items)} item(s).'
-                    )
-                else:
-                    break
-            except StopIteration:
-                break
         logger.info(
-            f'Saved {counter} post(s) of user {username} '
-            f'between {start_time.isoformat()} and {end_time.isoformat()}.'
+            f'Saved post {post.shortcode} of user {post.owner_username} '
+            f'which contains {len(post.items)} item(s).'
         )
 
-    def retrieve(self, shortcode: str) -> Optional[Post]:
+    async def retrieve(self, shortcode: str) -> Optional[Post]:
         """Retrieve info about a single post from the Internet.
 
         :param shortcode: shortcode of a single post
         :return: post metadata
         """
 
+        loop = asyncio.get_running_loop()
         try:
-            post = instaloader.Post.from_shortcode(self.instaloader_context, shortcode)
+            func = instaloader.Post.from_shortcode
+            post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+            logger.debug(f'Retrieved Post: {shortcode}')
             return Post.from_instaloader(post)
         except Exception:
+            logger.warning(f'Failed to retrieved Post: {shortcode}')
             return None
 
-    async def download_image_video(self, post: Post):
+    def _set_file_ownership(self, path: Path):
+        """Change ownership of the directory or file to a specific user id or group id.
+
+        :param path: the directory or file path to change the ownership
+        """
+
+        if self.user_id or self.group_id:
+            shutil.chown(path, self.user_id, self.group_id)
+
+    @staticmethod
+    def _set_file_access_modify_time(path: Path, creation_time: datetime):
+        """Set file access time and modify time to post creation time.
+
+        :param path: the file path to change access time and modify time
+        :param creation_time: post creation time
+        """
+
+        timestamp = creation_time.timestamp()
+        os.utime(path, (timestamp, timestamp))
+
+    async def _download_image_video(self, post: Post):
         """Download images and videos of a post.
 
         :param post: post metadata
@@ -137,22 +117,20 @@ class PostService(BaseService):
 
                     # save file
                     profile_dir.mkdir(parents=True, exist_ok=True)
-                    self._change_file_ownership(profile_dir)
+                    self._set_file_ownership(profile_dir)
                     async with aiofiles.open(file_path, 'wb') as file:
                         data = await response.read()
                         await file.write(data)
-                        self._change_file_ownership(file_path)
+                        self._set_file_ownership(file_path)
                         self._set_file_access_modify_time(file_path, post.creation_time)
 
-    @staticmethod
-    async def save_metadata(post: Post, connection: sa.engine.Connection):
+    async def _save_metadata(self, post: Post):
         """Save metadata of a post.
 
         :param post: post metadata
-        :param connection: a database connection
         """
 
-        with connection.begin():
+        with self.connection.begin():
             values = {
                 'shortcode': post.shortcode,
                 'owner_username': post.owner_username,
@@ -162,9 +140,9 @@ class PostService(BaseService):
             }
             updates = values.copy()
             updates.pop('shortcode')
-            statement = insert(schema.posts, bind=connection.engine).values(**values)
+            statement = insert(schema.posts, bind=self.connection.engine).values(**values)
             statement = statement.on_conflict_do_update(index_elements=[schema.posts.c.shortcode], set_=updates)
-            connection.execute(statement)
+            self.connection.execute(statement)
 
             for item in post.items:
                 values = {
@@ -176,9 +154,9 @@ class PostService(BaseService):
                 updates = values.copy()
                 updates.pop('post_shortcode')
                 updates.pop('index')
-                statement = insert(schema.post_items, bind=connection.engine).values(**values)
+                statement = insert(schema.post_items, bind=self.connection.engine).values(**values)
                 statement = statement.on_conflict_do_update(
                     index_elements=[schema.post_items.c.post_shortcode, schema.post_items.c.index],
                     set_=updates
                 )
-                connection.execute(statement)
+                self.connection.execute(statement)

@@ -1,55 +1,36 @@
 import logging
-from datetime import datetime
 from http import HTTPStatus
-from typing import List
 
 import sqlalchemy
-from fastapi import BackgroundTasks, Depends, FastAPI, Response
-from pydantic import BaseModel
+from fastapi import FastAPI, BackgroundTasks
+from fastapi.param_functions import Depends
+from fastapi.responses import Response, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
-from services import create_connection, PostService
+from api.requests import PostCreationFromShortcode
+from services.post import PostService
+from services.schema import create_connection
 
 app = FastAPI()
-
-logging.basicConfig(level=logging.INFO)
-
-
-class PostCreationFromShortcodesRequest(BaseModel):
-    shortcodes: List[str]
-
-
-class PostCreationFromTimeRangeRequest(BaseModel):
-    username: str
-    start_time: datetime
-    end_time: datetime
+app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
+logging.basicConfig(level=logging.DEBUG)
 
 
 @app.get('/')
-def read_root():
-    return {'Hello': 'World'}
+def root():
+    return RedirectResponse(url='web/index.html')
 
 
-@app.post('/api/posts/from_shortcodes/')
-async def create_post_from_shortcodes(
-        request: PostCreationFromShortcodesRequest,
+@app.get('/index.html')
+def index():
+    return RedirectResponse(url='web/index.html')
+
+
+@app.post('/api/posts/from_shortcode/')
+def create_post_from_url(
+        request: PostCreationFromShortcode,
         background_tasks: BackgroundTasks,
-        connection: sqlalchemy.engine.Connection = Depends(create_connection),
+        connection: sqlalchemy.engine.Connection = Depends(create_connection)
 ):
-    background_tasks.add_task(PostService().create_from_shortcodes, request.shortcodes, connection)
-    return Response(status_code=HTTPStatus.ACCEPTED)
-
-
-@app.post('/api/posts/from_time_range/')
-async def create_post_from_time_range(
-        request: PostCreationFromTimeRangeRequest,
-        background_tasks: BackgroundTasks,
-        connection: sqlalchemy.engine.Connection = Depends(create_connection),
-):
-    background_tasks.add_task(
-        PostService().create_from_time_range,
-        request.username,
-        request.start_time,
-        request.end_time,
-        connection
-    )
+    background_tasks.add_task(PostService(connection).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)
