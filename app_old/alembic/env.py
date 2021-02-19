@@ -26,7 +26,7 @@ target_metadata = None
 
 # assemble the database url
 hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-url = f'postgresql://postgres:postgres@{hostname}/insta_save'
+url = f'postgresql://postgres:postgres@{hostname}/insta_saver'
 
 # create database
 if not database_exists(url):

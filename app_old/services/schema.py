@@ -6,7 +6,7 @@ from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, String, Boo
 
 def create_engine() -> sqlalchemy.engine.Engine:
     hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-    url = f'postgresql://postgres:postgres@{hostname}/insta_save'
+    url = f'postgresql://postgres:postgres@{hostname}/insta_saver'
     return sqlalchemy.create_engine(url)
 
 
