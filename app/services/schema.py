@@ -5,13 +5,13 @@ from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, String, Boo
 from sqlalchemy.ext.asyncio import create_async_engine
 
 
-def create_engine() -> sqlalchemy.engine.Engine:
+def create_engine() -> sqlalchemy.ext.asyncio.engine.AsyncEngine:
     hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-    url = f'postgresql+asyncpg://postgres:postgres@{hostname}/insta_save'
+    url = f'postgresql+asyncpg://postgres:postgres@{hostname}/insta_saver'
     return create_async_engine(url)
 
 
-async def create_connection() -> sqlalchemy.engine.Connection:
+async def create_connection() -> sqlalchemy.ext.asyncio.AsyncConnection:
     engine = create_engine()
     async with engine.connect() as connection:
         yield connection
