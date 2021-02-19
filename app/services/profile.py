@@ -2,8 +2,8 @@ import asyncio
 import logging
 
 import instaloader
-import sqlalchemy as sa
 import sqlalchemy
+import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema

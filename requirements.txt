@@ -1,5 +1,6 @@
-alembic~=1.5
 aiofiles~=0.6
+aiohttp~=3.7
+alembic~=1.5
 asyncpg~=0.22
 fastapi~=0.63
 instaloader~=4.6
