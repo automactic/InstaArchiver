@@ -38,6 +38,7 @@ export class ArchiveComponent implements OnInit {
     if (this.shortcode) {
       let activity = new PostActivity('post.create', this.shortcode)
       this.socket.next(activity)
+      this.shortcode = undefined;
     }
   }
 }
