@@ -10,6 +10,7 @@ import {
   NbActionsModule, 
   NbButtonModule, 
   NbCardModule, 
+  NbIconModule,
   NbInputModule, 
   NbLayoutModule, 
   NbListModule, 
@@ -37,12 +38,13 @@ import { ArchiveComponent } from './archive/archive.component';
     NbActionsModule,
     NbButtonModule,
     NbCardModule,
-    NbEvaIconsModule,
+    NbIconModule,
     NbInputModule,
     NbLayoutModule,
     NbListModule,
     NbSidebarModule.forRoot(),
-    NbThemeModule.forRoot({ name: 'default' })
+    NbThemeModule.forRoot({ name: 'default' }),
+    NbEvaIconsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,13 +1,26 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
 
-class PostActivity {
-  event: string;
-  shortcode: string;
+enum Event {
+  post_create = "post.create",
+  post_saved = "post.saved",
+  post_not_found = "post.not_found",
+}
 
-  constructor(event: string, shortcode: string) {
-    this.event = event;
-    this.shortcode = shortcode;
+interface Post {
+  shortcode: string
+  owner_username: string
+  creation_time: Date
+}
+
+class PostActivity {
+  event: Event
+  shortcode: string
+  post?: Post
+
+  constructor(event: Event, shortcode: string) {
+    this.event = event
+    this.shortcode = shortcode
   }
 }
 
@@ -17,8 +30,11 @@ class PostActivity {
   styleUrls: ['./archive.component.scss']
 })
 export class ArchiveComponent implements OnInit {
-  shortcode?: string;
-  activities: PostActivity[] = [];
+  shortcode?: string
+
+  activities: string[] = []
+  latest_event = new Map<string, Event>()
+  posts = new Map<string, Post>()
 
   socket = webSocket<PostActivity>('ws://localhost:37500/web_socket/posts/')
 
@@ -26,7 +42,10 @@ export class ArchiveComponent implements OnInit {
   
   ngOnInit(): void {
     this.socket.subscribe(activity => {
-      this.activities.push(activity)
+      if (activity.event == Event.post_saved && activity.post) {
+        this.latest_event.set(activity.shortcode, activity.event)
+        this.posts.set(activity.shortcode, activity.post)
+      }
     })
   }
   
@@ -36,9 +55,13 @@ export class ArchiveComponent implements OnInit {
 
   onSubmit() {
     if (this.shortcode) {
-      let activity = new PostActivity('post.create', this.shortcode)
+      let activity = new PostActivity(Event.post_create, this.shortcode)
       this.socket.next(activity)
-      this.shortcode = undefined;
+      
+      this.latest_event.set(this.shortcode, activity.event)
+      this.activities.push(this.shortcode)
+      
+      this.shortcode = undefined
     }
   }
 }

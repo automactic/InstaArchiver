@@ -16,4 +16,8 @@ div.archive > div.activity {
     nb-card {
         height: 100%;
     }
+    div.post {
+        display: flex;
+        align-items: center;
+    }
 }

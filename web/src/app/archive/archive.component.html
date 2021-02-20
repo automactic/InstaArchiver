@@ -17,8 +17,21 @@
     <nb-card>
       <nb-card-header>Activities</nb-card-header>
       <nb-list>
-        <nb-list-item *ngFor="let activity of activities.slice().reverse()">
-          <div>{{activity.event}} -- {{activity.shortcode}}</div>
+        <nb-list-item *ngFor="let shortcode of activities.slice().reverse()">
+          <div class="post">
+            <div *ngIf="this.latest_event.get(shortcode) as event" [ngSwitch]="event">
+              <nb-icon *ngSwitchCase="'post.create'" icon="loader-outline" status="info"></nb-icon>
+              <nb-icon *ngSwitchCase="'post.saved'" icon="checkmark-circle-2" status="success"></nb-icon>
+              <nb-icon *ngSwitchCase="'post.not_found'" icon="alert-circle" status="info"></nb-icon>
+            </div>
+            <div>
+              <label><b>{{shortcode}}</b></label>
+              <div class="caption" *ngIf="this.posts.get(shortcode) as post; else loading">
+                {{post.owner_username}}
+              </div>
+              <ng-template #loading><div class="caption">Saving...</div></ng-template>
+            </div>
+          </div>
         </nb-list-item>
       </nb-list>
     </nb-card>
