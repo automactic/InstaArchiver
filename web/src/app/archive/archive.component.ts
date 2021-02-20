@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { webSocket } from 'rxjs/webSocket';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+
+import { environment } from './../../environments/environment';
 
 enum Event {
   post_create = "post.create",
@@ -30,14 +32,18 @@ class Activity {
   templateUrl: './archive.component.html',
   styleUrls: ['./archive.component.scss']
 })
-export class ArchiveComponent implements OnInit {
+export class ArchiveComponent implements OnInit, OnDestroy {
   shortcode?: string
 
   shortcodes: string[] = []
   activities = new Map<string, Activity>()
 
-  socket = webSocket<Activity>('ws://localhost:37500/web_socket/posts/')
-  constructor() { }
+  socket: WebSocketSubject<Activity>
+  constructor() {
+    let host = environment.production ? window.location.host : 'localhost:37500'
+    let url = 'ws://' + host + '/web_socket/posts/'
+    this.socket = webSocket<Activity>(url)
+  }
   
   ngOnInit(): void {
     this.socket.subscribe(activity => {
