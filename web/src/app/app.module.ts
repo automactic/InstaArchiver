@@ -6,14 +6,18 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NbButtonModule, NbCardModule, NbInputModule, NbLayoutModule, NbSidebarModule, NbThemeModule } from '@nebular/theme';
+import { NbActionsModule, NbButtonModule, NbCardModule, NbInputModule, NbLayoutModule, NbSidebarModule, NbThemeModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { CreatePostComponent } from './create-post/create-post.component';
+import { PostsComponent } from './posts/posts.component';
+import { ArchiveComponent } from './archive/archive.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CreatePostComponent
+    CreatePostComponent,
+    ArchiveComponent,
+    PostsComponent,
   ],
   imports: [
     BrowserModule,
@@ -21,13 +25,14 @@ import { CreatePostComponent } from './create-post/create-post.component';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    NbActionsModule,
     NbButtonModule,
     NbCardModule,
+    NbEvaIconsModule,
     NbInputModule,
     NbLayoutModule,
     NbSidebarModule.forRoot(),
-    NbThemeModule.forRoot({ name: 'dark' }),
-    NbEvaIconsModule
+    NbThemeModule.forRoot({ name: 'default' })
   ],
   providers: [],
   bootstrap: [AppComponent]
