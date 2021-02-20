@@ -1,5 +1,5 @@
 class PostNotFound(Exception):
-    event_code = 'post_not_found'
+    event_code = 'post.not_found'
 
     def __init__(self, shortcode):
         self.shortcode = shortcode
