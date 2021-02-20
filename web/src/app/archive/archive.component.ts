@@ -26,7 +26,7 @@ export class ArchiveComponent implements OnInit {
   
   ngOnInit(): void {
     this.socket.subscribe(activity => {
-      this.activities.push(activity);
+      this.activities.push(activity)
     })
   }
   
@@ -36,7 +36,8 @@ export class ArchiveComponent implements OnInit {
 
   onSubmit() {
     if (this.shortcode) {
-      this.socket.next({'event': 'post.create', 'shortcode': this.shortcode})
+      let activity = new PostActivity('post.create', this.shortcode)
+      this.socket.next(activity)
     }
   }
 }
