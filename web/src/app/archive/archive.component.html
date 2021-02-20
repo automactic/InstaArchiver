@@ -4,7 +4,12 @@
       <nb-card-header>From Shortcode</nb-card-header>
       <nb-card-body class="shortcode">
         <form (ngSubmit)="onSubmit()" #createPostForm="ngForm">
-          <input type="text" required nbInput fullWidth placeholder="Enter Instagram shortcode" [(ngModel)]="shortcode" name="post_url" #name="ngModel">
+          <input 
+            required nbInput fullWidth 
+            type="text" placeholder="Enter Instagram shortcode" 
+            [(ngModel)]="shortcode" name="post_url" #name="ngModel"
+            autocorrect="off" autocapitalize="off" spellcheck="false"
+          >
           <button nbButton type="submit" status="primary" [disabled]="!createPostForm.form.valid" style="margin-left: 1rem;">Save</button>
         </form>
       </nb-card-body>
