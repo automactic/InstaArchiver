@@ -1,6 +1,19 @@
 div.archive {
     display: flex;
+    justify-content: center;
+    height: 100%;
 }
-nb-card-body.add-post > form  {
-    display: flex;
+div.archive > div.add {
+    flex: 6;
+    margin-right: 1rem;
+    nb-card-body.shortcode > form  {
+        display: flex;
+    }
+}
+div.archive > div.activity {
+    flex: 4;
+    margin-left: 1rem;
+    nb-card {
+        height: 100%;
+    }
 }

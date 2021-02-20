@@ -1,8 +1,8 @@
 <div class="archive">
-  <div>
+  <div class="add">
     <nb-card>
       <nb-card-header>From Shortcode</nb-card-header>
-      <nb-card-body class="add-post">
+      <nb-card-body class="shortcode">
         <form (ngSubmit)="onSubmit()" #createPostForm="ngForm">
           <input type="text" required nbInput fullWidth placeholder="Enter Instagram shortcode" [(ngModel)]="shortcode" name="post_url" #name="ngModel">
           <button nbButton type="submit" status="primary" [disabled]="!createPostForm.form.valid" style="margin-left: 1rem;">Save</button>
@@ -13,11 +13,12 @@
       <nb-card-header>From Time Range</nb-card-header>
     </nb-card>
   </div>
-  <nb-card size="small">
-    <nb-card-header>Activities</nb-card-header>
-    <nb-list>
-  
-    </nb-list>
-  </nb-card>
+  <div class="activity">
+    <nb-card>
+      <nb-card-header>Activities</nb-card-header>
+      <nb-list>
+    
+      </nb-list>
+    </nb-card>
+  </div>
 </div>
-
