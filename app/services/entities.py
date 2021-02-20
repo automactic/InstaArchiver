@@ -73,6 +73,14 @@ class Post:
             items=items,
         )
 
+    @property
+    def response(self):
+        return {
+            'shortcode': self.shortcode,
+            'owner_username': self.owner_username,
+            'creation_time': self.creation_time.isoformat(),
+        }
+
 
 @dataclass
 class Profile:

@@ -1,7 +1,14 @@
 <nb-layout>
-  <nb-layout-header fixed><h1>InstaSaver</h1></nb-layout-header>
-  <nb-sidebar>Sidebar Content</nb-sidebar>
+  <nb-layout-header fixed>
+    <h1>InstaSaver</h1>
+    <nb-actions>
+      <nb-action link="/archive" icon="hard-drive" title="Archive"></nb-action>
+      <nb-action link="/posts" icon="grid" title="Posts"></nb-action>
+      <nb-action href="https://github.com/automactic/InstaSaver" icon="github-outline"></nb-action>
+    </nb-actions>
+  </nb-layout-header>
+  <nb-sidebar responsive start>Sidebar Content</nb-sidebar>
   <nb-layout-column>
-    <app-create-post></app-create-post>
+    <router-outlet></router-outlet>
   </nb-layout-column>
 </nb-layout>
