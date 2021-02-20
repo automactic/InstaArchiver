@@ -1,1 +1,23 @@
-<p>archive works!</p>
+<div class="archive">
+  <div>
+    <nb-card>
+      <nb-card-header>From Shortcode</nb-card-header>
+      <nb-card-body class="add-post">
+        <form (ngSubmit)="onSubmit()" #createPostForm="ngForm">
+          <input type="text" required nbInput fullWidth placeholder="Enter Instagram shortcode" [(ngModel)]="shortcode" name="post_url" #name="ngModel">
+          <button nbButton type="submit" status="primary" [disabled]="!createPostForm.form.valid" style="margin-left: 1rem;">Save</button>
+        </form>
+      </nb-card-body>
+    </nb-card>
+    <nb-card>
+      <nb-card-header>From Time Range</nb-card-header>
+    </nb-card>
+  </div>
+  <nb-card size="small">
+    <nb-card-header>Activities</nb-card-header>
+    <nb-list>
+  
+    </nb-list>
+  </nb-card>
+</div>
+
