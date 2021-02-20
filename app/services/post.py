@@ -5,7 +5,6 @@ import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import aiofiles
 import aiohttp
@@ -16,6 +15,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
 from services.entities import Post
+from services.exceptions import PostNotFound
 from services.profile import ProfileService
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,13 @@ class PostService:
             self.group_id = None
 
     async def create_from_shortcode(self, shortcode: str):
-        post = await self.retrieve(shortcode)
+        """Create and save a post from its shortcode.
+
+        :param shortcode: shortcode of a single post
+        :return: post metadata
+        """
+
+        post = await self._retrieve(shortcode)
 
         # create profile if not exist
         profile_service = ProfileService(self.connection)
@@ -51,8 +57,9 @@ class PostService:
             f'Saved post {post.shortcode} of user {post.owner_username} '
             f'which contains {len(post.items)} item(s).'
         )
+        return post
 
-    async def retrieve(self, shortcode: str) -> Optional[Post]:
+    async def _retrieve(self, shortcode: str) -> Post:
         """Retrieve info about a single post from the Internet.
 
         :param shortcode: shortcode of a single post
@@ -67,7 +74,7 @@ class PostService:
             return Post.from_instaloader(post)
         except Exception:
             logger.warning(f'Failed to retrieved Post: {shortcode}')
-            return None
+            raise PostNotFound(shortcode)
 
     def _set_file_ownership(self, path: Path):
         """Change ownership of the directory or file to a specific user id or group id.

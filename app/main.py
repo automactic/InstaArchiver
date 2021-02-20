@@ -3,18 +3,20 @@ from http import HTTPStatus
 
 import sqlalchemy
 from fastapi import FastAPI, BackgroundTasks
-from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.param_functions import Depends
 from fastapi.responses import Response, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from api.requests import PostCreationFromShortcode
+from services.exceptions import PostNotFound
 from services.post import PostService
 from services.schema import create_connection
 
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 @app.get('/')
@@ -46,8 +48,11 @@ async def posts(
     try:
         while True:
             data = await web_socket.receive_json()
-            print(data)
-            await web_socket.send_json({'success': 'yay'})
-            # await web_socket.close()
+            if shortcode := data.get('shortcode'):
+                try:
+                    post = await PostService(connection).create_from_shortcode(shortcode)
+                    await web_socket.send_json({'event': 'post_saved', 'post': post.response})
+                except PostNotFound as e:
+                    await web_socket.send_json(e.response)
     except WebSocketDisconnect:
-        pass
+        logger.debug('Web socket disconnected.')
