@@ -3,10 +3,11 @@ import { webSocket } from 'rxjs/webSocket';
 
 class PostActivity {
   event: string;
-  shortcode?: string;
+  shortcode: string;
 
-  constructor(event: string) {
+  constructor(event: string, shortcode: string) {
     this.event = event;
+    this.shortcode = shortcode;
   }
 }
 
@@ -26,7 +27,6 @@ export class ArchiveComponent implements OnInit {
   ngOnInit(): void {
     this.socket.subscribe(activity => {
       this.activities.push(activity);
-      console.log(activity)
     })
   }
   
@@ -36,7 +36,7 @@ export class ArchiveComponent implements OnInit {
 
   onSubmit() {
     if (this.shortcode) {
-      this.socket.next({'event': 'create', 'shortcode': this.shortcode})
+      this.socket.next({'event': 'post.create', 'shortcode': this.shortcode})
     }
   }
 }

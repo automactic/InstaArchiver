@@ -17,7 +17,9 @@
     <nb-card>
       <nb-card-header>Activities</nb-card-header>
       <nb-list>
-    
+        <nb-list-item *ngFor="let activity of activities.slice().reverse()">
+          <div>{{activity.event}} -- {{activity.shortcode}}</div>
+        </nb-list-item>
       </nb-list>
     </nb-card>
   </div>
