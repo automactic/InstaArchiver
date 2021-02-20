@@ -17,19 +17,20 @@
     <nb-card>
       <nb-card-header>Activities</nb-card-header>
       <nb-list>
-        <nb-list-item *ngFor="let shortcode of activities.slice().reverse()">
-          <div class="post">
-            <div *ngIf="this.latest_event.get(shortcode) as event" [ngSwitch]="event">
+        <nb-list-item *ngFor="let shortcode of shortcodes.slice().reverse()">
+          <div class="post" *ngIf="this.activities.get(shortcode) as activity">
+            <div [ngSwitch]="activity.event">
               <nb-icon *ngSwitchCase="'post.create'" icon="loader-outline" status="info"></nb-icon>
               <nb-icon *ngSwitchCase="'post.saved'" icon="checkmark-circle-2" status="success"></nb-icon>
-              <nb-icon *ngSwitchCase="'post.not_found'" icon="alert-circle" status="info"></nb-icon>
+              <nb-icon *ngSwitchCase="'post.not_found'" icon="alert-circle" status="danger"></nb-icon>
             </div>
-            <div>
-              <label><b>{{shortcode}}</b></label>
-              <div class="caption" *ngIf="this.posts.get(shortcode) as post; else loading">
-                {{post.owner_username}}
+            <div class="info">
+              <label><b>{{ activity.shortcode }}</b></label>
+              <div class="caption" [ngSwitch]="activity.event">
+                <div *ngSwitchCase="'post.create'">Saving...</div>
+                <div *ngSwitchCase="'post.saved'">{{ activity.post?.owner_username || "unknown" }}</div>
+                <div *ngSwitchCase="'post.not_found'">{{ activity.message }}</div>
               </div>
-              <ng-template #loading><div class="caption">Saving...</div></ng-template>
             </div>
           </div>
         </nb-list-item>

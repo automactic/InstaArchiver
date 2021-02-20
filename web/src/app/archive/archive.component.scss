@@ -17,7 +17,9 @@ div.archive > div.activity {
         height: 100%;
     }
     div.post {
+        width: 100%;
         display: flex;
         align-items: center;
+        > div.info { margin: 0 0.5rem; }
     }
 }

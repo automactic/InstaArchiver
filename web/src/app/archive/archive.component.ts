@@ -13,10 +13,11 @@ interface Post {
   creation_time: Date
 }
 
-class PostActivity {
+class Activity {
   event: Event
   shortcode: string
   post?: Post
+  message?: string
 
   constructor(event: Event, shortcode: string) {
     this.event = event
@@ -32,20 +33,15 @@ class PostActivity {
 export class ArchiveComponent implements OnInit {
   shortcode?: string
 
-  activities: string[] = []
-  latest_event = new Map<string, Event>()
-  posts = new Map<string, Post>()
+  shortcodes: string[] = []
+  activities = new Map<string, Activity>()
 
-  socket = webSocket<PostActivity>('ws://localhost:37500/web_socket/posts/')
-
+  socket = webSocket<Activity>('ws://localhost:37500/web_socket/posts/')
   constructor() { }
   
   ngOnInit(): void {
     this.socket.subscribe(activity => {
-      if (activity.event == Event.post_saved && activity.post) {
-        this.latest_event.set(activity.shortcode, activity.event)
-        this.posts.set(activity.shortcode, activity.post)
-      }
+      this.activities.set(activity.shortcode, activity)
     })
   }
   
@@ -55,12 +51,12 @@ export class ArchiveComponent implements OnInit {
 
   onSubmit() {
     if (this.shortcode) {
-      let activity = new PostActivity(Event.post_create, this.shortcode)
+      let activity = new Activity(Event.post_create, this.shortcode)
       this.socket.next(activity)
       
-      this.latest_event.set(this.shortcode, activity.event)
-      this.activities.push(this.shortcode)
-      
+      this.shortcodes.push(this.shortcode)
+      this.activities.set(this.shortcode, activity)
+
       this.shortcode = undefined
     }
   }
