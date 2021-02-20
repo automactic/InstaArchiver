@@ -1,9 +1,14 @@
-<form (ngSubmit)="onSubmit()" #createPostForm="ngForm">
-  <nb-card>
-    <nb-card-header>Save Post</nb-card-header>
-    <nb-card-body class="add-post">
-      <input type="text" required nbInput fullWidth placeholder="Enter Instagram shortcode" [(ngModel)]="shortcode" name="post_url" #name="ngModel">
-      <button nbButton type="submit" status="primary" [disabled]="!createPostForm.form.valid" style="margin-left: 1rem;">Save</button>
-    </nb-card-body>
-  </nb-card>
-</form>
+<nb-layout-column>
+  <form (ngSubmit)="onSubmit()" #createPostForm="ngForm">
+    <nb-card>
+      <nb-card-header>Save Post</nb-card-header>
+      <nb-card-body class="add-post">
+        <input type="text" required nbInput fullWidth placeholder="Enter Instagram shortcode" [(ngModel)]="shortcode" name="post_url" #name="ngModel">
+        <button nbButton type="submit" status="primary" [disabled]="!createPostForm.form.valid" style="margin-left: 1rem;">Save</button>
+      </nb-card-body>
+    </nb-card>
+  </form>
+</nb-layout-column>
+<nb-layout-column>
+  activities
+</nb-layout-column>
