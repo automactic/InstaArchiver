@@ -2,7 +2,7 @@ import logging
 from http import HTTPStatus
 
 import sqlalchemy
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, WebSocket
 from fastapi.param_functions import Depends
 from fastapi.responses import Response, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,3 +34,16 @@ def create_post_from_url(
 ):
     background_tasks.add_task(PostService(connection).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)
+
+
+@app.websocket('/api/posts/from_shortcode/')
+def create_post_from_url(
+        web_socket: WebSocket,
+        connection: sqlalchemy.engine.Connection = Depends(create_connection)
+):
+    await web_socket.accept()
+    while True:
+        data = await web_socket.receive_json()
+        print(data)
+        await web_socket.send_json({'success': 'yay'})
+        # await web_socket.close()
