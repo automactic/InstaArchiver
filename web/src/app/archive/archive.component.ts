@@ -1,6 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
 
+class Activity {
+  shortcode: string;
+
+  constructor(shortcode: string) {
+    this.shortcode = shortcode;
+  }
+}
+
 @Component({
   selector: 'app-archive',
   templateUrl: './archive.component.html',
