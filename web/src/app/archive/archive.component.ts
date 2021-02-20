@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
 
-class Activity {
-  shortcode: string;
+class PostActivity {
+  event: string;
+  shortcode?: string;
 
-  constructor(shortcode: string) {
-    this.shortcode = shortcode;
+  constructor(event: string) {
+    this.event = event;
   }
 }
 
@@ -16,13 +17,16 @@ class Activity {
 })
 export class ArchiveComponent implements OnInit {
   shortcode?: string;
-  socket = webSocket('ws://localhost:37500/web_socket/posts/')
+  activities: PostActivity[] = [];
+
+  socket = webSocket<PostActivity>('ws://localhost:37500/web_socket/posts/')
 
   constructor() { }
   
   ngOnInit(): void {
-    this.socket.subscribe(data => {
-      console.log(data)
+    this.socket.subscribe(activity => {
+      this.activities.push(activity);
+      console.log(activity)
     })
   }
   
@@ -32,7 +36,7 @@ export class ArchiveComponent implements OnInit {
 
   onSubmit() {
     if (this.shortcode) {
-      this.socket.next({'shortcode': this.shortcode})
+      this.socket.next({'event': 'create', 'shortcode': this.shortcode})
     }
   }
 }
