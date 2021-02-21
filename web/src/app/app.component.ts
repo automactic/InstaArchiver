@@ -14,6 +14,10 @@ export class AppComponent {
   menuItems: NbMenuItem[] = [
     {title: "Archive", icon: "archive", link: "/archive"},
     {title: "Posts", icon: "grid", link: "/posts"},
-    {title: "Profiles", icon: "person", link: "/profiles"},
+    {title: "Profiles", icon: "person", link: "/profiles", expanded: true, children: [
+      {title: "profile 1"},
+      {title: "profile 2"},
+      {title: "profile 3"},
+    ]},
   ]
 }
