@@ -3,10 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { ArchiveComponent } from './archive/archive.component';
 import { PostsComponent } from './posts/posts.component';
+import { ProfilesComponent } from './profiles/profiles.component';
 
 const routes: Routes = [
   { path: 'archive', component: ArchiveComponent },
   { path: 'posts', component: PostsComponent },
+  { path: 'profiles', component: ProfilesComponent },
   { path: '',   redirectTo: '/archive', pathMatch: 'full' },
 ];
 

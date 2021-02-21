@@ -23,6 +23,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PostsComponent } from './posts/posts.component';
 import { ArchiveComponent } from './archive/archive.component';
+import { ProfilesComponent } from './profiles/profiles.component';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { ArchiveComponent } from './archive/archive.component';
     AppComponent,
     ArchiveComponent,
     PostsComponent,
+    ProfilesComponent,
   ],
   imports: [
     BrowserModule,
