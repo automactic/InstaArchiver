@@ -2,17 +2,22 @@ div.archive {
     display: flex;
     justify-content: center;
     height: 100%;
+    @media (max-width: 767.98px) {
+        flex-direction: column;
+    }
 }
 div.archive > div.add {
     flex: 6;
-    margin-right: 1rem;
+    margin-right: 2rem;
+    @media (max-width: 767.98px) {
+        margin-right: 0;
+    }
     nb-card-body.shortcode > form  {
         display: flex;
     }
 }
 div.archive > div.activity {
     flex: 4;
-    margin-left: 1rem;
     nb-card {
         height: 100%;
     }
