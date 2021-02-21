@@ -7,6 +7,7 @@ import { PostsComponent } from './posts/posts.component';
 const routes: Routes = [
   { path: 'archive', component: ArchiveComponent },
   { path: 'posts', component: PostsComponent },
+  { path: '',   redirectTo: '/archive', pathMatch: 'full' },
 ];
 
 @NgModule({
