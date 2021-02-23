@@ -9,7 +9,6 @@ from pathlib import Path
 import aiofiles
 import aiohttp
 import instaloader
-import sqlalchemy
 import yarl
 from databases import Database
 from sqlalchemy.dialects.postgresql import insert
@@ -23,8 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class PostService:
-    def __init__(self, connection: sqlalchemy.engine.Connection, database: Database):
-        self.connection = connection
+    def __init__(self, database: Database):
         self.database = database
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
@@ -139,7 +137,7 @@ class PostService:
         :param post: post metadata
         """
 
-        with self.connection.begin():
+        async with self.database.transaction():
             values = {
                 'shortcode': post.shortcode,
                 'owner_username': post.owner_username,
@@ -149,9 +147,9 @@ class PostService:
             }
             updates = values.copy()
             updates.pop('shortcode')
-            statement = insert(schema.posts, bind=self.connection.engine).values(**values)
+            statement = insert(schema.posts).values(**values)
             statement = statement.on_conflict_do_update(index_elements=[schema.posts.c.shortcode], set_=updates)
-            self.connection.execute(statement)
+            await self.database.execute(statement)
 
             for item in post.items:
                 values = {
@@ -163,9 +161,9 @@ class PostService:
                 updates = values.copy()
                 updates.pop('post_shortcode')
                 updates.pop('index')
-                statement = insert(schema.post_items, bind=self.connection.engine).values(**values)
+                statement = insert(schema.post_items).values(**values)
                 statement = statement.on_conflict_do_update(
                     index_elements=[schema.post_items.c.post_shortcode, schema.post_items.c.index],
                     set_=updates
                 )
-                self.connection.execute(statement)
+                await self.database.execute(statement)

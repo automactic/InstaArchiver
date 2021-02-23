@@ -43,7 +43,7 @@ class ProfileService:
         statement = insert(schema.profiles) \
             .values(**values) \
             .on_conflict_do_update(index_elements=[schema.profiles.c.username], set_=updates)
-        await self.database.execute(query=statement)
+        await self.database.execute(statement)
         logger.info(f'Created Profile: {username}')
 
     async def exists(self, username: str) -> bool:
