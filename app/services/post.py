@@ -11,6 +11,7 @@ import aiohttp
 import instaloader
 import sqlalchemy
 import yarl
+from databases import Database
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
@@ -22,8 +23,9 @@ logger = logging.getLogger(__name__)
 
 
 class PostService:
-    def __init__(self, connection: sqlalchemy.engine.Connection):
+    def __init__(self, connection: sqlalchemy.engine.Connection, database: Database):
         self.connection = connection
+        self.database = database
         self.instaloader_context = instaloader.InstaloaderContext()
         self.data_dir = Path('/data')
 
@@ -46,7 +48,7 @@ class PostService:
         post = await self._retrieve(shortcode)
 
         # create profile if not exist
-        profile_service = ProfileService(self.connection)
+        profile_service = ProfileService(self.database)
         if not await profile_service.exists(post.owner_username):
             await profile_service.upsert(post.owner_username)
 

@@ -2,7 +2,6 @@ import asyncio
 import logging
 
 import instaloader
-import sqlalchemy
 import sqlalchemy as sa
 from databases import Database
 from sqlalchemy.dialects.postgresql import insert
@@ -14,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProfileService:
-    def __init__(self, connection: sqlalchemy.engine.Connection, database: Database):
-        self.connection = connection
+    def __init__(self, database: Database):
         self.database = database
         self.instaloader_context = instaloader.InstaloaderContext()
 
@@ -45,8 +43,7 @@ class ProfileService:
         statement = insert(schema.profiles, bind=self.connection.engine) \
             .values(**values) \
             .on_conflict_do_update(index_elements=[schema.profiles.c.username], set_=updates)
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.connection.execute, statement)
+        await self.database.execute(query=statement)
 
         logger.info(f'Created Profile: {username}')
 
@@ -59,10 +56,7 @@ class ProfileService:
 
         statement = schema.profiles.select().where(schema.profiles.c.username == username)
         exists_statement = sa.select([sa.exists(statement)])
-
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(None, self.connection.execute, exists_statement)
-        return result.scalar()
+        return await self.database.fetch_val(query=exists_statement)
 
     async def list(self, offset: int = 0, limit: int = 100) -> ProfileListResult:
         """List profiles.

@@ -46,7 +46,7 @@ def index():
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles():
-    return await ProfileService(None, database).list()
+    return await ProfileService(database).list()
 
 
 @app.post('/api/posts/from_shortcode/')
@@ -55,7 +55,7 @@ def create_post_from_url(
         background_tasks: BackgroundTasks,
         connection: sqlalchemy.engine.Connection = Depends(create_connection)
 ):
-    background_tasks.add_task(PostService(connection).create_from_shortcode, request.shortcode)
+    background_tasks.add_task(PostService(connection, database).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
@@ -70,7 +70,7 @@ async def posts(
             data = await web_socket.receive_json()
             if shortcode := data.get('shortcode'):
                 try:
-                    post = await PostService(connection).create_from_shortcode(shortcode)
+                    post = await PostService(connection, database).create_from_shortcode(shortcode)
                     await web_socket.send_json({'event': 'post.saved', 'shortcode': shortcode, 'post': post.response})
                 except PostNotFound as e:
                     await web_socket.send_json(e.response)
