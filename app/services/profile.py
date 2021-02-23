@@ -73,5 +73,9 @@ class ProfileService:
         """
 
         statement = schema.profiles.select(offset=offset, limit=limit)
-        results = [Profile(**profile) for profile in await self.database.fetch_all(query=statement)]
-        return ProfileListResult(profiles=results, limit=limit, offset=offset, count=0)
+        profiles = [Profile(**profile) for profile in await self.database.fetch_all(query=statement)]
+
+        statement = sa.select([sa.func.count()]).select_from(schema.profiles)
+        count = await self.database.fetch_val(query=statement)
+
+        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=count)
