@@ -40,11 +40,10 @@ class ProfileService:
         }
         updates = values.copy()
         updates.pop('username')
-        statement = insert(schema.profiles, bind=self.connection.engine) \
+        statement = insert(schema.profiles) \
             .values(**values) \
             .on_conflict_do_update(index_elements=[schema.profiles.c.username], set_=updates)
         await self.database.execute(query=statement)
-
         logger.info(f'Created Profile: {username}')
 
     async def exists(self, username: str) -> bool:
@@ -54,7 +53,7 @@ class ProfileService:
         :return: if the profile exists
         """
 
-        statement = schema.profiles.select().where(schema.profiles.c.username == username)
+        statement = sa.select([schema.profiles.c.username]).where(schema.profiles.c.username == username)
         exists_statement = sa.select([sa.exists(statement)])
         return await self.database.fetch_val(query=exists_statement)
 
