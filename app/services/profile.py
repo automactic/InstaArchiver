@@ -4,6 +4,7 @@ import logging
 import instaloader
 import sqlalchemy
 import sqlalchemy as sa
+from databases import Database
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
@@ -13,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 class ProfileService:
-    def __init__(self, connection: sqlalchemy.engine.Connection):
+    def __init__(self, connection: sqlalchemy.engine.Connection, database: Database):
         self.connection = connection
+        self.database = database
         self.instaloader_context = instaloader.InstaloaderContext()
 
     async def upsert(self, username: str):
@@ -71,7 +73,5 @@ class ProfileService:
         """
 
         statement = schema.profiles.select(offset=offset, limit=limit)
-        profiles = [Profile(**result) for result in self.connection.execute(statement)]
-        print(profiles)
-
-        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=0)
+        results = [Profile(**profile) for profile in await self.database.fetch_all(query=statement)]
+        return ProfileListResult(profiles=results, limit=limit, offset=offset, count=0)

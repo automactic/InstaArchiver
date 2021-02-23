@@ -1,6 +1,7 @@
 import logging
 from http import HTTPStatus
 
+import databases
 import sqlalchemy
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.param_functions import Depends
@@ -9,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from api.requests import PostCreationFromShortcode
+from services import schema
 from services.entities import ProfileListResult
 from services.exceptions import PostNotFound
 from services.post import PostService
@@ -17,8 +19,19 @@ from services.schema import create_connection
 
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
+database = databases.Database(schema.url())
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
+@app.on_event('startup')
+async def startup():
+    await database.connect()
+
+
+@app.on_event('shutdown')
+async def shutdown():
+    await database.disconnect()
 
 
 @app.get('/')
@@ -32,8 +45,8 @@ def index():
 
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
-async def list_profiles(connection: sqlalchemy.engine.Connection = Depends(create_connection)):
-    return await ProfileService(connection).list()
+async def list_profiles():
+    return await ProfileService(None, database).list()
 
 
 @app.post('/api/posts/from_shortcode/')

@@ -2,6 +2,7 @@ aiofiles~=0.6
 aiohttp~=3.7
 alembic~=1.5
 asyncpg~=0.22
+databases~=0.4
 fastapi~=0.63
 instaloader~=4.6
 psycopg2~=2.8
