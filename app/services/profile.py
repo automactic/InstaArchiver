@@ -37,6 +37,7 @@ class ProfileService:
             'username': profile.username,
             'full_name': profile.full_name,
             'biography': profile.biography,
+            'auto_update': False,
         }
         updates = values.copy()
         updates.pop('username')
