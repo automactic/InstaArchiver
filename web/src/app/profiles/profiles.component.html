@@ -2,6 +2,11 @@
     <div class="list">
         <nb-card>
             <nb-card-header>List</nb-card-header>
+            <nb-list>
+                <nb-list-item *ngFor="let profile of profiles">
+                    <nb-user [name]="profile.full_name" [title]="profile.username"></nb-user>
+                </nb-list-item>
+              </nb-list>
         </nb-card>
     </div>
     <div class="detail">
