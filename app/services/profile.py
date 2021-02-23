@@ -7,6 +7,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
+from services.entities import Profile, ProfileListResult
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +61,17 @@ class ProfileService:
         loop = asyncio.get_running_loop()
         result = await loop.run_in_executor(None, self.connection.execute, exists_statement)
         return result.scalar()
+
+    async def list(self, offset: int = 0, limit: int = 100) -> ProfileListResult:
+        """List profiles.
+
+        :param offset: the number of profiles to skip
+        :param limit: the number of profiles to fetch
+        :return: the list query result
+        """
+
+        statement = schema.profiles.select(offset=offset, limit=limit)
+        profiles = [Profile(**result) for result in self.connection.execute(statement)]
+        print(profiles)
+
+        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=0)

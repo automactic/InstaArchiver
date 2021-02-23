@@ -9,8 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from api.requests import PostCreationFromShortcode
+from services.entities import ProfileListResult
 from services.exceptions import PostNotFound
 from services.post import PostService
+from services.profile import ProfileService
 from services.schema import create_connection
 
 app = FastAPI()
@@ -27,6 +29,11 @@ def root():
 @app.get('/index.html')
 def index():
     return RedirectResponse(url='web/index.html')
+
+
+@app.get('/api/profiles/', response_model=ProfileListResult)
+async def list_profiles(connection: sqlalchemy.engine.Connection = Depends(create_connection)):
+    return await ProfileService(connection).list()
 
 
 @app.post('/api/posts/from_shortcode/')

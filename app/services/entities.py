@@ -4,6 +4,7 @@ from enum import Enum
 from typing import List, Optional
 
 import instaloader
+from pydantic import BaseModel
 
 
 class PostType(Enum):
@@ -82,11 +83,16 @@ class Post:
         }
 
 
-@dataclass
-class Profile:
+class Profile(BaseModel):
     username: str
     full_name: str
     biography: Optional[str] = None
     auto_update: bool = False
     last_update: Optional[datetime] = None
-    post_iterator: Optional[instaloader.NodeIterator[Post]] = None
+
+
+class ProfileListResult(BaseModel):
+    profiles: List[Profile]
+    limit: int
+    offset: int
+    count: int
