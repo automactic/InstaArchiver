@@ -1,13 +1,12 @@
 <nb-layout>
   <nb-layout-header fixed>
-    <h1>InstaSaver</h1>
-    <nb-actions>
-      <nb-action link="/archive" icon="hard-drive" title="Archive"></nb-action>
-      <nb-action link="/posts" icon="grid" title="Posts"></nb-action>
-      <nb-action href="https://github.com/automactic/InstaSaver" icon="github-outline"></nb-action>
+    <fa-icon [icon]="faInstagram" size="2x"></fa-icon>
+    <nb-actions size="small">
+      <nb-action icon="archive" link="/archive" routerLinkActive="active"></nb-action>
+      <nb-action icon="grid" link="/posts" routerLinkActive="active"></nb-action>
+      <nb-action icon="person" link="/profiles" routerLinkActive="active"></nb-action>
     </nb-actions>
   </nb-layout-header>
-  <nb-sidebar responsive start>Sidebar Content</nb-sidebar>
   <nb-layout-column>
     <router-outlet></router-outlet>
   </nb-layout-column>

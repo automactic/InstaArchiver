@@ -2,6 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
+import { Profile } from './entities';
+
+
+export interface ListProfilesResponse {
+  profiles: Profile[]
+  limit: number
+  offset: number
+  count: number
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,5 +26,10 @@ export class APIService {
       console.log(data);
     })
     console.log(shortcode)
+  }
+
+  listProfiles() {
+    let url = environment.apiRoot + '/api/profiles/'
+    return this.httpClient.get<ListProfilesResponse>(url)
   }
 }

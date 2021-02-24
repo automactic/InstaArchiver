@@ -1,22 +1,22 @@
-div.archive {
+div.profiles {
     display: flex;
     height: 100%;
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
         flex-direction: column;
     }
 }
-div.archive > div.add {
-    flex: 6;
+div.profiles > div.list {
+    flex: 3;
     margin-right: 2rem;
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
         margin-right: 0;
     }
-    nb-card-body.shortcode > form  {
-        display: flex;
+    nb-card {
+        height: 100%;
     }
 }
-div.archive > div.activity {
-    flex: 4;
+div.profiles > div.detail {
+    flex: 7;
     nb-card {
         height: 100%;
     }
