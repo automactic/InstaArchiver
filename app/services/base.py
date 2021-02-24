@@ -41,6 +41,7 @@ class BaseService:
         :param url: the url to retrieve the image or video
         :param destination: the destination dir to save the file, relative to the media dir
         :param file_name: file name, without extension
+        :return file_path: the path of the saved image or video
         """
 
         async with self.http_session.get(yarl.URL(url, encoded=True)) as response:
@@ -56,3 +57,5 @@ class BaseService:
                 data = await response.read()
                 await file.write(data)
                 self._set_file_ownership(file_path)
+
+            return file_path

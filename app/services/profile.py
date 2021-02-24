@@ -30,7 +30,7 @@ class ProfileService(BaseService):
             return
 
         # save profile image
-        await self.save_media(profile.profile_pic_url, Path('profile_image'), profile.username)
+        await self.save_media(profile.profile_pic_url, Path('profile_images'), profile.username)
 
         # upsert profile
         values = {

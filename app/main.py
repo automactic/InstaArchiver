@@ -46,13 +46,12 @@ def index():
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles():
-    await ProfileService(database, http_session).upsert('jo_ji_art')
     return await ProfileService(database, http_session).list()
 
 
 @app.post('/api/posts/from_shortcode/')
 def create_post_from_url(request: PostCreationFromShortcode, background_tasks: BackgroundTasks):
-    background_tasks.add_task(PostService(database).create_from_shortcode, request.shortcode)
+    background_tasks.add_task(PostService(database, http_session).create_from_shortcode, request.shortcode)
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
@@ -64,7 +63,7 @@ async def posts(web_socket: WebSocket):
             data = await web_socket.receive_json()
             if shortcode := data.get('shortcode'):
                 try:
-                    post = await PostService(database).create_from_shortcode(shortcode)
+                    post = await PostService(database, http_session).create_from_shortcode(shortcode)
                     await web_socket.send_json({'event': 'post.saved', 'shortcode': shortcode, 'post': post.response})
                 except PostNotFound as e:
                     await web_socket.send_json(e.response)
