@@ -30,7 +30,7 @@ profiles = Table(
     Column('biography', String, index=True, nullable=True),
     Column('auto_update', Boolean, index=True, nullable=False),
     Column('last_update', DateTime, index=True, nullable=True),
-    Column('image_filename', String, index=True, nullable=True),
+    Column('image_filename', String, index=True, nullable=False),
 )
 
 posts = Table(
