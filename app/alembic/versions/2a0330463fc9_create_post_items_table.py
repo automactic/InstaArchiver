@@ -6,7 +6,7 @@ Create Date: 2020-11-11 18:08:24.406396
 
 """
 from alembic import op
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 
 
 # revision identifiers, used by Alembic.
@@ -22,6 +22,7 @@ def upgrade():
         Column('post_shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
         Column('index', Integer, primary_key=True),
         Column('type', String, index=True, nullable=False),
+        Column('duration', Float, index=True, nullable=True),
         Column('filename', String, index=True, nullable=False),
     )
 

@@ -7,6 +7,7 @@ Create Date: 2020-11-11 17:42:51.365726
 """
 from alembic import op
 from sqlalchemy import Column, DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import ARRAY
 
 
 # revision identifiers, used by Alembic.
@@ -24,6 +25,8 @@ def upgrade():
         Column('creation_time', DateTime, index=True, nullable=False),
         Column('type', String, index=True, nullable=False),
         Column('caption', String, index=True, nullable=True),
+        Column('caption_hashtags', ARRAY(String), index=True, nullable=False, default=[]),
+        Column('caption_mentions', ARRAY(String), index=True, nullable=False, default=[]),
     )
 
 
