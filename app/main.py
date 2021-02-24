@@ -17,8 +17,11 @@ from services.profile import ProfileService
 
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
+app.mount('/media', StaticFiles(directory='/media'), name='media')
+
 database = databases.Database(schema.url())
 http_session = aiohttp.ClientSession()
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
