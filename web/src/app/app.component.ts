@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { NbMenuItem } from '@nebular/theme';
 
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 
@@ -10,15 +9,4 @@ import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 })
 export class AppComponent {
   faInstagram = faInstagram;
-  title = 'InstaSaver';
-  menuItems: NbMenuItem[] = [
-    {title: "Archive", icon: "archive", link: "/archive"},
-    {title: "Posts", icon: "grid", link: "/posts"},
-    {title: "Profiles", icon: "person", link: "/profiles"},
-    {title: "Favorite", icon: "star", expanded: true, children: [
-      {title: "profile 1"},
-      {title: "profile 2"},
-      {title: "profile 3"},
-    ]},
-  ]
 }
