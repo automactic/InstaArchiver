@@ -1,6 +1,7 @@
 import logging
 from http import HTTPStatus
 
+import aiohttp
 import databases
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import Response, RedirectResponse
@@ -17,6 +18,7 @@ from services.profile import ProfileService
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
 database = databases.Database(schema.url())
+http_session = aiohttp.ClientSession()
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ async def startup():
 @app.on_event('shutdown')
 async def shutdown():
     await database.disconnect()
+    await http_session.close()
 
 
 @app.get('/')

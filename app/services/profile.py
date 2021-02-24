@@ -1,19 +1,23 @@
 import asyncio
 import logging
-
+import aiohttp
 import instaloader
 import sqlalchemy as sa
 from databases import Database
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
+from services.base import BaseService
 from services.entities import Profile, ProfileListResult
-
+from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-class ProfileService:
-    def __init__(self, database: Database):
+class ProfileService(BaseService):
+    def __init__(self, database: Database, http_session: aiohttp.ClientSession):
+        super().__init__(database, http_session)
+
+        self.profile_image_dir = self.media_dir.joinpath('profile_image')
         self.database = database
         self.instaloader_context = instaloader.InstaloaderContext()
 
@@ -31,6 +35,9 @@ class ProfileService:
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Profile does not exist: {username}')
             return
+
+        # save profile image
+        await self.save_media(profile.profile_pic_url, Path('profile_image'), profile.username)
 
         # upsert profile
         values = {
