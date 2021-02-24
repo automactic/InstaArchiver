@@ -33,9 +33,10 @@ class PostItemType(Enum):
 class PostItem:
     type: PostItemType
     index: int = 0
+    duration: Optional[float] = None
+    filename: Optional[str] = None
     url: Optional[str] = None
     thumb_url: Optional[str] = None
-    filename: Optional[str] = None
 
 
 @dataclass
@@ -45,6 +46,8 @@ class Post:
     creation_time: datetime
     type: PostType
     caption: Optional[str]
+    caption_hashtags: [str]
+    caption_mentions: [str]
     items: List[PostItem]
 
     @classmethod
@@ -53,7 +56,9 @@ class Post:
         if post_type == PostType.IMAGE:
             items = [PostItem(type=PostItemType.IMAGE, url=post.url)]
         elif post_type == PostType.VIDEO:
-            items = [PostItem(type=PostItemType.VIDEO, url=post.video_url, thumb_url=post.url)]
+            items = [PostItem(
+                type=PostItemType.VIDEO, url=post.video_url, thumb_url=post.url, duration=post.video_duration
+            )]
         elif post_type == PostType.SIDECAR:
             items = [
                 PostItem(
@@ -61,6 +66,7 @@ class Post:
                     index=index,
                     url=node.video_url if node.is_video else node.display_url,
                     thumb_url=node.display_url if node.is_video else None,
+                    duration=post.video_duration,
                 )
                 for index, node in enumerate(post.get_sidecar_nodes())
             ]
@@ -73,6 +79,8 @@ class Post:
             creation_time=post.date_utc,
             type=post_type,
             caption=post.caption,
+            caption_hashtags=post.caption_hashtags,
+            caption_mentions=post.caption_mentions,
             items=items,
         )
 
@@ -91,6 +99,7 @@ class Profile(BaseModel):
     biography: Optional[str] = None
     auto_update: bool = False
     last_update: Optional[datetime] = None
+    image_filename: str
 
 
 class ProfileListResult(BaseModel):

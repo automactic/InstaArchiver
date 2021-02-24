@@ -35,7 +35,7 @@ class BaseService:
         if self.user_id or self.group_id:
             shutil.chown(path, self.user_id, self.group_id)
 
-    async def save_media(self, url: str, destination: Path, file_name: str):
+    async def save_media(self, url: str, destination: Path, file_name: str) -> Path:
         """Save a image or video to a destination with a file name.
 
         :param url: the url to retrieve the image or video

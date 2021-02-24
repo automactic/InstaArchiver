@@ -69,13 +69,14 @@ class PostService(BaseService):
 
         for index, item in enumerate(post.items):
             # save the image or video
-            file_name = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
-            file_path = await self.save_media(item.url, dir_path, file_name)
+            filename = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
+            file_path = await self.save_media(item.url, dir_path, filename)
+            item.filename = file_path.parts[-1]
             os.utime(file_path, post_timestamp)
 
             # save thumb image path
             if item.thumb_url:
-                file_path = await self.save_media(item.thumb_url, thumb_dir_path, file_name)
+                file_path = await self.save_media(item.thumb_url, thumb_dir_path, filename)
                 os.utime(file_path, post_timestamp)
 
     async def _save_metadata(self, post: Post):
@@ -91,6 +92,8 @@ class PostService(BaseService):
                 'creation_time': post.creation_time,
                 'type': post.type.value,
                 'caption': post.caption,
+                'caption_hashtags': post.caption_hashtags,
+                'caption_mentions': post.caption_mentions,
             }
             updates = values.copy()
             updates.pop('shortcode')
@@ -103,6 +106,7 @@ class PostService(BaseService):
                     'post_shortcode': post.shortcode,
                     'index': item.index,
                     'type': item.type.value,
+                    'duration': item.duration,
                     'filename': item.filename,
                 }
                 updates = values.copy()

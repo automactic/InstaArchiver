@@ -18,7 +18,7 @@ export class ProfilesComponent implements OnInit {
     })
   }
 
-  profileImagePath(username: string): string {
-    return `${environment.apiRoot}/media/profile_images/${username}.jpg`
+  profileImagePath(filename: string): string {
+    return `${environment.apiRoot}/media/profile_images/${filename}`
   }
 }

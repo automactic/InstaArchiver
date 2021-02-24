@@ -1,7 +1,8 @@
 import os
 
 import sqlalchemy
-from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, String, Boolean, DateTime
+from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, Float, String, Boolean, DateTime
+from sqlalchemy.dialects.postgresql import ARRAY
 
 
 def url() -> str:
@@ -29,6 +30,7 @@ profiles = Table(
     Column('biography', String, index=True, nullable=True),
     Column('auto_update', Boolean, index=True, nullable=False),
     Column('last_update', DateTime, index=True, nullable=True),
+    Column('image_filename', String, index=True, nullable=False),
 )
 
 posts = Table(
@@ -36,9 +38,11 @@ posts = Table(
     metadata,
     Column('shortcode', String, primary_key=True),
     Column('owner_username', String, ForeignKey('profiles.username'), index=True),
-    Column('creation_time', DateTime, index=True),
-    Column('type', String, index=True),
+    Column('creation_time', DateTime, index=True, nullable=False),
+    Column('type', String, index=True, nullable=False),
     Column('caption', String, index=True, nullable=True),
+    Column('caption_hashtags', ARRAY(String), index=True, nullable=False),
+    Column('caption_mentions', ARRAY(String), index=True, nullable=False),
 )
 
 post_items = Table(
@@ -46,6 +50,7 @@ post_items = Table(
     metadata,
     Column('post_shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
     Column('index', Integer, primary_key=True),
-    Column('type', String, index=True),
-    Column('filename', String, index=True),
+    Column('type', String, index=True, nullable=False),
+    Column('duration', Float, index=True, nullable=True),
+    Column('filename', String, index=True, nullable=False),
 )

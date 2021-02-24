@@ -6,4 +6,5 @@ export interface Profile {
     biography: string
     auto_update: boolean
     last_update?: Date
+    image_filename: string
 }

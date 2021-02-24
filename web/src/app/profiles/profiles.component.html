@@ -4,13 +4,17 @@
             <nb-card-header>Profiles</nb-card-header>
             <nb-list>
                 <nb-list-item *ngFor="let profile of profiles">
-                    <nb-user [name]="profile.full_name" [title]="profile.username" [picture]="profileImagePath(profile.username)"></nb-user>
+                    <nb-user 
+                      [name]="profile.full_name" 
+                      [title]="profile.username" 
+                      [picture]="profileImagePath(profile.image_filename)">
+                    </nb-user>
                 </nb-list-item>
               </nb-list>
         </nb-card>
     </div>
     <div class="detail">
-        <nb-card>
+        <nb-card size="medium">
             <nb-card-header>Detail</nb-card-header>
         </nb-card>
     </div>
