@@ -21,8 +21,8 @@ def upgrade():
         'post_items',
         Column('post_shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
         Column('index', Integer, primary_key=True),
-        Column('type', String, index=True),
-        Column('filename', String, index=True),
+        Column('type', String, index=True, nullable=False),
+        Column('filename', String, index=True, nullable=False),
     )
 
 
