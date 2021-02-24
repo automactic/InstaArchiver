@@ -28,9 +28,9 @@ profiles = Table(
     Column('username', String, primary_key=True),
     Column('full_name', String, index=True, nullable=False),
     Column('biography', String, index=True, nullable=True),
-    Column('auto_update', Boolean, index=True, nullable=False, default=False),
+    Column('auto_update', Boolean, index=True, nullable=False),
     Column('last_update', DateTime, index=True, nullable=True),
-    Column('image_filename', DateTime, index=True, nullable=True),
+    Column('image_filename', String, index=True, nullable=True),
 )
 
 posts = Table(
@@ -41,8 +41,8 @@ posts = Table(
     Column('creation_time', DateTime, index=True, nullable=False),
     Column('type', String, index=True, nullable=False),
     Column('caption', String, index=True, nullable=True),
-    Column('caption_hashtags', ARRAY(String), index=True, nullable=False, default=[]),
-    Column('caption_mentions', ARRAY(String), index=True, nullable=False, default=[]),
+    Column('caption_hashtags', ARRAY(String), index=True, nullable=False),
+    Column('caption_mentions', ARRAY(String), index=True, nullable=False),
 )
 
 post_items = Table(

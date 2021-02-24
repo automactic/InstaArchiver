@@ -25,8 +25,8 @@ def upgrade():
         Column('creation_time', DateTime, index=True, nullable=False),
         Column('type', String, index=True, nullable=False),
         Column('caption', String, index=True, nullable=True),
-        Column('caption_hashtags', ARRAY(String), index=True, nullable=False, default=[]),
-        Column('caption_mentions', ARRAY(String), index=True, nullable=False, default=[]),
+        Column('caption_hashtags', ARRAY(String), index=True, nullable=False),
+        Column('caption_mentions', ARRAY(String), index=True, nullable=False),
     )
 
 
