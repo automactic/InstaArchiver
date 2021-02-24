@@ -1,26 +1,19 @@
 import asyncio
 import logging
-import aiohttp
+from pathlib import Path
+
 import instaloader
 import sqlalchemy as sa
-from databases import Database
 from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
 from services.base import BaseService
 from services.entities import Profile, ProfileListResult
-from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
 
 class ProfileService(BaseService):
-    def __init__(self, database: Database, http_session: aiohttp.ClientSession):
-        super().__init__(database, http_session)
-
-        self.profile_image_dir = self.media_dir.joinpath('profile_image')
-        self.database = database
-        self.instaloader_context = instaloader.InstaloaderContext()
-
     async def upsert(self, username: str):
         """Create or update a profile.
 

@@ -2,6 +2,7 @@ import mimetypes
 from pathlib import Path
 
 import aiohttp
+import instaloader
 import yarl
 from databases import Database
 
@@ -10,6 +11,7 @@ class BaseService:
     def __init__(self, database: Database, http_session: aiohttp.ClientSession):
         self.database = database
         self.http_session = http_session
+        self.instaloader_context = instaloader.InstaloaderContext()
         self.media_dir = Path('/media')
 
     async def save_media(self, url: str, destination: Path, file_name: str):
@@ -19,4 +21,3 @@ class BaseService:
             print(('extension', extension))
             if not extension:
                 return
-
