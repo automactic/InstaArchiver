@@ -46,7 +46,8 @@ def index():
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles():
-    return await ProfileService(database).list()
+    await ProfileService(database, http_session).upsert('jo_ji_art')
+    return await ProfileService(database, http_session).list()
 
 
 @app.post('/api/posts/from_shortcode/')
