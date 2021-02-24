@@ -99,6 +99,7 @@ class Profile(BaseModel):
     biography: Optional[str] = None
     auto_update: bool = False
     last_update: Optional[datetime] = None
+    image_filename: str
 
 
 class ProfileListResult(BaseModel):
