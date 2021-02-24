@@ -4,14 +4,12 @@ import sqlalchemy
 from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, Float, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
 
-
-def url() -> str:
-    hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-    return f'postgresql://postgres:postgres@{hostname}/insta_saver'
+database_hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
+database_url = f'postgresql://postgres:postgres@{database_hostname}/insta_saver'
 
 
 def create_engine() -> sqlalchemy.engine.Engine:
-    return sqlalchemy.create_engine(url())
+    return sqlalchemy.create_engine(database_url)
 
 
 async def create_connection() -> sqlalchemy.engine.Connection:

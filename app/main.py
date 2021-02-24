@@ -15,20 +15,25 @@ from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
 app.mount('/media', StaticFiles(directory='/media'), name='media')
 
-database = databases.Database(schema.url())
+logger.debug(f'Database: {schema.database_url}')
+database = databases.Database(schema.database_url)
 http_session = aiohttp.ClientSession()
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 @app.on_event('startup')
 async def startup():
-    await database.connect()
+    try:
+        await database.connect()
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 @app.on_event('shutdown')
