@@ -63,15 +63,20 @@ class PostService(BaseService):
         """
 
         dir_path = Path('posts').joinpath(post.owner_username)
+        thumb_dir_path = Path('thumb_images').joinpath(post.owner_username)
+        post_timestamp = (post.creation_time.timestamp(), post.creation_time.timestamp())
         post_filename = f'{post.creation_time.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
+
         for index, item in enumerate(post.items):
             # save the image or video
             file_name = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
             file_path = await self.save_media(item.url, dir_path, file_name)
+            os.utime(file_path, post_timestamp)
 
-            # set file access time and modify time to post creation time
-            timestamp = post.creation_time.timestamp()
-            os.utime(file_path, (timestamp, timestamp))
+            # save thumb image path
+            if item.thumb_url:
+                file_path = await self.save_media(item.thumb_url, thumb_dir_path, file_name)
+                os.utime(file_path, post_timestamp)
 
     async def _save_metadata(self, post: Post):
         """Save metadata of a post.

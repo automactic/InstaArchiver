@@ -34,6 +34,7 @@ class PostItem:
     type: PostItemType
     index: int = 0
     url: Optional[str] = None
+    thumb_url: Optional[str] = None
     filename: Optional[str] = None
 
 
@@ -52,13 +53,14 @@ class Post:
         if post_type == PostType.IMAGE:
             items = [PostItem(type=PostItemType.IMAGE, url=post.url)]
         elif post_type == PostType.VIDEO:
-            items = [PostItem(type=PostItemType.VIDEO, url=post.video_url)]
+            items = [PostItem(type=PostItemType.VIDEO, url=post.video_url, thumb_url=post.url)]
         elif post_type == PostType.SIDECAR:
             items = [
                 PostItem(
                     type=PostItemType.VIDEO if node.is_video else PostItemType.IMAGE,
                     index=index,
-                    url=node.video_url if node.is_video else node.display_url
+                    url=node.video_url if node.is_video else node.display_url,
+                    thumb_url=node.display_url if node.is_video else None,
                 )
                 for index, node in enumerate(post.get_sidecar_nodes())
             ]
