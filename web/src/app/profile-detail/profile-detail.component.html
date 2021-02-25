@@ -1,0 +1,27 @@
+<nb-card *ngIf="profile$ | async as profile">
+  <nb-card-header>
+    <nb-user 
+      [name]="profile.full_name" 
+      [title]="profile.username" 
+      [picture]="profileImagePath(profile.image_filename)"
+      shape="rectangle" size="large">
+    </nb-user>
+  </nb-card-header>
+  <nb-card-body>
+    <div class="profile">
+      <div class="row">
+        <p class="title"><b>Username</b></p>
+        <p class="detail">{{ profile.username }}</p>
+      </div>
+      <div class="row">
+        <p class="title"><b>Full Name</b></p>
+        <p class="detail">{{ profile.full_name }}</p>
+      </div>
+      <div class="row">
+        <p class="title"><b>Biography</b></p>
+        <p class="detail">{{ profile.biography }}</p>
+      </div>
+    </div>
+  </nb-card-body>
+  <div>Temp: Recent images</div>
+</nb-card>

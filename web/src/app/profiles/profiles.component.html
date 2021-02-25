@@ -1,21 +1,23 @@
 <div class="profiles">
-    <div class="list">
-        <nb-card>
-            <nb-card-header>Profiles</nb-card-header>
-            <nb-list>
-                <nb-list-item *ngFor="let profile of profiles">
-                    <nb-user 
-                      [name]="profile.full_name" 
-                      [title]="profile.username" 
-                      [picture]="profileImagePath(profile.image_filename)">
-                    </nb-user>
-                </nb-list-item>
-              </nb-list>
-        </nb-card>
-    </div>
-    <div class="detail">
-        <nb-card size="medium">
-            <nb-card-header>Detail</nb-card-header>
-        </nb-card>
-    </div>
+  <div class="list">
+    <nb-card>
+      <nb-card-header>Profiles</nb-card-header>
+      <nb-list>
+        <nb-list-item 
+          *ngFor="let profile of profiles" 
+          [routerLink]="profile.username" 
+          routerLinkActive="active">
+          <nb-user 
+            [name]="profile.full_name" 
+            [title]="profile.username" 
+            [picture]="profileImagePath(profile.image_filename)"
+            shape="rectangle">
+          </nb-user>
+        </nb-list-item>
+      </nb-list>
+    </nb-card>
+  </div>
+  <div class="detail">
+    <router-outlet></router-outlet>
+  </div>
 </div>

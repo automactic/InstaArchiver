@@ -1,16 +1,17 @@
 import logging
 from http import HTTPStatus
+from pathlib import Path
 
 import aiohttp
 import databases
 from fastapi import FastAPI, BackgroundTasks
-from fastapi.responses import Response, RedirectResponse
+from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from api.requests import PostCreationFromShortcode
 from services import schema
-from services.entities import ProfileListResult
+from services.entities import ProfileListResult, Profile
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
@@ -19,7 +20,6 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-app.mount('/web', StaticFiles(directory='/web', html=True), name='web')
 app.mount('/media', StaticFiles(directory='/media'), name='media')
 
 logger.debug(f'Database: {schema.database_url}')
@@ -42,19 +42,14 @@ async def shutdown():
     await http_session.close()
 
 
-@app.get('/')
-def root():
-    return RedirectResponse(url='web/index.html')
-
-
-@app.get('/index.html')
-def index():
-    return RedirectResponse(url='web/index.html')
-
-
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles():
     return await ProfileService(database, http_session).list()
+
+
+@app.get('/api/profiles/{username:str}/', response_model=Profile)
+async def list_profiles(username: str):
+    return await ProfileService(database, http_session).get(username)
 
 
 @app.post('/api/posts/from_shortcode/')
@@ -77,3 +72,12 @@ async def posts(web_socket: WebSocket):
                     await web_socket.send_json(e.response)
     except WebSocketDisconnect:
         logger.debug('Web socket disconnected.')
+
+
+@app.get('/{path:path}')
+async def web(path: str):
+    path = Path(path)
+    if len(path.parts) == 1 and path.suffix in ['.html', '.css', '.js']:
+        return FileResponse(Path('/web/').joinpath(path.parts[-1]))
+    else:
+        return FileResponse(Path('/web/index.html'))
