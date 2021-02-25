@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 from services import schema
 from services.base import BaseService
 from services.entities import Profile, ProfileListResult
-
+from typing import Optional
 logger = logging.getLogger(__name__)
 
 
@@ -74,3 +74,14 @@ class ProfileService(BaseService):
         count = await self.database.fetch_val(query=statement)
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=count)
+
+    async def get(self, username: str) -> Optional[Profile]:
+        """Get a single profile.
+
+        :param username: the username of the profile to get.
+        :return: the profile query result
+        """
+
+        statement = schema.profiles.select().where(schema.profiles.c.username == username)
+        result = await self.database.fetch_one(query=statement)
+        return Profile(**result) if result else None
