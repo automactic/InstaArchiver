@@ -7,14 +7,17 @@ div.profiles {
 }
 div.profiles > div.list {
     flex: 3;
+    @media (max-width: 767.98px) { flex: none; }
+
     margin-right: 2rem;
-    @media (max-width: 991.98px) {
-        margin-right: 1rem;
-    }
-    @media (max-width: 767.98px) {
-        margin-right: 0;
+    @media (max-width: 991.98px) { margin-right: 1rem }
+    @media (max-width: 767.98px) { margin-right: 0 }
+    
+    nb-card {
+        @media (max-width: 767.98px) { max-height: 30rem; }
     }
 }
 div.profiles > div.detail {
     flex: 7;
+    @media (max-width: 767.98px) { flex: none; }
 }

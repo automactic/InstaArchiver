@@ -14,7 +14,7 @@ export class ProfilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.listProfiles().subscribe(data => {
-      this.profiles = data.profiles
+      this.profiles = data.profiles.slice(0, 5)
     })
   }
 
