@@ -1,0 +1,8 @@
+nb-card-body {
+  div.profile > div.row {
+    display: flex;
+    p.title { flex: 2 }
+    p.detail { flex: 8 }
+    p {margin: 0.5rem 0;}
+  }
+}

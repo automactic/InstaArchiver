@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { APIService } from 'src/app/api.service';
+import { Profile } from 'src/app/entities';
 import { environment } from 'src/environments/environment';
-import { APIService } from '../api.service';
-import { Profile } from '../entities';
+
 
 @Component({
   selector: 'app-profiles',

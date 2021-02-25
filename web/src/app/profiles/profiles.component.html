@@ -3,11 +3,12 @@
     <nb-card>
       <nb-card-header>Profiles</nb-card-header>
       <nb-list>
-        <nb-list-item *ngFor="let profile of profiles">
+        <nb-list-item *ngFor="let profile of profiles" [routerLink]="profile.username" routerLinkActive="active">
           <nb-user 
             [name]="profile.full_name" 
             [title]="profile.username" 
-            [picture]="profileImagePath(profile.image_filename)">
+            [picture]="profileImagePath(profile.image_filename)"
+            shape="rectangle">
           </nb-user>
         </nb-list-item>
       </nb-list>

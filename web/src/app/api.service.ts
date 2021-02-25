@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
 import { Profile } from './entities';
+import { Observable } from 'rxjs';
 
 
 export interface ListProfilesResponse {
@@ -31,5 +32,10 @@ export class APIService {
   listProfiles() {
     let url = environment.apiRoot + '/api/profiles/'
     return this.httpClient.get<ListProfilesResponse>(url)
+  }
+
+  getProfile(username: string): Observable<Profile> {
+    let url = `${environment.apiRoot}/api/profiles/${username}/`;
+    return this.httpClient.get<Profile>(url);
   }
 }
