@@ -7,3 +7,15 @@
 @include nb-install() {
   @include nb-theme-global();
 };
+
+nb-list-item:focus {
+  outline: none;
+}
+
+nb-list-item:hover {
+  background-color: #EFF5FB;
+}
+
+nb-list-item.active {
+  background-color: #E0ECF8;
+}

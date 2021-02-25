@@ -3,7 +3,10 @@
     <nb-card>
       <nb-card-header>Profiles</nb-card-header>
       <nb-list>
-        <nb-list-item *ngFor="let profile of profiles" [routerLink]="profile.username" routerLinkActive="active">
+        <nb-list-item 
+          *ngFor="let profile of profiles" 
+          [routerLink]="profile.username" 
+          routerLinkActive="active">
           <nb-user 
             [name]="profile.full_name" 
             [title]="profile.username" 
