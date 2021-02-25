@@ -1,24 +1,25 @@
 div.profiles {
-    display: flex;
-    @media (max-width: 767.98px) { flex-direction: column }
+  display: flex;
+  @media (max-width: 767.98px) { flex-direction: column }
 
-    height: calc(100vh - 9rem);
-    @media (max-width: 991.98px) { height: calc(100vh - 7.5rem) }
+  height: calc(100vh - 9rem);
+  @media (max-width: 991.98px) { height: calc(100vh - 7.5rem) }
+  @media (max-width: 767.98px) { height: auto }
 }
 div.profiles > div.list {
-    flex: 3;
-    @media (max-width: 767.98px) { flex: none; }
+  flex: 3;
+  @media (max-width: 767.98px) { flex: none; }
 
-    margin-right: 2rem;
-    @media (max-width: 991.98px) { margin-right: 1rem }
-    @media (max-width: 767.98px) { margin-right: 0 }
-    
-    nb-card {
-        max-height: 100%;
-        @media (max-width: 767.98px) { max-height: 30rem; }
-    }
+  margin-right: 2rem;
+  @media (max-width: 991.98px) { margin-right: 1rem }
+  @media (max-width: 767.98px) { margin-right: 0 }
+  
+  nb-card {
+    max-height: 100%;
+    @media (max-width: 767.98px) { max-height: 30rem; }
+  }
 }
 div.profiles > div.detail {
-    flex: 7;
-    @media (max-width: 767.98px) { flex: none; }
+  flex: 7;
+  @media (max-width: 767.98px) { flex: none; }
 }
