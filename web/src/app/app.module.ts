@@ -25,6 +25,7 @@ import { AppComponent } from './app.component';
 import { PostsComponent } from './posts/posts.component';
 import { ArchiveComponent } from './archive/archive.component';
 import { ProfilesComponent } from './profiles/profiles.component';
+import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
 
 
 @NgModule({
@@ -33,6 +34,7 @@ import { ProfilesComponent } from './profiles/profiles.component';
     ArchiveComponent,
     PostsComponent,
     ProfilesComponent,
+    ProfileDetailComponent,
   ],
   imports: [
     BrowserModule,
