@@ -107,3 +107,13 @@ class ProfileListResult(BaseModel):
     limit: int
     offset: int
     count: int
+
+
+class PostsSummary(BaseModel):
+    count: int
+    earliest_time: Optional[datetime]
+    latest_time: Optional[datetime]
+
+
+class ProfileDetail(Profile):
+    posts: PostsSummary

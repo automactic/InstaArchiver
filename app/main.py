@@ -11,7 +11,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from api.requests import PostCreationFromShortcode
 from services import schema
-from services.entities import ProfileListResult, Profile
+from services.entities import ProfileListResult, Profile, ProfileDetail
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
@@ -47,8 +47,8 @@ async def list_profiles():
     return await ProfileService(database, http_session).list()
 
 
-@app.get('/api/profiles/{username:str}/', response_model=Profile)
-async def list_profiles(username: str):
+@app.get('/api/profiles/{username:str}/', response_model=ProfileDetail)
+async def get_profile(username: str):
     return await ProfileService(database, http_session).get(username)
 
 
