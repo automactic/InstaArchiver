@@ -96,6 +96,7 @@ class Post:
 class Profile(BaseModel):
     username: str
     full_name: str
+    display_name: str
     biography: Optional[str] = None
     auto_update: bool = False
     last_update: Optional[datetime] = None

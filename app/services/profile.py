@@ -36,6 +36,7 @@ class ProfileService(BaseService):
         values = {
             'username': profile.username,
             'full_name': profile.full_name,
+            'display_name': profile.full_name,
             'biography': profile.biography,
             'auto_update': False,
             'image_filename': image_path.parts[-1]
@@ -85,6 +86,7 @@ class ProfileService(BaseService):
         statement = sa.select([
             schema.profiles.c.username,
             schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
             schema.profiles.c.biography,
             schema.profiles.c.auto_update,
             schema.profiles.c.last_update,
@@ -99,17 +101,20 @@ class ProfileService(BaseService):
         ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
         result = await self.database.fetch_one(query=statement)
 
-        profile_detail = ProfileDetail(
-            username=result['username'],
-            full_name=result['full_name'],
-            biography=result['biography'],
-            auto_update=result['auto_update'],
-            last_update=result['last_update'],
-            image_filename=result['image_filename'],
-            posts=PostsSummary(
-                count=result['post_count'],
-                earliest_time=result['earliest_time'],
-                latest_time=result['latest_time'],
+        if result:
+            return ProfileDetail(
+                username=result['username'],
+                full_name=result['full_name'],
+                display_name=result['display_name'],
+                biography=result['biography'],
+                auto_update=result['auto_update'],
+                last_update=result['last_update'],
+                image_filename=result['image_filename'],
+                posts=PostsSummary(
+                    count=result['post_count'],
+                    earliest_time=result['earliest_time'],
+                    latest_time=result['latest_time'],
+                )
             )
-        )
-        return profile_detail
+        else:
+            return None
