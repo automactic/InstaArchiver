@@ -17,7 +17,7 @@ from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
