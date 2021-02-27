@@ -66,7 +66,6 @@ class Post:
                     index=index,
                     url=node.video_url if node.is_video else node.display_url,
                     thumb_url=node.display_url if node.is_video else None,
-                    duration=post.video_duration,
                 )
                 for index, node in enumerate(post.get_sidecar_nodes())
             ]
