@@ -11,8 +11,8 @@ export interface Profile {
 	full_name: string
 	display_name: string
 	biography: string
-	auto_update: boolean
-	last_update?: Date
+	auto_archive: boolean
+	last_scan?: Date
 	image_filename: string
 	posts?: PostsSummary
 }
