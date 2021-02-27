@@ -41,7 +41,7 @@ async def shutdown():
 @app.on_event('startup')
 @repeat_every(seconds=60, wait_first=True)
 async def auto_update():
-    await AutoArchiveService(database, http_session).update_one_profile()
+    await AutoArchiveService(database, http_session).update_profiles()
 
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
