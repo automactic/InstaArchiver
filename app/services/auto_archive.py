@@ -39,7 +39,7 @@ class AutoArchiveService(BaseService):
                         break
 
                     # archive the post
-                    await PostService(self.database, self.http_session).create_from_shortcode(post.shortcode)
+                    await PostService(self.database, self.http_session).create_from_instaloader(post)
 
                 await self._set_last_update_timestamp(username)
 
