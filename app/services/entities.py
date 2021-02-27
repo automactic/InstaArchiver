@@ -97,8 +97,8 @@ class Profile(BaseModel):
     full_name: str
     display_name: str
     biography: Optional[str] = None
-    auto_update: bool = False
-    last_update: Optional[datetime] = None
+    auto_archive: bool = False
+    last_scan: Optional[datetime] = None
     image_filename: str
 
 
@@ -121,4 +121,4 @@ class ProfileListResult(BaseModel):
 
 class ProfileUpdates(BaseModel):
     display_name: Optional[str]
-    auto_update: Optional[bool]
+    auto_archive: Optional[bool]

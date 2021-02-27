@@ -38,7 +38,7 @@ class ProfileService(BaseService):
             'full_name': profile.full_name,
             'display_name': profile.full_name,
             'biography': profile.biography,
-            'auto_update': False,
+            'auto_archive': False,
             'image_filename': image_path.parts[-1]
         }
         updates = values.copy()
@@ -88,8 +88,8 @@ class ProfileService(BaseService):
             schema.profiles.c.full_name,
             schema.profiles.c.display_name,
             schema.profiles.c.biography,
-            schema.profiles.c.auto_update,
-            schema.profiles.c.last_update,
+            schema.profiles.c.auto_archive,
+            schema.profiles.c.last_scan,
             schema.profiles.c.image_filename,
             sa.func.count(schema.posts.c.shortcode).label('post_count'),
             sa.func.min(schema.posts.c.creation_time).label('earliest_time'),
@@ -107,8 +107,8 @@ class ProfileService(BaseService):
                 full_name=result['full_name'],
                 display_name=result['display_name'],
                 biography=result['biography'],
-                auto_update=result['auto_update'],
-                last_update=result['last_update'],
+                auto_archive=result['auto_archive'],
+                last_scan=result['last_scan'],
                 image_filename=result['image_filename'],
                 posts=PostsSummary(
                     count=result['post_count'],
