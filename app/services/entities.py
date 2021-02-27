@@ -96,6 +96,7 @@ class Post:
 class Profile(BaseModel):
     username: str
     full_name: str
+    display_name: str
     biography: Optional[str] = None
     auto_update: bool = False
     last_update: Optional[datetime] = None
@@ -107,3 +108,13 @@ class ProfileListResult(BaseModel):
     limit: int
     offset: int
     count: int
+
+
+class PostsSummary(BaseModel):
+    count: int
+    earliest_time: Optional[datetime]
+    latest_time: Optional[datetime]
+
+
+class ProfileDetail(Profile):
+    posts: PostsSummary

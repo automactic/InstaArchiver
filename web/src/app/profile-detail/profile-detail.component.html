@@ -1,7 +1,7 @@
 <nb-card *ngIf="profile$ | async as profile">
   <nb-card-header>
     <nb-user 
-      [name]="profile.full_name" 
+      [name]="profile.display_name" 
       [title]="profile.username" 
       [picture]="profileImagePath(profile.image_filename)"
       shape="rectangle" size="large">
@@ -20,6 +20,18 @@
       <div class="row">
         <p class="title"><b>Biography</b></p>
         <p class="detail">{{ profile.biography }}</p>
+      </div>
+      <div class="row" *ngIf="profile.posts as posts">
+        <p class="title"><b>Post Count</b></p>
+        <p class="detail">{{posts.count}}</p>
+      </div>
+      <div class="row" *ngIf="profile.posts?.earliest_time as earliest_time">
+        <p class="title"><b>Earliest Post</b></p>
+        <p class="detail">{{earliest_time}}</p>
+      </div>
+      <div class="row" *ngIf="profile.posts?.latest_time as latest_time">
+        <p class="title"><b>Latest Post</b></p>
+        <p class="detail">{{latest_time}}</p>
       </div>
     </div>
   </nb-card-body>

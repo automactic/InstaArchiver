@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
 from services.base import BaseService
-from services.entities import Profile, ProfileListResult
+from services.entities import Profile, ProfileDetail, ProfileListResult, PostsSummary
 from typing import Optional
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,7 @@ class ProfileService(BaseService):
         values = {
             'username': profile.username,
             'full_name': profile.full_name,
+            'display_name': profile.full_name,
             'biography': profile.biography,
             'auto_update': False,
             'image_filename': image_path.parts[-1]
@@ -75,13 +76,45 @@ class ProfileService(BaseService):
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=count)
 
-    async def get(self, username: str) -> Optional[Profile]:
+    async def get(self, username: str) -> Optional[ProfileDetail]:
         """Get a single profile.
 
         :param username: the username of the profile to get.
         :return: the profile query result
         """
 
-        statement = schema.profiles.select().where(schema.profiles.c.username == username)
+        statement = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
+            schema.profiles.c.biography,
+            schema.profiles.c.auto_update,
+            schema.profiles.c.last_update,
+            schema.profiles.c.image_filename,
+            sa.func.count(schema.posts.c.shortcode).label('post_count'),
+            sa.func.min(schema.posts.c.creation_time).label('earliest_time'),
+            sa.func.max(schema.posts.c.creation_time).label('latest_time'),
+        ]).select_from(
+            schema.profiles.join(
+                schema.posts, schema.profiles.c.username == schema.posts.c.owner_username
+            )
+        ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
         result = await self.database.fetch_one(query=statement)
-        return Profile(**result) if result else None
+
+        if result:
+            return ProfileDetail(
+                username=result['username'],
+                full_name=result['full_name'],
+                display_name=result['display_name'],
+                biography=result['biography'],
+                auto_update=result['auto_update'],
+                last_update=result['last_update'],
+                image_filename=result['image_filename'],
+                posts=PostsSummary(
+                    count=result['post_count'],
+                    earliest_time=result['earliest_time'],
+                    latest_time=result['latest_time'],
+                )
+            )
+        else:
+            return None

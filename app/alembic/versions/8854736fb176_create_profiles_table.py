@@ -20,6 +20,7 @@ def upgrade():
         'profiles',
         Column('username', String, primary_key=True),
         Column('full_name', String, index=True, nullable=False),
+        Column('display_name', String, index=True, nullable=False),
         Column('biography', String, index=True, nullable=True),
         Column('auto_update', Boolean, index=True, nullable=False),
         Column('last_update', DateTime, index=True, nullable=True),
