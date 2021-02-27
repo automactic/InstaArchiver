@@ -22,18 +22,13 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.mount('/media', StaticFiles(directory='/media'), name='media')
 
-logger.debug(f'Database: {schema.database_url}')
 database = databases.Database(schema.database_url)
 http_session = aiohttp.ClientSession()
 
 
 @app.on_event('startup')
 async def startup():
-    try:
-        await database.connect()
-    except Exception as e:
-        logger.error(e)
-        raise e
+    await database.connect()
 
 
 @app.on_event('shutdown')
@@ -57,7 +52,7 @@ async def get_profile(username: str):
 async def update_profile(username: str, updates: ProfileUpdates):
     service = ProfileService(database, http_session)
     await service.update(username, updates)
-    profile = await ProfileService(database, http_session).get(username)
+    profile = service.get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
