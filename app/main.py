@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
-from api.requests import PostCreationFromShortcode, PostCreationFromTimeRange
+from entities.posts import PostCreationFromShortcode, PostCreationFromTimeRange
 from services import schema, AutoArchiveService
 from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
