@@ -4,6 +4,7 @@ alembic~=1.5
 asyncpg~=0.22
 databases~=0.4
 fastapi~=0.63
+fastapi-utils~=0.2
 instaloader~=4.6
 psycopg2~=2.8
 SQLAlchemy~=1.3
