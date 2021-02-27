@@ -10,14 +10,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
-from api.requests import PostCreationFromShortcode
+from api.requests import PostCreationFromShortcode, PostCreationFromTimeRange
 from services import schema, AutoArchiveService
 from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -64,8 +64,16 @@ async def update_profile(username: str, updates: ProfileUpdates):
 
 
 @app.post('/api/posts/from_shortcode/')
-def create_post_from_url(request: PostCreationFromShortcode, background_tasks: BackgroundTasks):
-    background_tasks.add_task(PostService(database, http_session).create_from_shortcode, request.shortcode)
+def create_post_from_shortcode(request: PostCreationFromShortcode, background_tasks: BackgroundTasks):
+    service = PostService(database, http_session)
+    background_tasks.add_task(service.create_from_shortcode, request.shortcode)
+    return Response(status_code=HTTPStatus.ACCEPTED)
+
+
+@app.post('/api/posts/from_time_range/')
+def create_post_from_time_range(request: PostCreationFromTimeRange, background_tasks: BackgroundTasks):
+    service = PostService(database, http_session)
+    background_tasks.add_task(service.create_from_time_range, request.username, request.start, request.end)
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 

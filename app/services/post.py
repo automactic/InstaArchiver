@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from datetime import datetime
 from pathlib import Path
 
 import instaloader
@@ -32,8 +33,41 @@ class PostService(BaseService):
             logger.warning(f'Failed to retrieved Post: {shortcode}')
             raise PostNotFound(shortcode)
 
+    async def create_from_time_range(self, username: str, start: datetime, end: datetime):
+        """Create posts from a profile within a time range.
+
+        :param username: username of the profile to archive posts
+        :param start: start of the time range to archive posts
+        :param end: end of the time range to archive posts
+        """
+
+        loop = asyncio.get_running_loop()
+        func = instaloader.Profile.from_username
+        profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+        post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+
+        while True:
+            # fetch the next post
+            try:
+                post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+            except StopIteration:
+                break
+
+            # if post is later than the end date, that means we have yet to reach posts within the time range
+            if post.date_utc >= end:
+                continue
+
+            # if post is earlier than the start date, that means we have iterated through posts within the time range
+            if post.date_utc < start:
+                break
+
+            await self.create_from_instaloader(post)
+
     async def create_from_instaloader(self, post: instaloader.Post):
-        """Create a post from a instaloader post object."""
+        """Create a post from a instaloader post object.
+
+        :param post: a instaloader post object
+        """
 
         post = Post.from_instaloader(post)
 
