@@ -11,7 +11,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
 from api.requests import PostCreationFromShortcode
-from services import schema, UpdateService
+from services import schema, AutoArchiveService
 from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
 from services.post import PostService
@@ -41,7 +41,7 @@ async def shutdown():
 @app.on_event('startup')
 @repeat_every(seconds=10, wait_first=True)
 async def auto_update():
-    await UpdateService(database, http_session).update_posts()
+    await AutoArchiveService(database, http_session).update_one_profile()
 
 
 @app.get('/api/profiles/', response_model=ProfileListResult)

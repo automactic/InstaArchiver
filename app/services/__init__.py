@@ -1,2 +1,2 @@
 from services.post import PostService
-from services.update import UpdateService
+from services.auto_archive import AutoArchiveService

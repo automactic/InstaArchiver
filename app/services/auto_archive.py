@@ -13,11 +13,11 @@ from .base import BaseService
 logger = logging.getLogger(__name__)
 
 
-class UpdateService(BaseService):
+class AutoArchiveService(BaseService):
     OUTDATED_THRESHOLD = timedelta(minutes=15)
 
-    async def update_posts(self):
-        """Update the posts of one profile."""
+    async def update_one_profile(self):
+        """Catching up new posts of one profile."""
 
         loop = asyncio.get_running_loop()
         async with self.database.transaction():
