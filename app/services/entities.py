@@ -103,13 +103,6 @@ class Profile(BaseModel):
     image_filename: str
 
 
-class ProfileListResult(BaseModel):
-    profiles: List[Profile]
-    limit: int
-    offset: int
-    count: int
-
-
 class PostsSummary(BaseModel):
     count: int
     earliest_time: Optional[datetime]
@@ -118,3 +111,15 @@ class PostsSummary(BaseModel):
 
 class ProfileDetail(Profile):
     posts: PostsSummary
+
+
+class ProfileListResult(BaseModel):
+    profiles: List[Profile]
+    limit: int
+    offset: int
+    count: int
+
+
+class ProfileUpdates(BaseModel):
+    display_name: Optional[str]
+    auto_update: Optional[bool]

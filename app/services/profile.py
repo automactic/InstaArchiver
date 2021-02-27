@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from services import schema
 from services.base import BaseService
-from services.entities import Profile, ProfileDetail, ProfileListResult, PostsSummary
+from services.entities import Profile, ProfileDetail, ProfileUpdates, ProfileListResult, PostsSummary
 from typing import Optional
 logger = logging.getLogger(__name__)
 
@@ -118,3 +118,18 @@ class ProfileService(BaseService):
             )
         else:
             return None
+
+    async def update(self, username: str, updates: ProfileUpdates):
+        """Update a profile
+
+        :param username: username of the profile to update
+        :param updates: the updates to perform
+        """
+
+        updates = {key: value for key, value in updates if value is not None}
+        if not updates:
+            return
+        statement = sa.update(schema.profiles)\
+            .where(schema.profiles.c.username == username)\
+            .values(**updates)
+        await self.database.execute(statement)

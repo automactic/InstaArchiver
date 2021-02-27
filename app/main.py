@@ -8,38 +8,40 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
+from fastapi_utils.tasks import repeat_every
 
 from api.requests import PostCreationFromShortcode
-from services import schema
-from services.entities import ProfileListResult, ProfileDetail
+from services import schema, AutoArchiveService
+from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.mount('/media', StaticFiles(directory='/media'), name='media')
 
-logger.debug(f'Database: {schema.database_url}')
 database = databases.Database(schema.database_url)
 http_session = aiohttp.ClientSession()
 
 
 @app.on_event('startup')
 async def startup():
-    try:
-        await database.connect()
-    except Exception as e:
-        logger.error(e)
-        raise e
+    await database.connect()
 
 
 @app.on_event('shutdown')
 async def shutdown():
     await database.disconnect()
     await http_session.close()
+
+
+@app.on_event('startup')
+@repeat_every(seconds=10, wait_first=True)
+async def auto_update():
+    await AutoArchiveService(database, http_session).update_one_profile()
 
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
@@ -50,6 +52,14 @@ async def list_profiles():
 @app.get('/api/profiles/{username:str}/', response_model=ProfileDetail)
 async def get_profile(username: str):
     profile = await ProfileService(database, http_session).get(username)
+    return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
+
+
+@app.patch('/api/profiles/{username:str}/', response_model=ProfileDetail)
+async def update_profile(username: str, updates: ProfileUpdates):
+    service = ProfileService(database, http_session)
+    await service.update(username, updates)
+    profile = service.get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 

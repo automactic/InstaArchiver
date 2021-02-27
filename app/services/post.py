@@ -17,30 +17,7 @@ logger = logging.getLogger(__name__)
 
 class PostService(BaseService):
     async def create_from_shortcode(self, shortcode: str):
-        """Create and save a post from its shortcode.
-
-        :param shortcode: shortcode of a single post
-        :return: post metadata
-        """
-
-        post = await self._retrieve(shortcode)
-
-        # create profile if not exist
-        profile_service = ProfileService(self.database, self.http_session)
-        if not await profile_service.exists(post.owner_username):
-            await profile_service.upsert(post.owner_username)
-
-        await self._download_image_video(post)
-        await self._save_metadata(post)
-
-        logger.info(
-            f'Saved post {post.shortcode} of user {post.owner_username} '
-            f'which contains {len(post.items)} item(s).'
-        )
-        return post
-
-    async def _retrieve(self, shortcode: str) -> Post:
-        """Retrieve info about a single post from the Internet.
+        """Create a post from a shortcode.
 
         :param shortcode: shortcode of a single post
         :return: post metadata
@@ -50,11 +27,30 @@ class PostService(BaseService):
         try:
             func = instaloader.Post.from_shortcode
             post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-            logger.debug(f'Retrieved Post: {shortcode}')
-            return Post.from_instaloader(post)
+            return await self.create_from_instaloader(post)
         except Exception:
             logger.warning(f'Failed to retrieved Post: {shortcode}')
             raise PostNotFound(shortcode)
+
+    async def create_from_instaloader(self, post: instaloader.Post):
+        """Create a post from a instaloader post object."""
+
+        post = Post.from_instaloader(post)
+
+        # create profile if not exist
+        profile_service = ProfileService(self.database, self.http_session)
+        if not await profile_service.exists(post.owner_username):
+            await profile_service.upsert(post.owner_username)
+
+        # save post
+        await self._download_image_video(post)
+        await self._save_metadata(post)
+
+        logger.info(
+            f'Saved post {post.shortcode} of user {post.owner_username} '
+            f'which contains {len(post.items)} item(s).'
+        )
+        return post
 
     async def _download_image_video(self, post: Post):
         """Download images and videos of a post.
