@@ -41,10 +41,15 @@ class PostService(BaseService):
         :param end: end of the time range to archive posts
         """
 
+        # get the post iterator
         loop = asyncio.get_running_loop()
-        func = instaloader.Profile.from_username
-        profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
-        post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+        try:
+            func = instaloader.Profile.from_username
+            profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+            post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+        except instaloader.ProfileNotExistsException:
+            logger.warning(f'Failed to create posts from time range. Profile {username} does not exist.')
+            return
 
         while True:
             # fetch the next post
