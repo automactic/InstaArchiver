@@ -16,8 +16,19 @@ logger = logging.getLogger(__name__)
 class AutoArchiveService(BaseService):
     OUTDATED_THRESHOLD = timedelta(minutes=15)
 
-    async def update_one_profile(self):
-        """Catching up new posts of one profile."""
+    async def update_profiles(self):
+        """Catching up new posts of all outdated profiles."""
+
+        while True:
+            username = await self.update_one_profile()
+            if not username:
+                break
+
+    async def update_one_profile(self) -> Optional[str]:
+        """Catching up new posts of one profile.
+
+        :return: username of the profile that got updated
+        """
 
         loop = asyncio.get_running_loop()
         async with self.database.transaction():
@@ -42,6 +53,7 @@ class AutoArchiveService(BaseService):
                     await PostService(self.database, self.http_session).create_from_instaloader(post)
 
                 await self._set_last_update_timestamp(username)
+                return username
 
     async def _find_next_profile(self) -> Optional[str]:
         """Find username of the next outdated profile to archive.

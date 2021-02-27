@@ -68,11 +68,11 @@ class ProfileService(BaseService):
         :return: the list query result
         """
 
-        statement = schema.profiles.select(offset=offset, limit=limit)
-        profiles = [Profile(**profile) for profile in await self.database.fetch_all(query=statement)]
+        statement = schema.profiles.select(offset=offset, limit=limit).order_by(schema.profiles.c.username)
+        profiles = [Profile(**profile) for profile in await self.database.fetch_all(statement)]
 
         statement = sa.select([sa.func.count()]).select_from(schema.profiles)
-        count = await self.database.fetch_val(query=statement)
+        count = await self.database.fetch_val(statement)
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=count)
 
