@@ -39,7 +39,7 @@ async def shutdown():
 
 
 @app.on_event('startup')
-@repeat_every(seconds=10, wait_first=True)
+@repeat_every(seconds=60, wait_first=True)
 async def auto_update():
     await AutoArchiveService(database, http_session).update_one_profile()
 
@@ -59,7 +59,7 @@ async def get_profile(username: str):
 async def update_profile(username: str, updates: ProfileUpdates):
     service = ProfileService(database, http_session)
     await service.update(username, updates)
-    profile = service.get(username)
+    profile = await service.get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
