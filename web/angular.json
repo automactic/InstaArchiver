@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "InstaSaver": {
+    "InstaArchiver": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -69,18 +69,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "InstaSaver:build"
+            "browserTarget": "InstaArchiver:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "InstaSaver:build:production"
+              "browserTarget": "InstaArchiver:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "InstaSaver:build"
+            "browserTarget": "InstaArchiver:build"
           }
         },
         "test": {
@@ -117,16 +117,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "InstaSaver:serve"
+            "devServerTarget": "InstaArchiver:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "InstaSaver:serve:production"
+              "devServerTarget": "InstaArchiver:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "InstaSaver"
+  "defaultProject": "InstaArchiver"
 }

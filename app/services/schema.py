@@ -5,7 +5,7 @@ from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, Float, Stri
 from sqlalchemy.dialects.postgresql import ARRAY
 
 database_hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-database_url = f'postgresql://postgres:postgres@{database_hostname}/insta_saver'
+database_url = f'postgresql://postgres:postgres@{database_hostname}/insta_archiver'
 
 
 def create_engine() -> sqlalchemy.engine.Engine:
@@ -27,8 +27,8 @@ profiles = Table(
     Column('full_name', String, index=True, nullable=False),
     Column('display_name', String, index=True, nullable=False),
     Column('biography', String, index=True, nullable=True),
-    Column('auto_update', Boolean, index=True, nullable=False),
-    Column('last_update', DateTime, index=True, nullable=True),
+    Column('auto_archive', Boolean, index=True, nullable=False),
+    Column('last_scan', DateTime, index=True, nullable=True),
     Column('image_filename', String, index=True, nullable=False),
 )
 

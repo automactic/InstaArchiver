@@ -40,7 +40,7 @@ async def shutdown():
 
 @app.on_event('startup')
 @repeat_every(seconds=60, wait_first=True)
-async def auto_update():
+async def auto_archive():
     await AutoArchiveService(database, http_session).update_profiles()
 
 

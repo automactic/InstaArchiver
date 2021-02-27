@@ -22,8 +22,8 @@ def upgrade():
         Column('full_name', String, index=True, nullable=False),
         Column('display_name', String, index=True, nullable=False),
         Column('biography', String, index=True, nullable=True),
-        Column('auto_update', Boolean, index=True, nullable=False),
-        Column('last_update', DateTime, index=True, nullable=True),
+        Column('auto_archive', Boolean, index=True, nullable=False),
+        Column('last_scan', DateTime, index=True, nullable=True),
         Column('image_filename', String, index=True, nullable=False),
     )
 
