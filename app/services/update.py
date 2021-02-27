@@ -42,8 +42,6 @@ class UpdateService(BaseService):
                     await PostService(self.database, self.http_session).create_from_shortcode(post.shortcode)
 
                 await self._set_last_update_timestamp(username)
-            else:
-                logger.info('Nothing to update')
 
     async def _find_next_profile(self) -> Optional[str]:
         """Find username of the next outdated profile to archive.
