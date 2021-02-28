@@ -64,8 +64,8 @@ async def update_profile(username: str, updates: ProfileUpdates):
 
 
 @app.get('/api/posts/', response_model=PostListResult)
-async def list_posts():
-    return await PostService(database, http_session).list()
+async def list_posts(offset: int = 0, limit: int = 10):
+    return await PostService(database, http_session).list(offset, limit)
 
 
 @app.post('/api/posts/from_shortcode/')
