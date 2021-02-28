@@ -8,7 +8,8 @@ div.profiles > div.list {
 
   position: -webkit-sticky;
   position: sticky;
-  top: 6.25rem;
+  top: 7.25rem;
+  @media (max-width: 991.98px) { top: 6.25rem; }
   @media (max-width: 767.98px) { position: static }
 
   height: calc(100vh - 8.75rem);
