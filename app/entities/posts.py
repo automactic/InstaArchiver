@@ -11,6 +11,17 @@ class PostType(Enum):
     SIDECAR = 'sidecar'
 
 
+class PostItemType(Enum):
+    IMAGE = 'image'
+    VIDEO = 'video'
+
+
+class PostItem(BaseModel):
+    type: PostItemType
+    duration: Optional[float] = None
+    filename: Optional[str] = None
+
+
 class Post(BaseModel):
     shortcode: str
     owner_username: str
@@ -19,6 +30,7 @@ class Post(BaseModel):
     caption: Optional[str]
     caption_hashtags: List[str]
     caption_mentions: List[str]
+    first_item: PostItem
 
 
 class PostListResult(BaseModel):

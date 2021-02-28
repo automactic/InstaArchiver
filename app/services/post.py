@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
 from entities.posts import Post as Post2
-from entities.posts import PostListResult
+from entities.posts import PostItem, PostListResult
 from services import schema
 from services.base import BaseService
 from services.entities import Post
@@ -36,6 +36,9 @@ class PostService(BaseService):
             schema.posts.c.caption,
             schema.posts.c.caption_hashtags,
             schema.posts.c.caption_mentions,
+            schema.post_items.c.type.label('item_type'),
+            schema.post_items.c.duration.label('item_duration'),
+            schema.post_items.c.filename.label('item_filename'),
         ]).select_from(
             schema.posts.join(
                 schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode
@@ -44,7 +47,12 @@ class PostService(BaseService):
 
         posts = []
         for result in await self.database.fetch_all(statement):
-            post = Post2(**result)
+            item = PostItem(
+                type=result['item_type'],
+                duration=result['item_duration'],
+                filename=result['item_filename']
+            )
+            post = Post2(first_item=item, **result)
             posts.append(post)
 
         statement = sa.select([sa.func.count()]).select_from(schema.posts)
