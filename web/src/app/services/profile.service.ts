@@ -41,8 +41,8 @@ export class ProfileService {
   profiles: Profile[] = []
 
   constructor(private httpClient: HttpClient) {
-    this.list().subscribe(data => {
-      this.profiles = data.profiles
+    this.list().subscribe(response_data => {
+      this.profiles = response_data.profiles
     })
   }
 
