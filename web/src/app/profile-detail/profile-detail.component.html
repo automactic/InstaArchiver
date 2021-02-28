@@ -25,6 +25,29 @@
       </div>
      </nb-accordion-item-body>
     </nb-accordion-item>
+    <nb-accordion-item>
+      <nb-accordion-item-header>Configuration</nb-accordion-item-header>
+      <nb-accordion-item-body>
+        <form (ngSubmit)="saveConfiguration()" #configurationForm="ngForm">
+          <div class="row" >
+            <p class="title"><b>Display Name</b></p>
+            <p class="detail">
+              <input 
+                nbInput type="text" [(ngModel)]="configuration.display_name" name="display_name"
+                autocorrect="off" autocapitalize="off" spellcheck="false"
+              >
+            </p>
+          </div>
+          <div class="row" >
+            <p class="title"><b>Auto Archive</b></p>
+            <p class="detail">
+              <nb-toggle status="success" [(checked)]="configuration.auto_archive" name="auto_archive"></nb-toggle>
+            </p>
+          </div>
+          <button nbButton type="submit" status="primary" [disabled]="!configurationForm.form.valid">Save</button>
+        </form>
+      </nb-accordion-item-body>
+    </nb-accordion-item>
     <nb-accordion-item *ngIf="profile.posts as posts" expanded="true">
       <nb-accordion-item-header>Post Stats</nb-accordion-item-header>
       <nb-accordion-item-body>

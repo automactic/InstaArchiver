@@ -17,6 +17,7 @@ import {
   NbMenuModule,
   NbSidebarModule,
   NbThemeModule,
+  NbToggleModule,
   NbUserModule
 } from '@nebular/theme';
 import { AppRoutingModule } from './app-routing.module';
@@ -54,6 +55,7 @@ import { ProfilesComponent } from './profiles/profiles.component';
     NbMenuModule.forRoot(),
     NbSidebarModule.forRoot(),
     NbThemeModule.forRoot({ name: 'default' }),
+    NbToggleModule,
     NbUserModule,
   ],
   providers: [],
