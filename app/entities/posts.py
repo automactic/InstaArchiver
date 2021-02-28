@@ -30,7 +30,7 @@ class Post(BaseModel):
     caption: Optional[str]
     caption_hashtags: List[str]
     caption_mentions: List[str]
-    first_item: PostItem
+    items: List[PostItem]
 
 
 class PostListResult(BaseModel):
