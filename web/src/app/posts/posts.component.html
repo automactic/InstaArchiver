@@ -1,1 +1,17 @@
-<p>posts works!</p>
+<div class="posts">
+  <div class="grid">
+    <nb-card>
+      <nb-card-header>
+        <nb-select placeholder="All" size="medium">
+          <nb-option>All</nb-option>
+          <nb-option *ngFor="let profile of profileService.profiles" [value]="profile.username">{{ profile.display_name }}</nb-option>
+        </nb-select>
+      </nb-card-header>
+    </nb-card>
+  </div>
+  <div class="detail">
+    <nb-card>
+      <nb-card-header>Single Post</nb-card-header>
+    </nb-card>
+  </div>
+</div>

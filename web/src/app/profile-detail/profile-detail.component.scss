@@ -1,8 +1,6 @@
-nb-card-body {
-  div.profile > div.row {
-    display: flex;
-    p.title { flex: 2; margin-right: 1rem;}
-    p.detail { flex: 8 }
-    p {margin: 0.5rem 0;}
-  }
+nb-accordion-item-body div.row {
+  display: flex;
+  p.title { flex: 5; margin-right: 1rem;}
+  p.detail { flex: 15 }
+  p {margin: 0.5rem 0;}
 }

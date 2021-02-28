@@ -3,12 +3,14 @@
     <nb-user 
       [name]="profile.display_name" 
       [title]="profile.username" 
-      [picture]="profileImagePath(profile.image_filename)"
+      [picture]="profileService.getProfileImagePath(profile.image_filename)"
       shape="rectangle" size="large">
     </nb-user>
   </nb-card-header>
-  <nb-card-body>
-    <div class="profile">
+  <nb-accordion multi>
+    <nb-accordion-item>
+     <nb-accordion-item-header>Details</nb-accordion-item-header>
+     <nb-accordion-item-body>
       <div class="row">
         <p class="title"><b>Username</b></p>
         <p class="detail">{{ profile.username }}</p>
@@ -21,19 +23,47 @@
         <p class="title"><b>Biography</b></p>
         <p class="detail">{{ profile.biography }}</p>
       </div>
-      <div class="row" *ngIf="profile.posts as posts">
-        <p class="title"><b>Post Count</b></p>
-        <p class="detail">{{posts.count}}</p>
-      </div>
-      <div class="row" *ngIf="profile.posts?.earliest_time as earliest_time">
-        <p class="title"><b>Earliest Post</b></p>
-        <p class="detail">{{earliest_time}}</p>
-      </div>
-      <div class="row" *ngIf="profile.posts?.latest_time as latest_time">
-        <p class="title"><b>Latest Post</b></p>
-        <p class="detail">{{latest_time}}</p>
-      </div>
-    </div>
-  </nb-card-body>
-  <div>Temp: Recent images</div>
+     </nb-accordion-item-body>
+    </nb-accordion-item>
+    <nb-accordion-item>
+      <nb-accordion-item-header>Configuration</nb-accordion-item-header>
+      <nb-accordion-item-body>
+        <form (ngSubmit)="profileService.updateConfiguration(profile.username, configuration)" #configurationForm="ngForm">
+          <div class="row" >
+            <p class="title"><b>Display Name</b></p>
+            <p class="detail">
+              <input 
+                nbInput type="text" [(ngModel)]="configuration.display_name" name="display_name"
+                autocorrect="off" autocapitalize="off" spellcheck="false"
+              >
+            </p>
+          </div>
+          <div class="row" >
+            <p class="title"><b>Auto Archive</b></p>
+            <p class="detail">
+              <nb-toggle status="success" [(checked)]="configuration.auto_archive" name="auto_archive"></nb-toggle>
+            </p>
+          </div>
+          <button nbButton type="submit" status="primary" [disabled]="!configurationForm.form.valid">Save</button>
+        </form>
+      </nb-accordion-item-body>
+    </nb-accordion-item>
+    <nb-accordion-item *ngIf="profile.posts as posts" expanded="true">
+      <nb-accordion-item-header>Post Stats</nb-accordion-item-header>
+      <nb-accordion-item-body>
+        <div class="row" >
+          <p class="title"><b>Count</b></p>
+          <p class="detail">{{posts.count}}</p>
+        </div>
+        <div class="row" *ngIf="posts.earliest_time as earliest_time">
+          <p class="title"><b>Earliest</b></p>
+          <p class="detail">{{earliest_time}}</p>
+        </div>
+        <div class="row" *ngIf="posts.latest_time as latest_time">
+          <p class="title"><b>Latest</b></p>
+          <p class="detail">{{latest_time}}</p>
+        </div>
+      </nb-accordion-item-body>
+    </nb-accordion-item>
+   </nb-accordion>
 </nb-card>
