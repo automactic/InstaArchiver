@@ -1,17 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { environment } from 'src/environments/environment';
-import { APIService } from '../api.service';
-import { Profile } from '../entities';
+import { ProfileService, Profile, ProfileConfiguration } from '../services/profile.service';
 
-
-class ProfileConfiguration {
-  display_name = ""
-  auto_archive = false
-}
 
 @Component({
   selector: 'app-profile-detail',
@@ -19,14 +12,16 @@ class ProfileConfiguration {
   styleUrls: ['./profile-detail.component.scss']
 })
 export class ProfileDetailComponent implements OnInit {
+  profileService: ProfileService;
+  
   profile$: Observable<Profile>;
   configuration = new ProfileConfiguration()
-  username?: string;
 
-  constructor(private route: ActivatedRoute, private router: Router, private apiService: APIService) {
+  constructor(private route: ActivatedRoute, profileService: ProfileService) {
+    this.profileService = profileService;
     this.profile$ = this.route.paramMap.pipe(
       switchMap(params => {
-        return this.apiService.getProfile(params.get("username") ?? "")
+        return this.profileService.getProfile(params.get("username") ?? "")
       })
     );
     this.profile$.subscribe( profile => {
@@ -37,11 +32,4 @@ export class ProfileDetailComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  profileImagePath(filename: string): string {
-    return `${environment.apiRoot}/media/profile_images/${filename}`
-  }
-
-  saveConfiguration() {
-
-  }
 }

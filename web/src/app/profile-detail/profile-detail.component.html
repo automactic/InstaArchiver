@@ -3,7 +3,7 @@
     <nb-user 
       [name]="profile.display_name" 
       [title]="profile.username" 
-      [picture]="profileImagePath(profile.image_filename)"
+      [picture]="profileService.getProfileImagePath(profile.image_filename)"
       shape="rectangle" size="large">
     </nb-user>
   </nb-card-header>
@@ -28,7 +28,7 @@
     <nb-accordion-item>
       <nb-accordion-item-header>Configuration</nb-accordion-item-header>
       <nb-accordion-item-body>
-        <form (ngSubmit)="saveConfiguration()" #configurationForm="ngForm">
+        <form (ngSubmit)="profileService.updateConfiguration(profile.username, configuration)" #configurationForm="ngForm">
           <div class="row" >
             <p class="title"><b>Display Name</b></p>
             <p class="detail">
