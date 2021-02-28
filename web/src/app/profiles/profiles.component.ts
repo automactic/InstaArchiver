@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { APIService } from 'src/app/api.service';
-import { Profile } from 'src/app/entities';
-import { environment } from 'src/environments/environment';
+
+import { ProfileService } from '../services/profile.service';
 
 
 @Component({
@@ -10,16 +9,11 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./profiles.component.scss']
 })
 export class ProfilesComponent implements OnInit {
-  profiles: Profile[] = []
-  constructor(private apiService: APIService) { }
-
-  ngOnInit(): void {
-    this.apiService.listProfiles().subscribe(data => {
-      this.profiles = data.profiles
-    })
+  profileService: ProfileService;
+  
+  constructor(profileService: ProfileService) {
+    this.profileService = profileService;
   }
 
-  profileImagePath(filename: string): string {
-    return `${environment.apiRoot}/media/profile_images/${filename}`
-  }
+  ngOnInit(): void { }
 }

@@ -4,13 +4,13 @@
       <nb-card-header>Profiles</nb-card-header>
       <nb-list>
         <nb-list-item 
-          *ngFor="let profile of profiles" 
+          *ngFor="let profile of profileService.profiles" 
           [routerLink]="profile.username" 
           routerLinkActive="active">
           <nb-user 
             [name]="profile.display_name" 
             [title]="profile.username" 
-            [picture]="profileImagePath(profile.image_filename)"
+            [picture]="profileService.getProfileImagePath(profile.image_filename)"
             shape="rectangle">
           </nb-user>
         </nb-list-item>
