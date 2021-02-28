@@ -21,20 +21,12 @@
             </div>
             <button nbButton status="danger"><nb-icon icon="trash-2-outline"></nb-icon></button>
           </div>
-          <div *ngIf="post.first_item as first_item">
-            <img *ngIf="post.first_item?.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">
+          <div *ngFor="let item of post.items">
+            <img *ngIf="item.type == 'image'" [src]="postService.getMediaPath(post.owner_username, item.filename)">
+            <video *ngIf="item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, item.filename)"></video>
           </div>
         </nb-list-item>
       </nb-list>
     </nb-card>
   </div>
 </div>
-
-<!-- <div class="grid">
-  <div *ngFor="let post of posts">
-    <div *ngIf="post.first_item as first_item">
-      <img *ngIf="post.first_item?.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">
-      <video *ngIf="first_item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)" type="video/mp4"></video>
-    </div>
-  </div>
-</div> -->

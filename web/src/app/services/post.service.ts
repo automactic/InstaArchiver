@@ -9,7 +9,7 @@ export interface Post {
   shortcode: string
   owner_username: string
   creation_time: Date
-	first_item?: PostItem
+	items: PostItem[]
 }
 
 export interface PostItem {
