@@ -17,8 +17,8 @@ class Post(BaseModel):
     creation_time: datetime
     type: PostType
     caption: Optional[str]
-    caption_hashtags: [str]
-    caption_mentions: [str]
+    caption_hashtags: List[str]
+    caption_mentions: List[str]
 
 
 class PostListResult(BaseModel):
