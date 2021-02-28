@@ -21,13 +21,12 @@ export class PostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.postService.list().subscribe( response_data => {
-      this.posts = response_data.posts;
-    })
+    this.loadNext()
   }
 
   loadNext() {
-    
+    this.postService.list(this.posts.length, 20).subscribe( response_data => {
+      this.posts = this.posts.concat(response_data.posts);
+    })
   }
-
 }
