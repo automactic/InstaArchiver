@@ -35,9 +35,7 @@ export class ProfileDetailComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-    console.log('test')
-  }
+  ngOnInit(): void { }
 
   profileImagePath(filename: string): string {
     return `${environment.apiRoot}/media/profile_images/${filename}`
