@@ -21,7 +21,7 @@ export class ProfileDetailComponent implements OnInit {
     this.profileService = profileService;
     this.profile$ = this.route.paramMap.pipe(
       switchMap(params => {
-        return this.profileService.getProfile(params.get("username") ?? "")
+        return this.profileService.get(params.get("username") ?? "")
       })
     );
     this.profile$.subscribe( profile => {

@@ -41,17 +41,17 @@ export class ProfileService {
   profiles: Profile[] = []
 
   constructor(private httpClient: HttpClient) {
-    this.listProfiles().subscribe(data => {
+    this.list().subscribe(data => {
       this.profiles = data.profiles
     })
   }
 
-  listProfiles() {
+  list() {
     let url = `${environment.apiRoot}/api/profiles/`;
     return this.httpClient.get<ListProfilesResponse>(url);
   }
 
-  getProfile(username: string): Observable<Profile> {
+  get(username: string): Observable<Profile> {
     let url = `${environment.apiRoot}/api/profiles/${username}/`;
     return this.httpClient.get<Profile>(url);
   }
