@@ -65,15 +65,16 @@ class AutoArchiveService(BaseService):
         :return: username of the profile to update
         """
 
+        where_clause = sa.and_(
+            sa.sql.operators.eq(schema.profiles.c.auto_archive, True),
+            sa.or_(
+                schema.profiles.c.last_scan < datetime.utcnow() - self.OUTDATED_THRESHOLD,
+                sa.sql.operators.eq(schema.profiles.c.last_scan, None),
+            )
+        )
         statement = sa.select([schema.profiles.c.username], for_update=True) \
             .select_from(schema.profiles) \
-            .where(sa.and_(
-                sa.sql.operators.eq(schema.profiles.c.auto_archive, True),
-                sa.or_(
-                    schema.profiles.c.last_scan < datetime.utcnow() - self.OUTDATED_THRESHOLD,
-                    sa.sql.operators.eq(schema.profiles.c.last_scan, None),
-                )
-            )) \
+            .where(where_clause) \
             .order_by(schema.profiles.c.last_scan.desc().nullsfirst()) \
             .limit(1)
         result = await self.database.fetch_one(statement)
@@ -98,7 +99,7 @@ class AutoArchiveService(BaseService):
         :param username: username of the profile to perform update
         """
 
-        statement = sa.update(schema.profiles)\
-            .where(schema.profiles.c.username == username)\
+        statement = sa.update(schema.profiles) \
+            .where(schema.profiles.c.username == username) \
             .values(last_scan=datetime.utcnow())
         await self.database.execute(statement)
