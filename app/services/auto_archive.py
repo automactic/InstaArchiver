@@ -7,8 +7,9 @@ import instaloader
 import sqlalchemy as sa
 import sqlalchemy.sql.operators
 
-from services import schema, PostService
+from services import schema
 from .base import BaseService
+from .post import PostService
 
 logger = logging.getLogger(__name__)
 
