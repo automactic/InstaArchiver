@@ -19,7 +19,7 @@
               <div><b>{{ post.owner_username }}</b></div>
               <div>{{ post.creation_time }}</div>
             </div>
-            <button nbButton status="basic">Delete</button>
+            <button nbButton status="danger"><nb-icon icon="trash-2-outline"></nb-icon></button>
           </div>
           <div *ngIf="post.first_item as first_item">
             <img *ngIf="post.first_item?.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">

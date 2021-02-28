@@ -29,3 +29,15 @@ div.profiles > div.detail {
   flex: 7;
   @media (max-width: 767.98px) { flex: none; }
 }
+
+nb-list-item:focus {
+  outline: none;
+}
+
+nb-list-item:hover {
+  background-color: #EFF5FB;
+}
+
+nb-list-item.active {
+  background-color: #E0ECF8;
+}
