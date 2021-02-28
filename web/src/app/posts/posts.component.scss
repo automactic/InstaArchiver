@@ -1,15 +1,23 @@
-div.posts {
+div.container {
   display: flex;
   @media (max-width: 991.98px) { flex-direction: column }
 }
-div.posts > div.grid {
+div.container > div.posts {
   flex: 6;
   @media (max-width: 991.98px) { flex: none; }
 
-  margin-right: 2rem;
-  @media (max-width: 991.98px) { margin-right: 0rem }
+  margin-left: 2rem;
+  @media (max-width: 991.98px) { margin-left: 0rem }
+
+  nb-list-item {
+    padding: 0;
+    flex-direction: column;
+    img {
+      max-width: 100%;
+    }
+  }
 }
-div.posts > div.detail {
+div.container > div.detail {
   flex: 4;
   @media (max-width: 991.98px) { flex: none; }
 }

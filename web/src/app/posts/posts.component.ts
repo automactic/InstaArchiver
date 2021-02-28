@@ -26,4 +26,8 @@ export class PostsComponent implements OnInit {
     })
   }
 
+  loadNext() {
+    
+  }
+
 }

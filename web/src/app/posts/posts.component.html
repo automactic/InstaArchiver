@@ -1,25 +1,34 @@
-<div class="posts">
-  <div class="grid">
+<div class="container">
+  <div class="filter">
     <nb-card>
-      <nb-card-header>
+      <nb-card-header>Filter</nb-card-header>
+      <nb-card-body>
         <nb-select placeholder="All" size="medium">
           <nb-option>All</nb-option>
           <nb-option *ngFor="let profile of profileService.profiles" [value]="profile.username">{{ profile.display_name }}</nb-option>
         </nb-select>
-      </nb-card-header>
-      <div>
-        <div *ngFor="let post of posts">
-          <div *ngIf="post.first_item as first_item">
-            <img *ngIf="first_item.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">
-            <!-- <video *ngIf="first_item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)" type="video/mp4"></video> -->
-          </div>
-        </div>
-      </div>
+      </nb-card-body>
     </nb-card>
   </div>
-  <div class="detail">
+  <div class="posts">
     <nb-card>
-      <nb-card-header>Single Post</nb-card-header>
+      <nb-list nbInfiniteList [threshold]="500" (bottomThreshold)="loadNext()">
+        <nb-list-item *ngFor="let post of posts">
+          <div><p>{{post.shortcode}}</p></div>
+          <div *ngIf="post.first_item as first_item">
+            <img *ngIf="post.first_item?.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">
+          </div>
+        </nb-list-item>
+      </nb-list>
     </nb-card>
   </div>
 </div>
+
+<!-- <div class="grid">
+  <div *ngFor="let post of posts">
+    <div *ngIf="post.first_item as first_item">
+      <img *ngIf="post.first_item?.type == 'image'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)">
+      <video *ngIf="first_item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, first_item.filename)" type="video/mp4"></video>
+    </div>
+  </div>
+</div> -->
