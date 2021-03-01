@@ -10,14 +10,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
-from entities.posts import PostCreationFromShortcode, PostCreationFromTimeRange
+from entities.posts import PostListResult, PostCreationFromShortcode, PostCreationFromTimeRange
 from services import schema, AutoArchiveService
 from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -61,6 +61,11 @@ async def update_profile(username: str, updates: ProfileUpdates):
     await service.update(username, updates)
     profile = await service.get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
+
+
+@app.get('/api/posts/', response_model=PostListResult)
+async def list_posts(offset: int = 0, limit: int = 10):
+    return await PostService(database, http_session).list(offset, limit)
 
 
 @app.post('/api/posts/from_shortcode/')

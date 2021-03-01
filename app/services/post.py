@@ -5,8 +5,11 @@ from datetime import datetime
 from pathlib import Path
 
 import instaloader
+import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
+from entities.posts import Post as Post2
+from entities.posts import PostItem, PostListResult
 from services import schema
 from services.base import BaseService
 from services.entities import Post
@@ -17,6 +20,55 @@ logger = logging.getLogger(__name__)
 
 
 class PostService(BaseService):
+    async def list(self, offset: int = 0, limit: int = 10) -> PostListResult:
+        """List posts.
+
+        :param offset: the number of posts to skip
+        :param limit: the number of posts to fetch
+        :return: the list query result
+        """
+
+        posts_statement = sa.select([schema.posts.c.shortcode])\
+            .select_from(schema.posts)\
+            .order_by(schema.posts.c.creation_time.desc())\
+            .offset(offset).limit(limit)
+        statement = sa.select([
+            schema.posts.c.shortcode,
+            schema.posts.c.owner_username,
+            schema.posts.c.creation_time,
+            schema.posts.c.type,
+            schema.posts.c.caption,
+            schema.posts.c.caption_hashtags,
+            schema.posts.c.caption_mentions,
+            schema.post_items.c.type.label('item_type'),
+            schema.post_items.c.duration.label('item_duration'),
+            schema.post_items.c.filename.label('item_filename'),
+        ]).select_from(
+            schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
+        ).where(
+            schema.post_items.c.post_shortcode.in_(posts_statement)
+        ).order_by(
+            schema.posts.c.creation_time.desc(), schema.post_items.c.index.asc()
+        )
+
+        posts = []
+        for result in await self.database.fetch_all(statement):
+            item = PostItem(
+                type=result['item_type'],
+                duration=result['item_duration'],
+                filename=result['item_filename']
+            )
+            if posts and posts[-1].shortcode == result['shortcode']:
+                posts[-1].items.append(item)
+            else:
+                post = Post2(items=[item], **result)
+                posts.append(post)
+
+        statement = sa.select([sa.func.count()]).select_from(schema.posts)
+        count = await self.database.fetch_val(statement)
+
+        return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
+
     async def create_from_shortcode(self, shortcode: str):
         """Create a post from a shortcode.
 

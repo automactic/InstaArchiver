@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
+from typing import Optional
 
 import instaloader
 import sqlalchemy as sa
@@ -9,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert
 from services import schema
 from services.base import BaseService
 from services.entities import Profile, ProfileDetail, ProfileUpdates, ProfileListResult, PostsSummary
-from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 
@@ -129,7 +130,7 @@ class ProfileService(BaseService):
         updates = {key: value for key, value in updates if value is not None}
         if not updates:
             return
-        statement = sa.update(schema.profiles)\
-            .where(schema.profiles.c.username == username)\
+        statement = sa.update(schema.profiles) \
+            .where(schema.profiles.c.username == username) \
             .values(**updates)
         await self.database.execute(statement)
