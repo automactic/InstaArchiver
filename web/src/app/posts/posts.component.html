@@ -14,16 +14,16 @@
     <nb-card>
       <nb-list nbInfiniteList [threshold]="500" (bottomThreshold)="loadNext()">
         <nb-list-item *ngFor="let post of posts">
-          <div class="header">
+          <div *ngFor="let item of post.items">
+            <img *ngIf="item.type == 'image'" [src]="postService.getMediaPath(post.owner_username, item.filename)">
+            <video *ngIf="item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, item.filename)"></video>
+          </div>
+          <div class="footer">
             <div>
               <div><b>{{ post.owner_username }}</b></div>
               <div>{{ post.creation_time }}</div>
             </div>
             <button nbButton status="danger"><nb-icon icon="trash-2-outline"></nb-icon></button>
-          </div>
-          <div *ngFor="let item of post.items">
-            <img *ngIf="item.type == 'image'" [src]="postService.getMediaPath(post.owner_username, item.filename)">
-            <video *ngIf="item.type == 'video'" [src]="postService.getMediaPath(post.owner_username, item.filename)"></video>
           </div>
         </nb-list-item>
       </nb-list>
