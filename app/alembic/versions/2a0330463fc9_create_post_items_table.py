@@ -24,7 +24,7 @@ def upgrade():
         Column('type', String, index=True, nullable=False),
         Column('duration', Float, index=True, nullable=True),
         Column('filename', String, index=True, nullable=False),
-        Column('thumb_image_filename', String, index=True, nullable=True),
+        Column('thumb_image_filename', String, nullable=True),
     )
 
 

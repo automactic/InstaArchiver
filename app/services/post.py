@@ -79,16 +79,13 @@ class PostService(BaseService):
         """
 
         loop = asyncio.get_running_loop()
-        func = instaloader.Post.from_shortcode
-        post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-        return await self.create_from_instaloader(post)
-        # try:
-        #     func = instaloader.Post.from_shortcode
-        #     post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-        #     return await self.create_from_instaloader(post)
-        # except Exception:
-        #     logger.warning(f'Failed to retrieved Post: {shortcode}')
-        #     raise PostNotFound(shortcode)
+        try:
+            func = instaloader.Post.from_shortcode
+            post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+            return await self.create_from_instaloader(post)
+        except Exception:
+            logger.warning(f'Failed to retrieved Post: {shortcode}')
+            raise PostNotFound(shortcode)
 
     async def create_from_time_range(self, username: str, start: datetime, end: datetime):
         """Create posts from a profile within a time range.
