@@ -7,9 +7,9 @@ from pathlib import Path
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
-
+from typing import Optional
 from entities.posts import Post as Post2
-from entities.posts import PostItem, PostListResult
+from entities.posts import PostItem, PostItemType, PostListResult
 from services import schema
 from services.base import BaseService
 from services.entities import Post
@@ -70,6 +70,30 @@ class PostService(BaseService):
         count = await self.database.fetch_val(statement)
 
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
+
+    async def delete(self, shortcode: str, index: Optional[int] = None):
+        if index is not None:
+            where_clause = sa.and_(
+                schema.post_items.c.post_shortcode == shortcode,
+                schema.post_items.c.index == index,
+            )
+        else:
+            where_clause = schema.post_items.c.post_shortcode == shortcode
+        list_statement = sa.select([
+            schema.posts.c.owner_username,
+            schema.post_items.c.type,
+            schema.post_items.c.filename,
+        ]).select_from(
+            schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
+        ).where(where_clause)
+
+        paths = []
+        for result in await self.database.fetch_all(list_statement):
+            paths.append(self.post_dir.joinpath(result['filename']))
+            # if result['type'] == PostItemType.VIDEO:
+            #     paths.append(self.thumb_images_dir.joinpath(result['filename']))
+        print(paths)
+
 
     async def create_from_shortcode(self, shortcode: str):
         """Create a post from a shortcode.

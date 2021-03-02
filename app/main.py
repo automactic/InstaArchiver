@@ -82,6 +82,16 @@ def create_post_from_time_range(request: PostCreationFromTimeRange, background_t
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
+@app.delete('/api/posts/{shortcode:str}/')
+async def delete_post(shortcode: str):
+    await PostService(database, http_session).delete(shortcode)
+
+
+@app.delete('/api/posts/{shortcode:str}/{index:int}/')
+async def delete_post_item(shortcode: str, index: int):
+    await PostService(database, http_session).delete(shortcode, index)
+
+
 @app.websocket('/web_socket/posts/')
 async def posts(web_socket: WebSocket):
     await web_socket.accept()
