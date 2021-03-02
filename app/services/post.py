@@ -72,6 +72,7 @@ class PostService(BaseService):
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
 
     async def delete(self, shortcode: str, index: Optional[int] = None):
+        # find info about files to delete
         if index is not None:
             where_clause = sa.and_(
                 schema.post_items.c.post_shortcode == shortcode,
@@ -83,16 +84,18 @@ class PostService(BaseService):
             schema.posts.c.owner_username,
             schema.post_items.c.type,
             schema.post_items.c.filename,
+            schema.post_items.c.thumb_image_filename,
         ]).select_from(
             schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
         ).where(where_clause)
 
-        paths = []
+        # delete files
         for result in await self.database.fetch_all(list_statement):
-            paths.append(self.post_dir.joinpath(result['filename']))
-            # if result['type'] == PostItemType.VIDEO:
-            #     paths.append(self.thumb_images_dir.joinpath(result['filename']))
-        print(paths)
+            media_path = self.post_dir.joinpath(result['owner_username'], result['filename'])
+            media_path.unlink(missing_ok=True)
+            if result['thumb_image_filename']:
+                thumb_path = self.thumb_images_dir.joinpath(result['owner_username'], result['filename'])
+                thumb_path.unlink(missing_ok=True)
 
 
     async def create_from_shortcode(self, shortcode: str):
