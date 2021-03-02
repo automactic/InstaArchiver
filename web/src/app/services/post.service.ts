@@ -15,6 +15,7 @@ export interface PostItem {
   type: string
   duration: number
   filename: string
+  thumb_image_filename: string
 }
 
 export interface ListPostsResponse {
@@ -41,6 +42,6 @@ export class PostService {
   }
 
   getPosterPath(username: string, filename: string): string {
-    return `${environment.apiRoot}/media/thumb_images/${username}/${filename}`.replace('.mp4', '.jpg');
+    return `${environment.apiRoot}/media/thumb_images/${username}/${filename}`;
   }
 }
