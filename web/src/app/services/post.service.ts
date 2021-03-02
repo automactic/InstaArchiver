@@ -39,4 +39,8 @@ export class PostService {
   getMediaPath(username: string, filename: string): string {
     return `${environment.apiRoot}/media/posts/${username}/${filename}`;
   }
+
+  getPosterPath(username: string, filename: string): string {
+    return `${environment.apiRoot}/media/thumb_images/${username}/${filename}`.replace('.mp4', '.jpg');
+  }
 }
