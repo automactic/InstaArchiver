@@ -97,6 +97,13 @@ class PostService(BaseService):
                 thumb_path = self.thumb_images_dir.joinpath(result['owner_username'], result['filename'])
                 thumb_path.unlink(missing_ok=True)
 
+        # delete post(if index is not specified) and post item records
+        async with self.database.transaction():
+            delete_statement = sa.delete(schema.post_items).where(where_clause)
+            await self.database.execute(delete_statement)
+            if index is None:
+                delete_statement = sa.delete(schema.posts).where(schema.posts.c.shortcode == shortcode)
+                await self.database.execute(delete_statement)
 
     async def create_from_shortcode(self, shortcode: str):
         """Create a post from a shortcode.
