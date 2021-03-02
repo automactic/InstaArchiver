@@ -20,6 +20,7 @@ class PostItem(BaseModel):
     type: PostItemType
     duration: Optional[float] = None
     filename: Optional[str] = None
+    thumb_image_filename: Optional[str] = None
 
 
 class Post(BaseModel):

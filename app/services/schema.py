@@ -52,4 +52,5 @@ post_items = Table(
     Column('type', String, index=True, nullable=False),
     Column('duration', Float, index=True, nullable=True),
     Column('filename', String, index=True, nullable=False),
+    Column('thumb_image_filename', String, index=True, nullable=True),
 )
