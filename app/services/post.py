@@ -43,6 +43,7 @@ class PostService(BaseService):
             schema.post_items.c.type.label('item_type'),
             schema.post_items.c.duration.label('item_duration'),
             schema.post_items.c.filename.label('item_filename'),
+            schema.post_items.c.thumb_image_filename.label('item_thumb_image_filename'),
         ]).select_from(
             schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
         ).where(
@@ -56,7 +57,8 @@ class PostService(BaseService):
             item = PostItem(
                 type=result['item_type'],
                 duration=result['item_duration'],
-                filename=result['item_filename']
+                filename=result['item_filename'],
+                thumb_image_filename=result['item_thumb_image_filename'],
             )
             if posts and posts[-1].shortcode == result['shortcode']:
                 posts[-1].items.append(item)
@@ -77,13 +79,16 @@ class PostService(BaseService):
         """
 
         loop = asyncio.get_running_loop()
-        try:
-            func = instaloader.Post.from_shortcode
-            post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-            return await self.create_from_instaloader(post)
-        except Exception:
-            logger.warning(f'Failed to retrieved Post: {shortcode}')
-            raise PostNotFound(shortcode)
+        func = instaloader.Post.from_shortcode
+        post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+        return await self.create_from_instaloader(post)
+        # try:
+        #     func = instaloader.Post.from_shortcode
+        #     post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+        #     return await self.create_from_instaloader(post)
+        # except Exception:
+        #     logger.warning(f'Failed to retrieved Post: {shortcode}')
+        #     raise PostNotFound(shortcode)
 
     async def create_from_time_range(self, username: str, start: datetime, end: datetime):
         """Create posts from a profile within a time range.
@@ -158,12 +163,13 @@ class PostService(BaseService):
             # save the image or video
             filename = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
             file_path = await self.save_media(item.url, dir_path, filename)
-            item.filename = file_path.parts[-1]
+            item.filename = file_path.name
             os.utime(file_path, post_timestamp)
 
             # save thumb image path
             if item.thumb_url:
                 file_path = await self.save_media(item.thumb_url, thumb_dir_path, filename)
+                item.thumb_image_filename = file_path.name
                 os.utime(file_path, post_timestamp)
 
     async def _save_metadata(self, post: Post):
@@ -195,6 +201,7 @@ class PostService(BaseService):
                     'type': item.type.value,
                     'duration': item.duration,
                     'filename': item.filename,
+                    'thumb_image_filename': item.thumb_image_filename,
                 }
                 updates = values.copy()
                 updates.pop('post_shortcode')

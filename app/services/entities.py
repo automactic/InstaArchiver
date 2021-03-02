@@ -35,6 +35,7 @@ class PostItem:
     index: int = 0
     duration: Optional[float] = None
     filename: Optional[str] = None
+    thumb_image_filename: Optional[str] = None
     url: Optional[str] = None
     thumb_url: Optional[str] = None
 
