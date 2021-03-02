@@ -13,6 +13,7 @@ export class PostsComponent implements OnInit {
   postService: PostService;
   profileService: ProfileService;
 
+  loading = false;
   posts: Post[] = [];
   
   constructor(postService: PostService, profileService: ProfileService) {
@@ -25,8 +26,11 @@ export class PostsComponent implements OnInit {
   }
 
   loadNext() {
+    if (this.loading) { return }
+    this.loading = true;
     this.postService.list(this.posts.length, 20).subscribe( response_data => {
-      this.posts = this.posts.concat(response_data.posts);
+      this.posts.push(...response_data.posts);
+      this.loading = false;
     })
   }
 }
