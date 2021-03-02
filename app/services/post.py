@@ -79,13 +79,16 @@ class PostService(BaseService):
         """
 
         loop = asyncio.get_running_loop()
-        try:
-            func = instaloader.Post.from_shortcode
-            post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
-            return await self.create_from_instaloader(post)
-        except Exception:
-            logger.warning(f'Failed to retrieved Post: {shortcode}')
-            raise PostNotFound(shortcode)
+        func = instaloader.Post.from_shortcode
+        post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+        return await self.create_from_instaloader(post)
+        # try:
+        #     func = instaloader.Post.from_shortcode
+        #     post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+        #     return await self.create_from_instaloader(post)
+        # except Exception:
+        #     logger.warning(f'Failed to retrieved Post: {shortcode}')
+        #     raise PostNotFound(shortcode)
 
     async def create_from_time_range(self, username: str, start: datetime, end: datetime):
         """Create posts from a profile within a time range.
@@ -160,7 +163,7 @@ class PostService(BaseService):
             # save the image or video
             filename = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
             file_path = await self.save_media(item.url, dir_path, filename)
-            item.name = file_path.name
+            item.filename = file_path.name
             os.utime(file_path, post_timestamp)
 
             # save thumb image path
