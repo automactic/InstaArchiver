@@ -1,15 +1,17 @@
 import asyncio
 import logging
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
-from typing import Optional
+
 from entities.posts import Post as Post2
-from entities.posts import PostItem, PostItemType, PostListResult
+from entities.posts import PostItem, PostListResult
 from services import schema
 from services.base import BaseService
 from services.entities import Post
@@ -99,10 +101,10 @@ class PostService(BaseService):
                     continue
                 if filename := item['filename']:
                     media_path = self.post_dir.joinpath(item['owner_username'], filename)
-                    media_path.rename(self.recycle_dir.joinpath(filename))
+                    shutil.move(media_path, self.recycle_dir.joinpath(filename))
                 if thumb_image_filename := item['thumb_image_filename']:
                     thumb_path = self.thumb_images_dir.joinpath(item['owner_username'], thumb_image_filename)
-                    thumb_path.rename(self.recycle_dir.joinpath(thumb_image_filename))
+                    shutil.move(thumb_path, self.recycle_dir.joinpath(thumb_image_filename))
 
             # delete post(if post has only one item left) and post item records
             if index is not None:
