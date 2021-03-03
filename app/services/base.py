@@ -19,6 +19,7 @@ class BaseService:
         self.media_dir = Path('/media')
         self.post_dir = self.media_dir.joinpath('posts')
         self.thumb_images_dir = self.media_dir.joinpath('thumb_images')
+        self.recycle_dir = self.media_dir.joinpath('recycle')
         try:
             self.user_id = int(os.getenv('USER_ID'))
         except ValueError:

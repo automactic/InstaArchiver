@@ -93,15 +93,16 @@ class PostService(BaseService):
             ).where(schema.post_items.c.post_shortcode == shortcode)
             post_items = [item for item in await self.database.fetch_all(list_statement)]
 
-            # delete files
+            # move files to recycle
             for item in post_items:
                 if index is not None and item['index'] != index:
                     continue
-                media_path = self.post_dir.joinpath(item['owner_username'], item['filename'])
-                media_path.unlink(missing_ok=True)
+                if filename := item['filename']:
+                    media_path = self.post_dir.joinpath(item['owner_username'], filename)
+                    media_path.rename(self.recycle_dir.joinpath(filename))
                 if thumb_image_filename := item['thumb_image_filename']:
                     thumb_path = self.thumb_images_dir.joinpath(item['owner_username'], thumb_image_filename)
-                    thumb_path.unlink(missing_ok=True)
+                    thumb_path.rename(self.recycle_dir.joinpath(thumb_image_filename))
 
             # delete post(if post has only one item left) and post item records
             if index is not None:
