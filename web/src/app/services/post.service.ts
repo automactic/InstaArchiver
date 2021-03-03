@@ -38,6 +38,11 @@ export class PostService {
     return this.httpClient.get<ListPostsResponse>(url, {params: {offset: String(offset), limit: String(limit)}});
   }
 
+  delete(shortcode: string, itemIndex: number) {
+    let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
+    return this.httpClient.delete(url);
+  }
+
   getMediaPath(username: string, filename: string): string {
     return `${environment.apiRoot}/media/posts/${username}/${filename}`;
   }

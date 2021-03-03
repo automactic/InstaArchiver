@@ -34,7 +34,13 @@ export class PostsComponent implements OnInit {
     })
   }
 
-  delete(shortcode: string, itemIndex: number) {
-    console.log(shortcode, itemIndex)
+  delete(post: Post, postIndex: number, itemIndex: number) {
+    this.postService.delete(post.shortcode, itemIndex).subscribe( _ => {
+      if (post.items.length == 1) {
+        this.posts.splice(postIndex, 1);
+      } else {
+        post.items.splice(itemIndex, 1);
+      }
+    })
   }
 }
