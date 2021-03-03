@@ -17,6 +17,7 @@ class PostItemType(Enum):
 
 
 class PostItem(BaseModel):
+    index: int
     type: PostItemType
     duration: Optional[float] = None
     filename: Optional[str] = None

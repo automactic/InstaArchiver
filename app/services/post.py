@@ -7,9 +7,9 @@ from pathlib import Path
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
-
+from typing import Optional
 from entities.posts import Post as Post2
-from entities.posts import PostItem, PostListResult
+from entities.posts import PostItem, PostItemType, PostListResult
 from services import schema
 from services.base import BaseService
 from services.entities import Post
@@ -40,6 +40,7 @@ class PostService(BaseService):
             schema.posts.c.caption,
             schema.posts.c.caption_hashtags,
             schema.posts.c.caption_mentions,
+            schema.post_items.c.index.label('item_index'),
             schema.post_items.c.type.label('item_type'),
             schema.post_items.c.duration.label('item_duration'),
             schema.post_items.c.filename.label('item_filename'),
@@ -55,6 +56,7 @@ class PostService(BaseService):
         posts = []
         for result in await self.database.fetch_all(statement):
             item = PostItem(
+                index=result['item_index'],
                 type=result['item_type'],
                 duration=result['item_duration'],
                 filename=result['item_filename'],
@@ -70,6 +72,50 @@ class PostService(BaseService):
         count = await self.database.fetch_val(statement)
 
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
+
+    async def delete(self, shortcode: str, index: Optional[int] = None):
+        """Delete post and post items
+
+        :param shortcode: the shortcode of the post to delete
+        :param index: index of the post item to delete
+        """
+
+        async with self.database.transaction():
+            # find info about post items
+            list_statement = sa.select([
+                schema.posts.c.owner_username,
+                schema.post_items.c.index,
+                schema.post_items.c.type,
+                schema.post_items.c.filename,
+                schema.post_items.c.thumb_image_filename,
+            ]).select_from(
+                schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
+            ).where(schema.post_items.c.post_shortcode == shortcode)
+            post_items = [item for item in await self.database.fetch_all(list_statement)]
+
+            # delete files
+            for item in post_items:
+                if index is not None and item['index'] != index:
+                    continue
+                media_path = self.post_dir.joinpath(item['owner_username'], item['filename'])
+                media_path.unlink(missing_ok=True)
+                if thumb_image_filename := item['thumb_image_filename']:
+                    thumb_path = self.thumb_images_dir.joinpath(item['owner_username'], thumb_image_filename)
+                    thumb_path.unlink(missing_ok=True)
+
+            # delete post(if post has only one item left) and post item records
+            if index is not None:
+                where_clause = sa.and_(
+                    schema.post_items.c.post_shortcode == shortcode,
+                    schema.post_items.c.index == index,
+                )
+            else:
+                where_clause = schema.post_items.c.post_shortcode == shortcode
+            delete_statement = sa.delete(schema.post_items).where(where_clause)
+            await self.database.execute(delete_statement)
+            if len(post_items) == 1:
+                delete_statement = sa.delete(schema.posts).where(schema.posts.c.shortcode == shortcode)
+                await self.database.execute(delete_statement)
 
     async def create_from_shortcode(self, shortcode: str):
         """Create a post from a shortcode.

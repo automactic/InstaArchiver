@@ -17,6 +17,8 @@ class BaseService:
         self.instaloader_context = instaloader.InstaloaderContext()
 
         self.media_dir = Path('/media')
+        self.post_dir = self.media_dir.joinpath('posts')
+        self.thumb_images_dir = self.media_dir.joinpath('thumb_images')
         try:
             self.user_id = int(os.getenv('USER_ID'))
         except ValueError:
