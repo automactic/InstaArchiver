@@ -40,6 +40,7 @@ class PostService(BaseService):
             schema.posts.c.caption,
             schema.posts.c.caption_hashtags,
             schema.posts.c.caption_mentions,
+            schema.post_items.c.index.label('item_index'),
             schema.post_items.c.type.label('item_type'),
             schema.post_items.c.duration.label('item_duration'),
             schema.post_items.c.filename.label('item_filename'),
@@ -55,6 +56,7 @@ class PostService(BaseService):
         posts = []
         for result in await self.database.fetch_all(statement):
             item = PostItem(
+                index=result['item_index'],
                 type=result['item_type'],
                 duration=result['item_duration'],
                 filename=result['item_filename'],
@@ -73,7 +75,7 @@ class PostService(BaseService):
 
     async def delete(self, shortcode: str, index: Optional[int] = None):
         """Delete post and post items
-        
+
         :param shortcode: the shortcode of the post to delete
         :param index: index of the post item to delete
         """
@@ -93,7 +95,7 @@ class PostService(BaseService):
 
             # delete files
             for item in post_items:
-                if index and item['index'] != index:
+                if index is not None and item['index'] != index:
                     continue
                 media_path = self.post_dir.joinpath(item['owner_username'], item['filename'])
                 media_path.unlink(missing_ok=True)
