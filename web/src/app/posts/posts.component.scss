@@ -14,6 +14,19 @@ div.container > div.posts {
     nb-card {
       padding-bottom: 0.5rem;
     }
+    div.media {
+      position: relative;
+      > button {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+        display: none;
+        z-index: 2;
+      }
+    }
+    div.media:hover > button {
+      display:block;
+    }
     div.footer {
       width: 100%;
       padding: 0.25rem 1rem;

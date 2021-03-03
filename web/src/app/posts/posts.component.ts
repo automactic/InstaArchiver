@@ -33,4 +33,8 @@ export class PostsComponent implements OnInit {
       this.loading = false;
     })
   }
+
+  delete(shortcode: string, itemIndex: number) {
+    console.log(shortcode, itemIndex)
+  }
 }
