@@ -21,7 +21,7 @@
                 <source [src]="postService.getMediaPath(post.owner_username, item.filename)" type="video/mp4">
               </video>
             </div>
-            <button nbButton (click)="delete(post, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+            <button nbButton (click)="delete(post, item, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button>
           </div>
           <div class="footer">
             <div>

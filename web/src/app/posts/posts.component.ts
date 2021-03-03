@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Post, PostService } from '../services/post.service';
+import { Post, PostItem, PostService } from '../services/post.service';
 import { ProfileService } from '../services/profile.service';
 
 
@@ -34,8 +34,8 @@ export class PostsComponent implements OnInit {
     })
   }
 
-  delete(post: Post, postIndex: number, itemIndex: number) {
-    this.postService.delete(post.shortcode, itemIndex).subscribe( _ => {
+  delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
+    this.postService.delete(post.shortcode, item.index).subscribe( _ => {
       if (post.items.length == 1) {
         this.posts.splice(postIndex, 1);
       } else {

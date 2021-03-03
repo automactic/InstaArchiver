@@ -13,6 +13,7 @@ export interface Post {
 }
 
 export interface PostItem {
+  index: number
   type: string
   duration: number
   filename: string
