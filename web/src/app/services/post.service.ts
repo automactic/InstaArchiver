@@ -8,6 +8,7 @@ export interface Post {
   shortcode: string
   owner_username: string
   creation_time: Date
+  caption: string
 	items: PostItem[]
 }
 
