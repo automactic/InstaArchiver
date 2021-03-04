@@ -34,10 +34,14 @@ export interface ListPostsResponse {
 export class PostService {
   constructor(private httpClient: HttpClient) { }
 
-  list(offset: number = 0, limit: number = 10, username?: string) {
+  list(offset: number = 0, limit: number = 10, username?: string, year?: string) {
     let url = `${environment.apiRoot}/api/posts/`;
     let params: Record<string, string> = { offset: String(offset), limit: String(limit) };
     if (username) { params.username = username }
+    if (year) {
+      params.start_time = new Date(+year, 0, 1).toISOString();
+      params.end_time = new Date(+year + 1, 0, 1).toISOString();
+    }
     return this.httpClient.get<ListPostsResponse>(url, {params: params});
   }
 

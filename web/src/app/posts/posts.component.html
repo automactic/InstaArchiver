@@ -21,7 +21,9 @@
         <nb-select 
           fullWidth 
           placeholder="All" 
-          size="medium" 
+          size="medium"
+          [selected]="year" 
+          (selectedChange)="selectedYearChanged($event)"
         >
           <nb-option>All</nb-option>
           <nb-option value="2021">2021</nb-option>
