@@ -15,6 +15,21 @@
         </nb-select>
       </nb-card-body>
     </nb-card>
+    <nb-card>
+      <nb-card-header>Time Range</nb-card-header>
+      <nb-card-body>
+        <nb-select 
+          fullWidth 
+          placeholder="All" 
+          size="medium" 
+        >
+          <nb-option>All</nb-option>
+          <nb-option value="2021">2021</nb-option>
+          <nb-option value="2020">2020</nb-option>
+          <nb-option value="2019">2019</nb-option>
+        </nb-select>
+      </nb-card-body>
+    </nb-card>
   </div>
   <div class="list">
     <nb-list nbInfiniteList [threshold]="500" (bottomThreshold)="loadNext()">
