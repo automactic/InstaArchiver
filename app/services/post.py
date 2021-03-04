@@ -26,7 +26,7 @@ class PostService(BaseService):
             self,
             offset: int = 0,
             limit: int = 10,
-            owner_username: Optional[str] = None,
+            username: Optional[str] = None,
             creation_time_start: Optional[datetime] = None,
             creation_time_end: Optional[datetime] = None,
     ) -> PostListResult:
@@ -34,15 +34,15 @@ class PostService(BaseService):
 
         :param offset: the number of posts to skip
         :param limit: the number of posts to fetch
-        :param owner_username: owner username to filter posts
+        :param username: username of post owner to filter
         :param creation_time_start: the start of creation time to filter posts
         :param creation_time_end: the end of creation time to filter posts
         :return: the list query result
         """
 
         posts_statement = sa.select([schema.posts.c.shortcode]).select_from(schema.posts)
-        if owner_username:
-            posts_statement = posts_statement.where(schema.posts.c.owner_username == owner_username)
+        if username:
+            posts_statement = posts_statement.where(schema.posts.c.owner_username == username)
         if creation_time_start:
             posts_statement = posts_statement.where(schema.posts.c.creation_time >= creation_time_start)
         if creation_time_end:

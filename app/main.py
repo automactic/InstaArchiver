@@ -69,11 +69,11 @@ async def update_profile(username: str, updates: ProfileUpdates):
 async def list_posts(
         offset: Optional[int] = 0,
         limit: int = 10,
-        owner_username: Optional[str] = None,
+        username: Optional[str] = None,
         creation_time_start: Optional[datetime] = None,
         creation_time_end: Optional[datetime] = None,
 ):
-    return await PostService(database, http_session).list(offset, limit, owner_username, creation_time_start, creation_time_end)
+    return await PostService(database, http_session).list(offset, limit, username, creation_time_start, creation_time_end)
 
 
 @app.post('/api/posts/from_shortcode/')
