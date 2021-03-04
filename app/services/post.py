@@ -44,8 +44,10 @@ class PostService(BaseService):
         if username:
             posts_statement = posts_statement.where(schema.posts.c.owner_username == username)
         if start_time:
+            start_time = datetime.utcfromtimestamp(start_time.timestamp())
             posts_statement = posts_statement.where(schema.posts.c.creation_time >= start_time)
         if end_time:
+            end_time = datetime.utcfromtimestamp(end_time.timestamp())
             posts_statement = posts_statement.where(schema.posts.c.creation_time < end_time)
         posts_statement = posts_statement.order_by(schema.posts.c.creation_time.desc()).offset(offset).limit(limit)
         statement = sa.select([
