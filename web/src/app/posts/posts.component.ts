@@ -28,6 +28,7 @@ export class PostsComponent implements OnInit {
         return this.postService.list(0, 10, queryParam.get("username") ?? undefined)
       })
     ).subscribe(response => {
+      window.scrollTo({ top: 0, behavior: 'smooth'});
       this.posts = response.posts;
     })
   }
