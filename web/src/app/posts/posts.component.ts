@@ -16,7 +16,7 @@ export class PostsComponent implements OnInit {
   profileService: ProfileService;
 
   loading = false;
-  profile_username?: string;
+  username?: string;
   posts: Post[] = [];
   
   constructor(private route: ActivatedRoute, private router: Router, postService: PostService, profileService: ProfileService) {
@@ -24,8 +24,8 @@ export class PostsComponent implements OnInit {
     this.profileService = profileService;
     this.route.queryParamMap.pipe(
       switchMap(queryParam => {
-        this.profile_username = queryParam.get("profile_username") ?? undefined;
-        return this.postService.list(0, 10, queryParam.get("profile_username") ?? undefined)
+        this.username = queryParam.get("username") ?? undefined;
+        return this.postService.list(0, 10, queryParam.get("username") ?? undefined)
       })
     ).subscribe(response => {
       this.posts = response.posts;
@@ -39,14 +39,14 @@ export class PostsComponent implements OnInit {
   loadNext() {
     if (this.loading) { return }
     this.loading = true;
-    this.postService.list(this.posts.length, 20, this.profile_username).subscribe( response_data => {
+    this.postService.list(this.posts.length, 20, this.username).subscribe( response_data => {
       this.posts.push(...response_data.posts);
       this.loading = false;
     })
   }
 
-  selectedProfileChanged(profile_username: string) {
-    this.router.navigate(['/posts'], { queryParams: { profile_username: profile_username} })
+  selectedProfileChanged(username: string) {
+    this.router.navigate(['/posts'], { queryParams: { username: username} })
   }
 
   delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
