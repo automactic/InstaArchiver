@@ -1,6 +1,8 @@
 import logging
+from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
+from typing import Optional
 
 import aiohttp
 import databases
@@ -64,8 +66,14 @@ async def update_profile(username: str, updates: ProfileUpdates):
 
 
 @app.get('/api/posts/', response_model=PostListResult)
-async def list_posts(offset: int = 0, limit: int = 10):
-    return await PostService(database, http_session).list(offset, limit)
+async def list_posts(
+        offset: Optional[int] = 0,
+        limit: int = 10,
+        username: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+):
+    return await PostService(database, http_session).list(offset, limit, username, start_time, end_time)
 
 
 @app.post('/api/posts/from_shortcode/')
