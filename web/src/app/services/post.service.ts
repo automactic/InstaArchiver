@@ -34,9 +34,11 @@ export interface ListPostsResponse {
 export class PostService {
   constructor(private httpClient: HttpClient) { }
 
-  list(offset: number = 0, limit: number = 10) {
+  list(offset: number = 0, limit: number = 10, profile_username?: string) {
     let url = `${environment.apiRoot}/api/posts/`;
-    return this.httpClient.get<ListPostsResponse>(url, {params: {offset: String(offset), limit: String(limit)}});
+    let params: Record<string, string> = { offset: String(offset), limit: String(limit) };
+    if (profile_username) { params.profile_username = profile_username }
+    return this.httpClient.get<ListPostsResponse>(url, {params: params});
   }
 
   delete(shortcode: string, itemIndex: number) {
