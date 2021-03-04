@@ -22,18 +22,32 @@ logger = logging.getLogger(__name__)
 
 
 class PostService(BaseService):
-    async def list(self, offset: int = 0, limit: int = 10) -> PostListResult:
+    async def list(
+            self,
+            offset: int = 0,
+            limit: int = 10,
+            owner_username: Optional[str] = None,
+            creation_time_start: Optional[datetime] = None,
+            creation_time_end: Optional[datetime] = None,
+    ) -> PostListResult:
         """List posts.
 
         :param offset: the number of posts to skip
         :param limit: the number of posts to fetch
+        :param owner_username: owner username to filter posts
+        :param creation_time_start: the start of creation time to filter posts
+        :param creation_time_end: the end of creation time to filter posts
         :return: the list query result
         """
 
-        posts_statement = sa.select([schema.posts.c.shortcode])\
-            .select_from(schema.posts)\
-            .order_by(schema.posts.c.creation_time.desc())\
-            .offset(offset).limit(limit)
+        posts_statement = sa.select([schema.posts.c.shortcode]).select_from(schema.posts)
+        if owner_username:
+            posts_statement = posts_statement.where(schema.posts.c.owner_username == owner_username)
+        if creation_time_start:
+            posts_statement = posts_statement.where(schema.posts.c.creation_time >= creation_time_start)
+        if creation_time_end:
+            posts_statement = posts_statement.where(schema.posts.c.creation_time < creation_time_end)
+        posts_statement = posts_statement.order_by(schema.posts.c.creation_time.desc()).offset(offset).limit(limit)
         statement = sa.select([
             schema.posts.c.shortcode,
             schema.posts.c.owner_username,
