@@ -1,16 +1,22 @@
-<div class="container">
+<div class="posts">
   <div class="filter">
     <nb-card>
       <nb-card-header>Profile</nb-card-header>
       <nb-card-body>
-        <nb-select placeholder="All" size="medium" [selected]="username" (selectedChange)="selectedProfileChanged($event)">
+        <nb-select 
+          fullWidth 
+          placeholder="All" 
+          size="medium" 
+          [selected]="username" 
+          (selectedChange)="selectedProfileChanged($event)"
+        >
           <nb-option>All</nb-option>
           <nb-option *ngFor="let profile of profileService.profiles" [value]="profile.username">{{ profile.display_name }}</nb-option>
         </nb-select>
       </nb-card-body>
     </nb-card>
   </div>
-  <div class="posts">
+  <div class="list">
     <nb-list nbInfiniteList [threshold]="500" (bottomThreshold)="loadNext()">
       <nb-list-item *ngFor="let post of posts; let postIndex=index;">
         <nb-card>
