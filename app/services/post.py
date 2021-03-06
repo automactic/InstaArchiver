@@ -117,10 +117,12 @@ class PostService(BaseService):
                     continue
                 if filename := item['filename']:
                     media_path = self.post_dir.joinpath(item['owner_username'], filename)
-                    shutil.move(media_path, self.recycle_dir.joinpath(filename))
+                    shutil.chown(media_path, os.getuid(), os.getgid())
+                    media_path.unlink()
                 if thumb_image_filename := item['thumb_image_filename']:
                     thumb_path = self.thumb_images_dir.joinpath(item['owner_username'], thumb_image_filename)
-                    shutil.move(thumb_path, self.recycle_dir.joinpath(thumb_image_filename))
+                    shutil.chown(thumb_path, os.getuid(), os.getgid())
+                    thumb_path.unlink()
 
             # delete post(if post has only one item left) and post item records
             if index is not None:
