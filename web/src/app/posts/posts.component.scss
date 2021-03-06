@@ -43,7 +43,7 @@ div.posts > div.list {
     div.media:hover > button {
       display:block;
     }
-    div.media img, video {
+    div.media > img, video {
       max-width: 100%;
     }
     nb-accordion {
@@ -51,6 +51,11 @@ div.posts > div.list {
       nb-accordion-item-header {
         padding-top: 0.75rem;
         padding-bottom: 0.75rem;
+      }
+    }
+    nb-accordion-item-body {
+      div {
+        word-break: break-word;
       }
     }
   }

@@ -17,7 +17,7 @@ export class PostsComponent {
 
   username?: string;
   year?: string;
-  loading = false;
+  loading = true;
   posts: Post[] = [];
   
   constructor(private route: ActivatedRoute, private router: Router, postService: PostService, profileService: ProfileService) {
