@@ -46,7 +46,7 @@
           </div>
           <div class="footer">
             <div>
-              <div><b>{{ post.owner_username }}</b></div>
+              <div><b>{{ this.profileService.display_names.get(post.owner_username) }}</b></div>
               <div>{{ post.creation_time | date:'medium' }}</div>
             </div>
           </div>

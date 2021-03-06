@@ -39,10 +39,14 @@ export interface ListProfilesResponse {
 })
 export class ProfileService {
   profiles: Profile[] = []
+  display_names = new Map<string, string>();
 
   constructor(private httpClient: HttpClient) {
     this.list().subscribe(response_data => {
       this.profiles = response_data.profiles
+      response_data.profiles.forEach(profile => {
+        this.display_names.set(profile.username, profile.display_name);
+      })
     })
   }
 
@@ -63,6 +67,7 @@ export class ProfileService {
       if (index != -1) {
         this.profiles.splice(index, 1, profile);
       }
+      this.display_names.set(profile.username, profile.display_name);
     });
   }
 
