@@ -40,7 +40,7 @@
           <div *ngFor="let item of post.items; let itemIndex=index;" class="media">
             <div>
               <img *ngIf="item.type == 'image'" [src]="postService.getMediaPath(post.owner_username, item.filename)">
-              <video *ngIf="item.type == 'video'" controls muted [poster]="postService.getPosterPath(post.owner_username, item.thumb_image_filename)">
+              <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.owner_username, item.thumb_image_filename)">
                 <source [src]="postService.getMediaPath(post.owner_username, item.filename)" type="video/mp4">
               </video>
             </div>
