@@ -32,4 +32,8 @@ export class ProfileDetailComponent implements OnInit {
 
   ngOnInit(): void { }
 
+  openInstagramProfile(username: string) {
+    window.open(`https://www.instagram.com/${username}/`, '_blank');
+  }
+
 }
