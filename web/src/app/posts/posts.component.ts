@@ -11,7 +11,7 @@ import { ProfileService } from '../services/profile.service';
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss']
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent {
   postService: PostService;
   profileService: ProfileService;
 
@@ -27,24 +27,11 @@ export class PostsComponent implements OnInit {
       switchMap(queryParam => {
         this.username = queryParam.get("username") ?? undefined;
         this.year = queryParam.get("year") ?? undefined;
-        return this.postService.list(0, 10, this.username, this.year);
+        return this.postService.list(0, 5, this.username, this.year);
       })
     ).subscribe(response => {
       window.scrollTo({ top: 0, behavior: 'smooth'});
       this.posts = response.posts;
-    })
-  }
-
-  ngOnInit(): void {
-    this.loadNext()
-  }
-
-  loadNext() {
-    if (this.loading) { return }
-    this.loading = true;
-    this.postService.list(this.posts.length, 20, this.username, this.year).subscribe( response_data => {
-      this.posts.push(...response_data.posts);
-      this.loading = false;
     })
   }
 
@@ -62,6 +49,15 @@ export class PostsComponent implements OnInit {
       queryParams: { year: year}, 
       queryParamsHandling: 'merge' 
     });
+  }
+
+  loadNext() {
+    if (this.loading) { return }
+    this.loading = true;
+    this.postService.list(this.posts.length, 5, this.username, this.year).subscribe( response_data => {
+      this.posts.push(...response_data.posts);
+      this.loading = false;
+    })
   }
 
   delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
