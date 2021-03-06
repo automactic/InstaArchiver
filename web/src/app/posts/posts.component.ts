@@ -21,7 +21,12 @@ export class PostsComponent {
   loading = true;
   posts: Post[] = [];
   
-  constructor(private route: ActivatedRoute, private router: Router, postService: PostService, profileService: ProfileService) {
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router, 
+    postService: PostService, 
+    profileService: ProfileService
+  ) {
     this.postService = postService;
     this.profileService = profileService;
     this.route.queryParamMap.pipe(
@@ -29,7 +34,7 @@ export class PostsComponent {
         this.username = queryParam.get("username") ?? undefined;
         this.year = queryParam.get("year") ?? undefined;
         this.month = queryParam.get("month") ?? undefined;
-        return this.postService.list(0, 5, this.username, this.year);
+        return this.postService.list(0, 5, this.username, this.year, this.month);
       })
     ).subscribe(response => {
       window.scrollTo({ top: 0, behavior: 'smooth'});
@@ -65,7 +70,7 @@ export class PostsComponent {
   loadNext() {
     if (this.loading) { return }
     this.loading = true;
-    this.postService.list(this.posts.length, 5, this.username, this.year).subscribe( response_data => {
+    this.postService.list(this.posts.length, 5, this.username, this.year, this.month).subscribe( response_data => {
       this.posts.push(...response_data.posts);
       this.loading = false;
     })
