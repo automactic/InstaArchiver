@@ -26,9 +26,6 @@ div.posts > div.list {
 
   nb-list-item {
     padding: 0;
-    nb-card {
-      padding-bottom: 0.5rem;
-    }
     div.media {
       position: relative;
       > button {
@@ -46,18 +43,15 @@ div.posts > div.list {
     div.media:hover > button {
       display:block;
     }
-    div.footer {
-      width: 100%;
-      padding: 0.25rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items:center;
-    }
-    img {
+    div.media img, video {
       max-width: 100%;
     }
-    video {
-      max-width: 100%;
+    nb-accordion {
+      box-shadow: none;
+      nb-accordion-item-header {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
     }
   }
 }
