@@ -31,6 +31,7 @@ export class PostsComponent {
       })
     ).subscribe(response => {
       window.scrollTo({ top: 0, behavior: 'smooth'});
+      this.loading = false;
       this.posts = response.posts;
     })
   }
