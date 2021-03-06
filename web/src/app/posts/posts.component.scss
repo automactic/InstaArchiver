@@ -19,6 +19,10 @@ div.posts > div.filter {
   height: calc(100vh - 8.75rem);
   @media (max-width: 991.98px) { height: calc(100vh - 7.25rem) }
   @media (max-width: 767.98px) { height: auto }
+
+  nb-card.time_range nb-card-body nb-select:first-of-type {
+    margin-bottom: 0.5rem;
+  }
 }
 div.posts > div.list {
   flex: 6;

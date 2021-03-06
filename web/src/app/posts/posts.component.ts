@@ -17,6 +17,7 @@ export class PostsComponent {
 
   username?: string;
   year?: string;
+  month?: string;
   loading = true;
   posts: Post[] = [];
   
@@ -27,6 +28,7 @@ export class PostsComponent {
       switchMap(queryParam => {
         this.username = queryParam.get("username") ?? undefined;
         this.year = queryParam.get("year") ?? undefined;
+        this.month = queryParam.get("month") ?? undefined;
         return this.postService.list(0, 5, this.username, this.year);
       })
     ).subscribe(response => {
@@ -48,6 +50,14 @@ export class PostsComponent {
     this.router.navigate([], { 
       relativeTo: this.route, 
       queryParams: { year: year}, 
+      queryParamsHandling: 'merge' 
+    });
+  }
+
+  selectedMonthChanged(month: string) {
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { month: month}, 
       queryParamsHandling: 'merge' 
     });
   }
