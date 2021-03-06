@@ -34,16 +34,14 @@
     </nb-card>
   </div>
   <div class="list">
-    <nb-list nbInfiniteList [threshold]="500" (bottomThreshold)="loadNext()">
+    <nb-list nbInfiniteList [threshold]="500" [listenWindowScroll]="true" (bottomThreshold)="loadNext()">
       <nb-list-item *ngFor="let post of posts; let postIndex=index;">
         <nb-card>
           <div *ngFor="let item of post.items; let itemIndex=index;" class="media">
-            <div>
-              <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.owner_username, item.filename)">
-              <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.owner_username, item.thumb_image_filename)">
-                <source [src]="postService.getMediaPath(post.owner_username, item.filename)" type="video/mp4">
-              </video>
-            </div>
+            <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.owner_username, item.filename)">
+            <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.owner_username, item.thumb_image_filename)">
+              <source [src]="postService.getMediaPath(post.owner_username, item.filename)" type="video/mp4">
+            </video>
             <button nbButton (click)="delete(post, item, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button>
           </div>
           <div class="footer">

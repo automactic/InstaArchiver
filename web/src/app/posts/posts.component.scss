@@ -39,6 +39,10 @@ div.posts > div.list {
         z-index: 2;
       }
     }
+    div.media:first-of-type  {
+      img { border-radius: 4px 4px 0 0; }
+      video { border-radius: 4px 4px 0 0; }
+    }
     div.media:hover > button {
       display:block;
     }
