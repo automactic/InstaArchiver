@@ -4,11 +4,11 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Optional
 
+import aiofiles
 import aiohttp
 import databases
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.responses import Response, FileResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
@@ -23,8 +23,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-app.mount('/media', StaticFiles(directory='/media'), name='media')
-
 database = databases.Database(schema.database_url)
 http_session = aiohttp.ClientSession()
 
@@ -98,6 +96,36 @@ async def delete_post(shortcode: str):
 @app.delete('/api/posts/{shortcode:str}/{index:int}/')
 async def delete_post_item(shortcode: str, index: int):
     await PostService(database, http_session).delete(shortcode, index)
+
+
+@app.get('/media/{path:path}')
+async def get_media(path: str, request: Request):
+    path = Path('/media').joinpath(path)
+    if not path.exists():
+        return Response(status_code=HTTPStatus.NOT_FOUND)
+    if range_header := request.headers.get('Range'):
+        size = path.stat().st_size
+
+        try:
+            start, end = range_header.strip('bytes=').split('-')
+            start = int(start)
+            end = size - 1 if end == '' else int(end)
+            chunk_size = end - start + 1
+            if chunk_size <= 0:
+                raise ValueError
+        except ValueError:
+            return Response(status_code=HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+
+        async with aiofiles.open(path, mode='rb') as file:
+            await file.seek(start)
+            chunk = await file.read(chunk_size)
+            return Response(chunk, status_code=HTTPStatus.PARTIAL_CONTENT, headers={
+                'Accept-Ranges': 'bytes',
+                'Content-Range': f'bytes {start}-{end}/{size}',
+                'Content-Length': str(chunk_size),
+            })
+    else:
+        return FileResponse(path)
 
 
 @app.websocket('/web_socket/posts/')
