@@ -60,11 +60,11 @@
         </div>
         <div class="row" *ngIf="posts.earliest_time as earliest_time">
           <p class="title"><b>Earliest</b></p>
-          <p class="detail">{{earliest_time}}</p>
+          <p class="detail">{{ earliest_time | date:'medium' }}</p>
         </div>
         <div class="row" *ngIf="posts.latest_time as latest_time">
           <p class="title"><b>Latest</b></p>
-          <p class="detail">{{latest_time}}</p>
+          <p class="detail">{{ latest_time | date:'medium' }}</p>
         </div>
       </nb-accordion-item-body>
     </nb-accordion-item>
