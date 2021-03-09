@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import timezone
 from pathlib import Path
 from typing import Optional
 
@@ -113,8 +114,8 @@ class ProfileService(BaseService):
                 image_filename=result['image_filename'],
                 posts=PostsSummary(
                     count=result['post_count'],
-                    earliest_time=result['earliest_time'],
-                    latest_time=result['latest_time'],
+                    earliest_time=result['earliest_time'].replace(tzinfo=timezone.utc),
+                    latest_time=result['latest_time'].replace(tzinfo=timezone.utc),
                 )
             )
         else:
