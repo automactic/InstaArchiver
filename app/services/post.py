@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -84,6 +84,7 @@ class PostService(BaseService):
                 posts[-1].items.append(item)
             else:
                 post = Post2(items=[item], **result)
+                post.creation_time = post.creation_time.replace(tzinfo=timezone.utc)
                 posts.append(post)
 
         statement = sa.select([sa.func.count()]).select_from(schema.posts)
