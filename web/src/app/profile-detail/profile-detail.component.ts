@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -17,7 +17,7 @@ export class ProfileDetailComponent implements OnInit {
   profile$: Observable<Profile>;
   configuration = new ProfileConfiguration()
 
-  constructor(private route: ActivatedRoute, profileService: ProfileService) {
+  constructor(private route: ActivatedRoute, private router: Router, profileService: ProfileService) {
     this.profileService = profileService;
     this.profile$ = this.route.paramMap.pipe(
       switchMap(params => {
@@ -34,6 +34,13 @@ export class ProfileDetailComponent implements OnInit {
 
   openInstagramProfile(username: string) {
     window.open(`https://www.instagram.com/${username}/`, '_blank');
+  }
+
+  navigateToPosts(username: string) {
+    this.router.navigate(['/posts'], {
+      queryParams: { username: username}, 
+      queryParamsHandling: 'merge' 
+    });
   }
 
 }
