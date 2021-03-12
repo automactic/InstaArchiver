@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class AutoArchiveService(BaseService):
-    OUTDATED_THRESHOLD = timedelta(minutes=15)
+    OUTDATED_THRESHOLD = timedelta(hours=3)
 
     async def update_profiles(self):
         """Catching up new posts of all outdated profiles."""
