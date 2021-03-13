@@ -98,9 +98,9 @@ class Profile(BaseModel):
     full_name: str
     display_name: str
     biography: Optional[str] = None
-    auto_archive: bool = False
-    last_scan: Optional[datetime] = None
     image_filename: str
+    auto_archive: bool = False
+    last_archive_timestamp: Optional[datetime] = None
 
 
 class PostsSummary(BaseModel):
