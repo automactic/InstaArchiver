@@ -158,7 +158,6 @@ class PostService(BaseService):
             return await self.create_from_instaloader(post)
         except Exception:
             logger.warning(f'Failed to retrieved Post: {shortcode}')
-            raise PostNotFound(shortcode)
 
     async def create_from_time_range(self, username: str, start: datetime, end: datetime):
         """Create posts from a profile within a time range.
@@ -236,7 +235,7 @@ class PostService(BaseService):
             caption=post.caption,
             caption_hashtags=post.caption_hashtags,
             caption_mentions=post.caption_mentions,
-            items=items,
+            items=[],
         )
 
         # create profile if not exist
@@ -265,6 +264,7 @@ class PostService(BaseService):
                 item.thumb_image_filename = file_path.name
 
         # upsert the post entity
+        post.items = items
         await self._upsert(post)
 
         logger.info(

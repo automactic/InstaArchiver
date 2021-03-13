@@ -93,3 +93,5 @@ class BaseService:
 
             # set file ownership
             self._set_file_ownership(file_path)
+
+            return file_path
