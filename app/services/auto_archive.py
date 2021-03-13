@@ -30,11 +30,11 @@ class AutoArchiveService(BaseService):
         """Catching up new posts of all outdated profiles."""
 
         while True:
-            username = await self.update_next_profile()
+            username = await self._update_next()
             if not username:
                 break
 
-    async def update_next_profile(self) -> Optional[str]:
+    async def _update_next(self) -> Optional[str]:
         """Catching up new posts of the next profile.
 
         :return: username of the profile that got updated, None if no profile needs to be updated
