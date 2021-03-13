@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-
+from entities.posts import PostItemType
 import instaloader
-from pydantic import BaseModel
 
 
 class PostType(Enum):
@@ -22,11 +21,6 @@ class PostType(Enum):
             return cls.SIDECAR
         else:
             return None
-
-
-class PostItemType(Enum):
-    IMAGE = 'image'
-    VIDEO = 'video'
 
 
 @dataclass
@@ -91,35 +85,3 @@ class Post:
             'username': self.username,
             'timestamp': self.timestamp.isoformat(),
         }
-
-
-class Profile(BaseModel):
-    username: str
-    full_name: str
-    display_name: str
-    biography: Optional[str] = None
-    image_filename: str
-    auto_archive: bool = False
-    last_archive_timestamp: Optional[datetime] = None
-
-
-class PostsSummary(BaseModel):
-    count: int
-    earliest_timestamp: Optional[datetime]
-    latest_timestamp: Optional[datetime]
-
-
-class ProfileDetail(Profile):
-    posts: PostsSummary
-
-
-class ProfileListResult(BaseModel):
-    profiles: List[Profile]
-    limit: int
-    offset: int
-    count: int
-
-
-class ProfileUpdates(BaseModel):
-    display_name: Optional[str]
-    auto_archive: Optional[bool]

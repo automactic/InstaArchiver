@@ -8,9 +8,9 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
+from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates
 from services import schema
 from services.base import BaseService
-from services.entities import Profile, ProfileDetail, ProfileUpdates, ProfileListResult, PostsSummary
 
 logger = logging.getLogger(__name__)
 

@@ -79,9 +79,9 @@ class AutoArchiveService(BaseService):
                 statement = sa.update(schema.profiles) \
                     .where(schema.profiles.c.username == auto_archive.username) \
                     .values(
-                        last_archive_timestamp=datetime.utcnow(),
-                        last_archive_latest_post_timestamp=auto_archive.last_archive_latest_post_timestamp,
-                    )
+                    last_archive_timestamp=datetime.utcnow(),
+                    last_archive_latest_post_timestamp=auto_archive.last_archive_latest_post_timestamp,
+                )
                 await self.database.execute(statement)
 
                 message = f'Auto archive profile {auto_archive.username} -- {auto_archive.post_count} post(s) added.'

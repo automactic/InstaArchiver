@@ -13,8 +13,8 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
 from entities.posts import PostListResult, PostCreationFromShortcode, PostCreationFromTimeRange
+from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
 from services import schema, AutoArchiveService
-from services.entities import ProfileListResult, ProfileDetail, ProfileUpdates
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
