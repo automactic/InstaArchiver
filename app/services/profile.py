@@ -8,9 +8,9 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
+from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates
 from services import schema
 from services.base import BaseService
-from services.entities import Profile, ProfileDetail, ProfileUpdates, ProfileListResult, PostsSummary
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class ProfileService(BaseService):
             return
 
         # save profile image
-        image_path = await self.save_media(profile.profile_pic_url, Path('profile_images'), profile.username)
+        image_path = await self._download(profile.profile_pic_url, self.profile_images_dir, profile.username)
 
         # upsert profile
         values = {
@@ -90,15 +90,15 @@ class ProfileService(BaseService):
             schema.profiles.c.full_name,
             schema.profiles.c.display_name,
             schema.profiles.c.biography,
-            schema.profiles.c.auto_archive,
-            schema.profiles.c.last_scan,
             schema.profiles.c.image_filename,
+            schema.profiles.c.auto_archive,
+            schema.profiles.c.last_archive_timestamp,
             sa.func.count(schema.posts.c.shortcode).label('post_count'),
-            sa.func.min(schema.posts.c.creation_time).label('earliest_time'),
-            sa.func.max(schema.posts.c.creation_time).label('latest_time'),
+            sa.func.min(schema.posts.c.timestamp).label('earliest_timestamp'),
+            sa.func.max(schema.posts.c.timestamp).label('latest_timestamp'),
         ]).select_from(
             schema.profiles.join(
-                schema.posts, schema.profiles.c.username == schema.posts.c.owner_username
+                schema.posts, schema.profiles.c.username == schema.posts.c.username
             )
         ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
         result = await self.database.fetch_one(query=statement)
@@ -109,13 +109,13 @@ class ProfileService(BaseService):
                 full_name=result['full_name'],
                 display_name=result['display_name'],
                 biography=result['biography'],
-                auto_archive=result['auto_archive'],
-                last_scan=result['last_scan'],
                 image_filename=result['image_filename'],
+                auto_archive=result['auto_archive'],
+                last_archive_timestamp=result['last_archive_timestamp'],
                 posts=PostsSummary(
                     count=result['post_count'],
-                    earliest_time=result['earliest_time'].replace(tzinfo=timezone.utc),
-                    latest_time=result['latest_time'].replace(tzinfo=timezone.utc),
+                    earliest_timestamp=result['earliest_timestamp'].replace(tzinfo=timezone.utc),
+                    latest_timestamp=result['latest_timestamp'].replace(tzinfo=timezone.utc),
                 )
             )
         else:

@@ -10,16 +10,16 @@ export interface Profile {
 	full_name: string
 	display_name: string
 	biography: string
+  image_filename: string
 	auto_archive: boolean
-	last_scan?: Date
-	image_filename: string
+	last_archive_timestamp?: Date
 	posts?: PostsSummary
 }
 
 export interface PostsSummary {
   count: number
-	earliest_time?: Date
-	latest_time?: Date
+	earliest_timestamp?: Date
+	latest_timestamp?: Date
 }
 
 export class ProfileConfiguration {

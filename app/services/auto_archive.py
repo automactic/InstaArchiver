@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -14,6 +15,16 @@ from .post import PostService
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class AutoArchive:
+    username: str
+    auto_archive: bool
+    latest_post_timestamp: Optional[datetime]  # timestamp of the latest post in the database
+    last_archive_timestamp: Optional[datetime]  # timestamp of the last auto archive
+    last_archive_latest_post_timestamp: Optional[datetime]  # timestamp of the latest known post found in last archive
+    post_count: int = 0
+
+
 class AutoArchiveService(BaseService):
     OUTDATED_THRESHOLD = timedelta(hours=3)
 
@@ -21,24 +32,30 @@ class AutoArchiveService(BaseService):
         """Catching up new posts of all outdated profiles."""
 
         while True:
-            username = await self.update_one_profile()
+            username = await self._update_next()
             if not username:
                 break
 
-    async def update_one_profile(self) -> Optional[str]:
-        """Catching up new posts of one profile.
+    async def _update_next(self) -> Optional[str]:
+        """Catching up new posts of the next profile.
 
-        :return: username of the profile that got updated
+        :return: username of the profile that got updated, None if no profile needs to be updated
         """
 
         loop = asyncio.get_running_loop()
         async with self.database.transaction():
-            if username := await self._find_next_profile():
+            if auto_archive := await self._find_next():
                 func = instaloader.Profile.from_username
-                profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+                profile = await loop.run_in_executor(None, func, self.instaloader_context, auto_archive.username)
                 post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
 
-                latest_post_creation_time = await self._find_latest_post_creation_time(username)
+                # get the timestamp that is used to stop auto archive
+                stopping_timestamp = max(filter(lambda x: x is not None, [
+                    auto_archive.latest_post_timestamp,
+                    auto_archive.last_archive_latest_post_timestamp,
+                    datetime.utcnow() - timedelta(days=7)
+                ]))
+
                 while True:
                     # fetch the next post
                     try:
@@ -46,61 +63,67 @@ class AutoArchiveService(BaseService):
                     except StopIteration:
                         break
 
-                    # break if post is earlier than or the same as the latest archived post
-                    if latest_post_creation_time and latest_post_creation_time >= post.date_utc:
+                    # break if post timestamp is earlier than or the same as the stopping timestamp
+                    if stopping_timestamp >= post.date_utc:
                         break
 
                     # archive the post
                     await PostService(self.database, self.http_session).create_from_instaloader(post)
+                    auto_archive.post_count += 1
+                    if timestamp := auto_archive.last_archive_latest_post_timestamp:
+                        auto_archive.last_archive_latest_post_timestamp = max(post.date_utc, timestamp)
+                    else:
+                        auto_archive.last_archive_latest_post_timestamp = post.date_utc
 
-                await self._set_last_scan_timestamp(username)
-                return username
+                # update last archive info of the profile
+                statement = sa.update(schema.profiles) \
+                    .where(schema.profiles.c.username == auto_archive.username) \
+                    .values(
+                    last_archive_timestamp=datetime.utcnow(),
+                    last_archive_latest_post_timestamp=auto_archive.last_archive_latest_post_timestamp,
+                )
+                await self.database.execute(statement)
 
-    async def _find_next_profile(self) -> Optional[str]:
-        """Find username of the next outdated profile to archive.
+                message = f'Auto archive profile {auto_archive.username} -- {auto_archive.post_count} post(s) added.'
+                logging.info(message)
+                return auto_archive.username
+
+    async def _find_next(self) -> Optional[AutoArchive]:
+        """Find auto archive info of the next outdated profile.
 
         A profile is considered outdated when:
-        - auto update is set to true
-        - the profile was last updated OUTDATED_THRESHOLD ago or has never been updated
+        - auto archive is set to true
+        - the profile's last archive time is older than the OUTDATED_THRESHOLD or has never been updated
 
-        :return: username of the profile to update
+        :return: profile auto archive info
         """
 
+        # get the next profile
         where_clause = sa.and_(
             sa.sql.operators.eq(schema.profiles.c.auto_archive, True),
             sa.or_(
-                schema.profiles.c.last_scan < datetime.utcnow() - self.OUTDATED_THRESHOLD,
-                sa.sql.operators.eq(schema.profiles.c.last_scan, None),
+                schema.profiles.c.last_archive_timestamp < datetime.utcnow() - self.OUTDATED_THRESHOLD,
+                sa.sql.operators.eq(schema.profiles.c.last_archive_timestamp, None),
             )
         )
-        statement = sa.select([schema.profiles.c.username], for_update=True) \
+        statement = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.auto_archive,
+            schema.profiles.c.last_archive_timestamp,
+            schema.profiles.c.last_archive_latest_post_timestamp,
+        ], for_update=True) \
             .select_from(schema.profiles) \
             .where(where_clause) \
-            .order_by(schema.profiles.c.last_scan.desc().nullsfirst()) \
+            .order_by(schema.profiles.c.last_archive_timestamp.desc().nullsfirst()) \
             .limit(1)
         result = await self.database.fetch_one(statement)
-        return result.get('username')
+        auto_archive = AutoArchive(latest_post_timestamp=None, **result)
 
-    async def _find_latest_post_creation_time(self, username: str) -> Optional[datetime]:
-        """Find creation time of the latest post that belongs to a profile.
-
-        :param username: username of the profile
-        :return: creation time of the latest post
-        """
-
+        # get latest_post_timestamp
         statement = sa.select([
-            sa.func.max(schema.posts.c.creation_time).label('max_creation_time')
-        ]).select_from(schema.posts).where(schema.posts.c.owner_username == username)
+            sa.func.max(schema.posts.c.timestamp).label('max_timestamp')
+        ]).select_from(schema.posts).where(schema.posts.c.username == auto_archive.username)
         result = await self.database.fetch_one(statement)
-        return result.get('max_creation_time')
+        auto_archive.latest_post_timestamp = result.get('max_timestamp')
 
-    async def _set_last_scan_timestamp(self, username: str):
-        """Update last_scan column of a profile to utc now.
-
-        :param username: username of the profile to perform update
-        """
-
-        statement = sa.update(schema.profiles) \
-            .where(schema.profiles.c.username == username) \
-            .values(last_scan=datetime.utcnow())
-        await self.database.execute(statement)
+        return auto_archive
