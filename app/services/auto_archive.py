@@ -53,7 +53,7 @@ class AutoArchiveService(BaseService):
                     # archive the post
                     await PostService(self.database, self.http_session).create_from_instaloader(post)
 
-                await self._set_last_scan_timestamp(username)
+                await self._set_last_archive_timestamp(username)
                 return username
 
     async def _find_next_profile(self) -> Optional[str]:
@@ -69,14 +69,14 @@ class AutoArchiveService(BaseService):
         where_clause = sa.and_(
             sa.sql.operators.eq(schema.profiles.c.auto_archive, True),
             sa.or_(
-                schema.profiles.c.last_scan < datetime.utcnow() - self.OUTDATED_THRESHOLD,
-                sa.sql.operators.eq(schema.profiles.c.last_scan, None),
+                schema.profiles.c.last_archive_timestamp < datetime.utcnow() - self.OUTDATED_THRESHOLD,
+                sa.sql.operators.eq(schema.profiles.c.last_archive_timestamp, None),
             )
         )
         statement = sa.select([schema.profiles.c.username], for_update=True) \
             .select_from(schema.profiles) \
             .where(where_clause) \
-            .order_by(schema.profiles.c.last_scan.desc().nullsfirst()) \
+            .order_by(schema.profiles.c.last_archive_timestamp.desc().nullsfirst()) \
             .limit(1)
         result = await self.database.fetch_one(statement)
         return result.get('username')
@@ -94,13 +94,13 @@ class AutoArchiveService(BaseService):
         result = await self.database.fetch_one(statement)
         return result.get('max_creation_time')
 
-    async def _set_last_scan_timestamp(self, username: str):
-        """Update last_scan column of a profile to utc now.
+    async def _set_last_archive_timestamp(self, username: str):
+        """Update last_archive_timestamp column of a profile to utc now.
 
         :param username: username of the profile to perform update
         """
 
         statement = sa.update(schema.profiles) \
             .where(schema.profiles.c.username == username) \
-            .values(last_scan=datetime.utcnow())
+            .values(last_archive_timestamp=datetime.utcnow())
         await self.database.execute(statement)
