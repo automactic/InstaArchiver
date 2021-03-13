@@ -249,7 +249,7 @@ class PostService(BaseService):
             filename = f'{post_filename}_{item.index}' if len(post.items) > 1 else post_filename
             file_path = await self._download(
                 download_task.url,
-                self.media_dir.joinpath(post.username),
+                self.post_dir.joinpath(post.username),
                 filename,
                 post.timestamp
             )
