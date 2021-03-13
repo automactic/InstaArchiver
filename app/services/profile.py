@@ -94,8 +94,8 @@ class ProfileService(BaseService):
             schema.profiles.c.auto_archive,
             schema.profiles.c.last_archive_timestamp,
             sa.func.count(schema.posts.c.shortcode).label('post_count'),
-            sa.func.min(schema.posts.c.creation_time).label('earliest_time'),
-            sa.func.max(schema.posts.c.creation_time).label('latest_time'),
+            sa.func.min(schema.posts.c.creation_time).label('earliest_timestamp'),
+            sa.func.max(schema.posts.c.creation_time).label('latest_timestamp'),
         ]).select_from(
             schema.profiles.join(
                 schema.posts, schema.profiles.c.username == schema.posts.c.owner_username
@@ -114,8 +114,8 @@ class ProfileService(BaseService):
                 last_archive_timestamp=result['last_archive_timestamp'],
                 posts=PostsSummary(
                     count=result['post_count'],
-                    earliest_time=result['earliest_time'].replace(tzinfo=timezone.utc),
-                    latest_time=result['latest_time'].replace(tzinfo=timezone.utc),
+                    earliest_timestamp=result['earliest_timestamp'].replace(tzinfo=timezone.utc),
+                    latest_timestamp=result['latest_timestamp'].replace(tzinfo=timezone.utc),
                 )
             )
         else:

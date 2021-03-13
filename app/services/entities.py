@@ -105,8 +105,8 @@ class Profile(BaseModel):
 
 class PostsSummary(BaseModel):
     count: int
-    earliest_time: Optional[datetime]
-    latest_time: Optional[datetime]
+    earliest_timestamp: Optional[datetime]
+    latest_timestamp: Optional[datetime]
 
 
 class ProfileDetail(Profile):
