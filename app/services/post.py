@@ -10,11 +10,9 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.posts import Post as Post2
-from entities.posts import PostItem, PostType, PostItemType, PostListResult
+from entities.posts import Post, PostItem, PostType, PostItemType, PostListResult
 from services import schema
 from services.base import BaseService
-from services.exceptions import PostNotFound
 from services.profile import ProfileService
 
 logger = logging.getLogger(__name__)
@@ -88,7 +86,7 @@ class PostService(BaseService):
             if posts and posts[-1].shortcode == result['shortcode']:
                 posts[-1].items.append(item)
             else:
-                post = Post2(items=[item], **result)
+                post = Post(items=[item], **result)
                 post.timestamp = post.timestamp.replace(tzinfo=timezone.utc)
                 posts.append(post)
 
@@ -144,7 +142,7 @@ class PostService(BaseService):
                 delete_statement = sa.delete(schema.posts).where(schema.posts.c.shortcode == shortcode)
                 await self.database.execute(delete_statement)
 
-    async def create_from_shortcode(self, shortcode: str):
+    async def create_from_shortcode(self, shortcode: str) -> Post:
         """Create a post from a shortcode.
 
         :param shortcode: shortcode of a single post
@@ -194,7 +192,7 @@ class PostService(BaseService):
 
             await self.create_from_instaloader(post)
 
-    async def create_from_instaloader(self, post: instaloader.Post):
+    async def create_from_instaloader(self, post: instaloader.Post) -> Post:
         """Create a post from a instaloader post object.
 
         :param post: a instaloader post object
@@ -227,7 +225,7 @@ class PostService(BaseService):
             items, download_tasks = [], []
 
         # convert instaloader post to Post object
-        post = Post2(
+        post = Post(
             shortcode=post.shortcode,
             username=post.owner_username,
             timestamp=post.date_utc,
@@ -273,7 +271,7 @@ class PostService(BaseService):
         )
         return post
 
-    async def _upsert(self, post: Post2):
+    async def _upsert(self, post: Post):
         """Create or update a post.
 
         :param post: post metadata

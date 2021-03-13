@@ -137,7 +137,10 @@ async def posts(web_socket: WebSocket):
             if shortcode := data.get('shortcode'):
                 try:
                     post = await PostService(database, http_session).create_from_shortcode(shortcode)
-                    await web_socket.send_json({'event': 'post.saved', 'shortcode': shortcode, 'post': post.response})
+                    response = {
+                        'shortcode': post.shortcode, 'username': post.username, 'timestamp': post.timestamp.isoformat()
+                    }
+                    await web_socket.send_json({'event': 'post.saved', 'shortcode': shortcode, 'post': response})
                 except PostNotFound as e:
                     await web_socket.send_json(e.response)
     except WebSocketDisconnect:
