@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -14,6 +15,14 @@ from .post import PostService
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class AutoArchive:
+    username: str
+    auto_archive: bool
+    last_archive_timestamp: Optional[datetime]
+    last_archive_latest_post_timestamp: Optional[datetime]
+
+
 class AutoArchiveService(BaseService):
     OUTDATED_THRESHOLD = timedelta(hours=3)
 
@@ -21,24 +30,24 @@ class AutoArchiveService(BaseService):
         """Catching up new posts of all outdated profiles."""
 
         while True:
-            username = await self.update_one_profile()
+            username = await self.update_next_profile()
             if not username:
                 break
 
-    async def update_one_profile(self) -> Optional[str]:
-        """Catching up new posts of one profile.
+    async def update_next_profile(self) -> Optional[str]:
+        """Catching up new posts of the next profile.
 
-        :return: username of the profile that got updated
+        :return: username of the profile that got updated, None if no profile needs to be updated
         """
 
         loop = asyncio.get_running_loop()
         async with self.database.transaction():
-            if username := await self._find_next_profile():
+            if auto_archive := await self._find_next():
                 func = instaloader.Profile.from_username
-                profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
-                post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+                profile = await loop.run_in_executor(None, func, self.instaloader_context, auto_archive.username)
 
-                latest_post_creation_time = await self._find_latest_post_creation_time(username)
+                post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+                latest_post_creation_time = await self._find_latest_post_creation_time(auto_archive.username)
                 while True:
                     # fetch the next post
                     try:
@@ -53,17 +62,17 @@ class AutoArchiveService(BaseService):
                     # archive the post
                     await PostService(self.database, self.http_session).create_from_instaloader(post)
 
-                await self._set_last_archive_timestamp(username)
-                return username
+                await self._set_last_archive_timestamp(auto_archive.username)
+                return auto_archive.username
 
-    async def _find_next_profile(self) -> Optional[str]:
-        """Find username of the next outdated profile to archive.
+    async def _find_next(self) -> Optional[AutoArchive]:
+        """Find auto archive info of the next outdated profile.
 
         A profile is considered outdated when:
-        - auto update is set to true
-        - the profile was last updated OUTDATED_THRESHOLD ago or has never been updated
+        - auto archive is set to true
+        - the profile's last archive time is older than the OUTDATED_THRESHOLD or has never been updated
 
-        :return: username of the profile to update
+        :return: profile auto archive info
         """
 
         where_clause = sa.and_(
@@ -73,13 +82,18 @@ class AutoArchiveService(BaseService):
                 sa.sql.operators.eq(schema.profiles.c.last_archive_timestamp, None),
             )
         )
-        statement = sa.select([schema.profiles.c.username], for_update=True) \
+        statement = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.auto_archive,
+            schema.profiles.c.last_archive_timestamp,
+            schema.profiles.c.last_archive_latest_post_timestamp,
+        ], for_update=True) \
             .select_from(schema.profiles) \
             .where(where_clause) \
             .order_by(schema.profiles.c.last_archive_timestamp.desc().nullsfirst()) \
             .limit(1)
         result = await self.database.fetch_one(statement)
-        return result.get('username')
+        return AutoArchive(**result)
 
     async def _find_latest_post_creation_time(self, username: str) -> Optional[datetime]:
         """Find creation time of the latest post that belongs to a profile.
