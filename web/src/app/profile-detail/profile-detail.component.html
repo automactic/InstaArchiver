@@ -59,13 +59,13 @@
           <p class="title"><b>Count</b></p>
           <p class="detail">{{posts.count}}</p>
         </div>
-        <div class="row" *ngIf="posts.earliest_time as earliest_time">
+        <div class="row" *ngIf="posts.earliest_timestamp as earliest_timestamp">
           <p class="title"><b>Earliest</b></p>
-          <p class="detail">{{ earliest_time | date:'medium' }}</p>
+          <p class="detail">{{ earliest_timestamp | date:'medium' }}</p>
         </div>
-        <div class="row" *ngIf="posts.latest_time as latest_time">
+        <div class="row" *ngIf="posts.latest_timestamp as latest_timestamp">
           <p class="title"><b>Latest</b></p>
-          <p class="detail">{{ latest_time | date:'medium' }}</p>
+          <p class="detail">{{ latest_timestamp | date:'medium' }}</p>
         </div>
       </nb-accordion-item-body>
     </nb-accordion-item>
