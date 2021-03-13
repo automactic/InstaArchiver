@@ -121,8 +121,8 @@ class AutoArchiveService(BaseService):
 
         # get latest_post_timestamp
         statement = sa.select([
-            sa.func.max(schema.posts.c.creation_time).label('max_timestamp')
-        ]).select_from(schema.posts).where(schema.posts.c.owner_username == auto_archive.username)
+            sa.func.max(schema.posts.c.timestamp).label('max_timestamp')
+        ]).select_from(schema.posts).where(schema.posts.c.username == auto_archive.username)
         result = await self.database.fetch_one(statement)
         auto_archive.latest_post_timestamp = result.get('max_timestamp')
 

@@ -43,8 +43,8 @@ class PostItem:
 @dataclass
 class Post:
     shortcode: str
-    owner_username: str
-    creation_time: datetime
+    username: str
+    timestamp: datetime
     type: PostType
     caption: Optional[str]
     caption_hashtags: [str]
@@ -75,8 +75,8 @@ class Post:
 
         return cls(
             shortcode=post.shortcode,
-            owner_username=post.owner_username,
-            creation_time=post.date_utc,
+            username=post.owner_username,
+            timestamp=post.date_utc,
             type=post_type,
             caption=post.caption,
             caption_hashtags=post.caption_hashtags,
@@ -88,8 +88,8 @@ class Post:
     def response(self):
         return {
             'shortcode': self.shortcode,
-            'owner_username': self.owner_username,
-            'creation_time': self.creation_time.isoformat(),
+            'username': self.username,
+            'timestamp': self.timestamp.isoformat(),
         }
 
 

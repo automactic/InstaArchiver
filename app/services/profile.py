@@ -94,11 +94,11 @@ class ProfileService(BaseService):
             schema.profiles.c.auto_archive,
             schema.profiles.c.last_archive_timestamp,
             sa.func.count(schema.posts.c.shortcode).label('post_count'),
-            sa.func.min(schema.posts.c.creation_time).label('earliest_timestamp'),
-            sa.func.max(schema.posts.c.creation_time).label('latest_timestamp'),
+            sa.func.min(schema.posts.c.timestamp).label('earliest_timestamp'),
+            sa.func.max(schema.posts.c.timestamp).label('latest_timestamp'),
         ]).select_from(
             schema.profiles.join(
-                schema.posts, schema.profiles.c.username == schema.posts.c.owner_username
+                schema.posts, schema.profiles.c.username == schema.posts.c.username
             )
         ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
         result = await self.database.fetch_one(query=statement)

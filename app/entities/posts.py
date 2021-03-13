@@ -26,8 +26,8 @@ class PostItem(BaseModel):
 
 class Post(BaseModel):
     shortcode: str
-    owner_username: str
-    creation_time: datetime
+    username: str
+    timestamp: datetime
     type: PostType
     caption: Optional[str]
     caption_hashtags: List[str]

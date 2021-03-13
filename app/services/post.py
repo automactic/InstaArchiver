@@ -42,18 +42,18 @@ class PostService(BaseService):
 
         posts_statement = sa.select([schema.posts.c.shortcode]).select_from(schema.posts)
         if username:
-            posts_statement = posts_statement.where(schema.posts.c.owner_username == username)
+            posts_statement = posts_statement.where(schema.posts.c.username == username)
         if start_time:
             start_time = datetime.utcfromtimestamp(start_time.timestamp())
-            posts_statement = posts_statement.where(schema.posts.c.creation_time >= start_time)
+            posts_statement = posts_statement.where(schema.posts.c.timestamp >= start_time)
         if end_time:
             end_time = datetime.utcfromtimestamp(end_time.timestamp())
-            posts_statement = posts_statement.where(schema.posts.c.creation_time < end_time)
-        posts_statement = posts_statement.order_by(schema.posts.c.creation_time.desc()).offset(offset).limit(limit)
+            posts_statement = posts_statement.where(schema.posts.c.timestamp < end_time)
+        posts_statement = posts_statement.order_by(schema.posts.c.timestamp.desc()).offset(offset).limit(limit)
         statement = sa.select([
             schema.posts.c.shortcode,
-            schema.posts.c.owner_username,
-            schema.posts.c.creation_time,
+            schema.posts.c.username,
+            schema.posts.c.timestamp,
             schema.posts.c.type,
             schema.posts.c.caption,
             schema.posts.c.caption_hashtags,
@@ -64,11 +64,11 @@ class PostService(BaseService):
             schema.post_items.c.filename.label('item_filename'),
             schema.post_items.c.thumb_image_filename.label('item_thumb_image_filename'),
         ]).select_from(
-            schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
+            schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.shortcode)
         ).where(
-            schema.post_items.c.post_shortcode.in_(posts_statement)
+            schema.post_items.c.shortcode.in_(posts_statement)
         ).order_by(
-            schema.posts.c.creation_time.desc(), schema.post_items.c.index.asc()
+            schema.posts.c.timestamp.desc(), schema.post_items.c.index.asc()
         )
 
         posts = []
@@ -84,7 +84,7 @@ class PostService(BaseService):
                 posts[-1].items.append(item)
             else:
                 post = Post2(items=[item], **result)
-                post.creation_time = post.creation_time.replace(tzinfo=timezone.utc)
+                post.timestamp = post.timestamp.replace(tzinfo=timezone.utc)
                 posts.append(post)
 
         statement = sa.select([sa.func.count()]).select_from(schema.posts)
@@ -102,14 +102,14 @@ class PostService(BaseService):
         async with self.database.transaction():
             # find info about post items
             list_statement = sa.select([
-                schema.posts.c.owner_username,
+                schema.posts.c.username,
                 schema.post_items.c.index,
                 schema.post_items.c.type,
                 schema.post_items.c.filename,
                 schema.post_items.c.thumb_image_filename,
             ]).select_from(
-                schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.post_shortcode)
-            ).where(schema.post_items.c.post_shortcode == shortcode)
+                schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.shortcode)
+            ).where(schema.post_items.c.shortcode == shortcode)
             post_items = [item for item in await self.database.fetch_all(list_statement)]
 
             # move files to recycle
@@ -117,22 +117,22 @@ class PostService(BaseService):
                 if index is not None and item['index'] != index:
                     continue
                 if filename := item['filename']:
-                    media_path = self.post_dir.joinpath(item['owner_username'], filename)
+                    media_path = self.post_dir.joinpath(item['username'], filename)
                     shutil.chown(media_path, os.getuid(), os.getgid())
                     media_path.unlink()
                 if thumb_image_filename := item['thumb_image_filename']:
-                    thumb_path = self.thumb_images_dir.joinpath(item['owner_username'], thumb_image_filename)
+                    thumb_path = self.thumb_images_dir.joinpath(item['username'], thumb_image_filename)
                     shutil.chown(thumb_path, os.getuid(), os.getgid())
                     thumb_path.unlink()
 
             # delete post(if post has only one item left) and post item records
             if index is not None:
                 where_clause = sa.and_(
-                    schema.post_items.c.post_shortcode == shortcode,
+                    schema.post_items.c.shortcode == shortcode,
                     schema.post_items.c.index == index,
                 )
             else:
-                where_clause = schema.post_items.c.post_shortcode == shortcode
+                where_clause = schema.post_items.c.shortcode == shortcode
             delete_statement = sa.delete(schema.post_items).where(where_clause)
             await self.database.execute(delete_statement)
             if len(post_items) == 1:
@@ -200,15 +200,15 @@ class PostService(BaseService):
 
         # create profile if not exist
         profile_service = ProfileService(self.database, self.http_session)
-        if not await profile_service.exists(post.owner_username):
-            await profile_service.upsert(post.owner_username)
+        if not await profile_service.exists(post.username):
+            await profile_service.upsert(post.username)
 
         # save post
         await self._download_image_video(post)
         await self._save_metadata(post)
 
         logger.info(
-            f'Saved post {post.shortcode} of user {post.owner_username} '
+            f'Saved post {post.shortcode} of user {post.username} '
             f'which contains {len(post.items)} item(s).'
         )
         return post
@@ -219,10 +219,10 @@ class PostService(BaseService):
         :param post: post metadata
         """
 
-        dir_path = Path('posts').joinpath(post.owner_username)
-        thumb_dir_path = Path('thumb_images').joinpath(post.owner_username)
-        post_timestamp = (post.creation_time.timestamp(), post.creation_time.timestamp())
-        post_filename = f'{post.creation_time.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
+        dir_path = Path('posts').joinpath(post.username)
+        thumb_dir_path = Path('thumb_images').joinpath(post.username)
+        post_timestamp = (post.timestamp.timestamp(), post.timestamp.timestamp())
+        post_filename = f'{post.timestamp.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
 
         for index, item in enumerate(post.items):
             # save the image or video
@@ -246,8 +246,8 @@ class PostService(BaseService):
         async with self.database.transaction():
             values = {
                 'shortcode': post.shortcode,
-                'owner_username': post.owner_username,
-                'creation_time': post.creation_time,
+                'username': post.username,
+                'timestamp': post.timestamp,
                 'type': post.type.value,
                 'caption': post.caption,
                 'caption_hashtags': post.caption_hashtags,
@@ -261,7 +261,7 @@ class PostService(BaseService):
 
             for item in post.items:
                 values = {
-                    'post_shortcode': post.shortcode,
+                    'shortcode': post.shortcode,
                     'index': item.index,
                     'type': item.type.value,
                     'duration': item.duration,
@@ -269,11 +269,11 @@ class PostService(BaseService):
                     'thumb_image_filename': item.thumb_image_filename,
                 }
                 updates = values.copy()
-                updates.pop('post_shortcode')
+                updates.pop('shortcode')
                 updates.pop('index')
                 statement = insert(schema.post_items).values(**values)
                 statement = statement.on_conflict_do_update(
-                    index_elements=[schema.post_items.c.post_shortcode, schema.post_items.c.index],
+                    index_elements=[schema.post_items.c.shortcode, schema.post_items.c.index],
                     set_=updates
                 )
                 await self.database.execute(statement)

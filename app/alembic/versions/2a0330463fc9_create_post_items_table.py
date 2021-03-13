@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.create_table(
         'post_items',
-        Column('post_shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
+        Column('shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
         Column('index', Integer, primary_key=True),
         Column('type', String, index=True, nullable=False),
         Column('duration', Float, index=True, nullable=True),
