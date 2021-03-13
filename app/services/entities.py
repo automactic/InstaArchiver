@@ -1,26 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from typing import List, Optional
-from entities.posts import PostItemType
+
 import instaloader
 
-
-class PostType(Enum):
-    IMAGE = 'image'
-    VIDEO = 'video'
-    SIDECAR = 'sidecar'
-
-    @classmethod
-    def from_instaloader(cls, type):
-        if type == 'GraphImage':
-            return cls.IMAGE
-        elif type == 'GraphVideo':
-            return cls.VIDEO
-        elif type == 'GraphSidecar':
-            return cls.SIDECAR
-        else:
-            return None
+from entities.posts import PostType, PostItemType
 
 
 @dataclass
@@ -47,14 +31,16 @@ class Post:
 
     @classmethod
     def from_instaloader(cls, post: instaloader.Post):
-        post_type = PostType.from_instaloader(post.typename)
-        if post_type == PostType.IMAGE:
+        if post.typename == 'GraphImage':
+            post_type = PostType.IMAGE
             items = [PostItem(type=PostItemType.IMAGE, url=post.url)]
-        elif post_type == PostType.VIDEO:
-            items = [PostItem(
-                type=PostItemType.VIDEO, url=post.video_url, thumb_url=post.url, duration=post.video_duration
-            )]
-        elif post_type == PostType.SIDECAR:
+        elif post.typename == 'GraphVideo':
+            post_type = PostType.VIDEO
+            items = [
+                PostItem(type=PostItemType.VIDEO, url=post.video_url, thumb_url=post.url, duration=post.video_duration)
+            ]
+        elif post.typename == 'GraphSidecar':
+            post_type = PostType.SIDECAR
             items = [
                 PostItem(
                     type=PostItemType.VIDEO if node.is_video else PostItemType.IMAGE,
@@ -65,6 +51,7 @@ class Post:
                 for index, node in enumerate(post.get_sidecar_nodes())
             ]
         else:
+            post_type = None
             items = []
 
         return cls(
