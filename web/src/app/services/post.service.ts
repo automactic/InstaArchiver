@@ -6,8 +6,8 @@ import { environment } from '../../environments/environment';
 
 export interface Post {
   shortcode: string
-  owner_username: string
-  creation_time: Date
+  username: string
+  timestamp: Date
   caption: string
 	items: PostItem[]
 }

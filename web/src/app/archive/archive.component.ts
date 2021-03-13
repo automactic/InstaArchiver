@@ -11,8 +11,8 @@ enum Event {
 
 interface Post {
   shortcode: string
-  owner_username: string
-  creation_time: Date
+  username: string
+  timestamp: Date
 }
 
 class Activity {

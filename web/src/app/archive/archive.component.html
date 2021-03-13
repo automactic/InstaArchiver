@@ -33,7 +33,7 @@
               <label><b>{{ activity.shortcode }}</b></label>
               <div class="caption" [ngSwitch]="activity.event">
                 <div *ngSwitchCase="'post.create'">Saving...</div>
-                <div *ngSwitchCase="'post.saved'">{{ activity.post?.owner_username || "unknown" }}</div>
+                <div *ngSwitchCase="'post.saved'">{{ activity.post?.username || "unknown" }}</div>
                 <div *ngSwitchCase="'post.not_found'">{{ activity.message }}</div>
               </div>
             </div>
