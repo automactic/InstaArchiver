@@ -2,8 +2,8 @@ import asyncio
 import logging
 import os
 import shutil
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Optional
 
 import instaloader
@@ -11,14 +11,19 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
 from entities.posts import Post as Post2
-from entities.posts import PostItem, PostListResult
+from entities.posts import PostItem, PostType, PostItemType, PostListResult
 from services import schema
 from services.base import BaseService
-from services.entities import Post
 from services.exceptions import PostNotFound
 from services.profile import ProfileService
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class DownloadTask:
+    url: str
+    thumb_url: Optional[str] = None
 
 
 class PostService(BaseService):
@@ -196,16 +201,71 @@ class PostService(BaseService):
         :param post: a instaloader post object
         """
 
-        post = Post.from_instaloader(post)
+        # figure out post_type, items and download_tasks
+        if post.typename == 'GraphImage':
+            post_type = PostType.IMAGE
+            post_item = PostItem(index=0, type=PostItemType.IMAGE)
+            download_task = DownloadTask(url=post.url)
+            items, download_tasks = [post_item], [download_task]
+        elif post.typename == 'GraphVideo':
+            post_type = PostType.VIDEO
+            post_item = PostItem(index=0, type=PostItemType.VIDEO, duration=post.video_duration)
+            download_task = DownloadTask(url=post.video_url, thumb_url=post.url)
+            items, download_tasks = [post_item], [download_task]
+        elif post.typename == 'GraphSidecar':
+            post_type = PostType.SIDECAR
+            items, download_tasks = [], []
+            for index, node in enumerate(post.get_sidecar_nodes()):
+                post_item = PostItem(index=index, type=PostItemType.VIDEO if node.is_video else PostItemType.IMAGE)
+                download_task = DownloadTask(
+                    url=node.video_url if node.is_video else node.display_url,
+                    thumb_url=node.display_url if node.is_video else None,
+                )
+                items.append(post_item)
+                download_tasks.append(download_task)
+        else:
+            post_type = None
+            items, download_tasks = [], []
+
+        # convert instaloader post to Post object
+        post = Post2(
+            shortcode=post.shortcode,
+            username=post.owner_username,
+            timestamp=post.date_utc,
+            type=post_type,
+            caption=post.caption,
+            caption_hashtags=post.caption_hashtags,
+            caption_mentions=post.caption_mentions,
+            items=items,
+        )
 
         # create profile if not exist
         profile_service = ProfileService(self.database, self.http_session)
         if not await profile_service.exists(post.username):
             await profile_service.upsert(post.username)
 
-        # save post
-        await self._download_image_video(post)
-        await self._save_metadata(post)
+        # download image and videos
+        post_filename = f'{post.timestamp.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
+        for item, download_task in zip(items, download_tasks):
+            filename = f'{post_filename}_{item.index}' if len(post.items) > 1 else post_filename
+            file_path = await self._download(
+                download_task.url,
+                self.media_dir.joinpath(post.username),
+                filename,
+                post.timestamp
+            )
+            item.filename = file_path.name
+            if download_task.thumb_url:
+                file_path = await self._download(
+                    download_task.thumb_url,
+                    self.thumb_images_dir.joinpath(post.username),
+                    filename,
+                    post.timestamp,
+                )
+                item.thumb_image_filename = file_path.name
+
+        # upsert the post entity
+        await self._upsert(post)
 
         logger.info(
             f'Saved post {post.shortcode} of user {post.username} '
@@ -213,32 +273,8 @@ class PostService(BaseService):
         )
         return post
 
-    async def _download_image_video(self, post: Post):
-        """Download images and videos of a post.
-
-        :param post: post metadata
-        """
-
-        dir_path = Path('posts').joinpath(post.username)
-        thumb_dir_path = Path('thumb_images').joinpath(post.username)
-        post_timestamp = (post.timestamp.timestamp(), post.timestamp.timestamp())
-        post_filename = f'{post.timestamp.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
-
-        for index, item in enumerate(post.items):
-            # save the image or video
-            filename = f'{post_filename}_{index}' if len(post.items) > 1 else post_filename
-            file_path = await self.save_media(item.url, dir_path, filename)
-            item.filename = file_path.name
-            os.utime(file_path, post_timestamp)
-
-            # save thumb image path
-            if item.thumb_url:
-                file_path = await self.save_media(item.thumb_url, thumb_dir_path, filename)
-                item.thumb_image_filename = file_path.name
-                os.utime(file_path, post_timestamp)
-
-    async def _save_metadata(self, post: Post):
-        """Save metadata of a post.
+    async def _upsert(self, post: Post2):
+        """Create or update a post.
 
         :param post: post metadata
         """
