@@ -201,14 +201,12 @@ class PostService(BaseService):
         # figure out post_type, items and download_tasks
         if post.typename == 'GraphImage':
             post_type = PostType.IMAGE
-            post_item = PostItem(index=0, type=PostItemType.IMAGE)
-            download_task = DownloadTask(url=post.url)
-            items, download_tasks = [post_item], [download_task]
+            items = [PostItem(index=0, type=PostItemType.IMAGE)]
+            download_tasks = [DownloadTask(url=post.url)]
         elif post.typename == 'GraphVideo':
             post_type = PostType.VIDEO
-            post_item = PostItem(index=0, type=PostItemType.VIDEO, duration=post.video_duration)
-            download_task = DownloadTask(url=post.video_url, thumb_url=post.url)
-            items, download_tasks = [post_item], [download_task]
+            items = [PostItem(index=0, type=PostItemType.VIDEO, duration=post.video_duration)]
+            download_tasks = [DownloadTask(url=post.video_url, thumb_url=post.url)]
         elif post.typename == 'GraphSidecar':
             post_type = PostType.SIDECAR
             items, download_tasks = [], []
