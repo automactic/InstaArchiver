@@ -152,7 +152,7 @@ class PostService(BaseService):
         loop = asyncio.get_running_loop()
         try:
             func = instaloader.Post.from_shortcode
-            post = await loop.run_in_executor(None, func, self.instaloader_context, shortcode)
+            post = await loop.run_in_executor(None, func, self.instaloader.context, shortcode)
             return await self.create_from_instaloader(post)
         except Exception:
             logger.warning(f'Failed to retrieved Post: {shortcode}')
@@ -169,7 +169,7 @@ class PostService(BaseService):
         loop = asyncio.get_running_loop()
         try:
             func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
             post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Failed to create posts from time range. Profile {username} does not exist.')

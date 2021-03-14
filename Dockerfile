@@ -17,6 +17,8 @@ RUN pip install -r /requirements.txt
 ENV USER_ID=""
 ENV GROUP_ID=""
 ENV DATABASE_HOSTNAME="localhost"
+ENV INSTAGRAM_USERNAME=""
+ENV INSTAGRAM_PASSWORD=""
 
 COPY ./app /app
 

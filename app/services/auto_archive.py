@@ -46,7 +46,7 @@ class AutoArchiveService(BaseService):
         async with self.database.transaction():
             if auto_archive := await self._find_next():
                 func = instaloader.Profile.from_username
-                profile = await loop.run_in_executor(None, func, self.instaloader_context, auto_archive.username)
+                profile = await loop.run_in_executor(None, func, self.instaloader.context, auto_archive.username)
                 post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
 
                 # get the timestamp that is used to stop auto archive
