@@ -26,7 +26,7 @@ class ProfileService(BaseService):
         loop = asyncio.get_running_loop()
         try:
             func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader_context, username)
+            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Profile does not exist: {username}')
             return
