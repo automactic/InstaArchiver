@@ -1,7 +1,9 @@
+import logging
 import mimetypes
 import os
 import shutil
 from datetime import datetime
+from functools import cached_property
 from pathlib import Path
 from typing import Optional
 
@@ -11,12 +13,13 @@ import instaloader
 import yarl
 from databases import Database
 
+logger = logging.getLogger(__name__)
+
 
 class BaseService:
     def __init__(self, database: Database, http_session: aiohttp.ClientSession):
         self.database = database
         self.http_session = http_session
-        self.instaloader_context = instaloader.InstaloaderContext()
 
         self.media_dir = Path('/media')
         self.profile_images_dir = self.media_dir.joinpath('profile_images')
@@ -30,6 +33,26 @@ class BaseService:
             self.group_id = int(os.getenv('GROUP_ID'))
         except ValueError:
             self.group_id = None
+
+    @cached_property
+    def instaloader(self):
+        instance = instaloader.Instaloader()
+        if username := os.getenv('INSTAGRAM_USERNAME'):
+            try:
+                instance.load_session_from_file(username)
+                logger.info(f'Loaded Instagram session for user {username}.')
+            except FileNotFoundError:
+                if password := os.getenv('INSTAGRAM_PASSWORD'):
+                    try:
+                        instance.login(username, password)
+                        instance.save_session_to_file()
+                        logger.info(f'Logged in to Instagram as user {username}.')
+                    except (instaloader.InvalidArgumentException,
+                            instaloader.BadCredentialsException,
+                            instaloader.ConnectionException,
+                            instaloader.TwoFactorAuthRequiredException) as e:
+                        logger.error(f'Failed logging in to Instagram: {e}.')
+        return instance
 
     def _set_file_ownership(self, path: Path):
         """Change ownership of the directory or file to a specific user id or group id.
