@@ -7,7 +7,7 @@ RUN npm install
 RUN ng build --prod
 
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-slim
 
 COPY --from=web /web/dist /web
 
