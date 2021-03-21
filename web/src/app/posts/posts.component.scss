@@ -30,6 +30,9 @@ div.posts > div.list {
 
   nb-list-item {
     padding: 0;
+    nb-card {
+      width: 100%;
+    }
     div.media {
       position: relative;
       > button {
@@ -48,7 +51,7 @@ div.posts > div.list {
       display:block;
     }
     div.media > img, video {
-      max-width: 100%;
+      width: 100%;
     }
     nb-accordion {
       box-shadow: none;
