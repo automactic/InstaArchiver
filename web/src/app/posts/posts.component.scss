@@ -6,6 +6,9 @@ div.filter {
   flex: 4;
   @media (max-width: 767.98px) { flex: none; }
 
+  display: flex;
+  flex-direction: column;
+
   position: -webkit-sticky;
   position: sticky;
   top: 7rem;
@@ -21,10 +24,10 @@ div.trailing {
 }
 
 nb-card.profile-list {
-  max-height: 100%;
-  @media (max-width: 991.98px) { max-height: 30rem }
+  // max-height: 100%;
+  // @media (max-width: 991.98px) { max-height: none; }
 
-  @media (max-width: 767.98px) { display: none }
+  @media (max-width: 767.98px) { display: none; }
 
   nb-card-header {
     display: flex;
@@ -44,6 +47,9 @@ nb-card.profile-list {
   }
 }
 nb-card.time-range-selector {
+  display: none;
+  @media (max-width: 991.98px) { display: flex; }
+
   nb-select:first-of-type {
     margin-bottom: 0.5rem;
   }
@@ -53,8 +59,8 @@ div.posts > div.list {
   flex: 6;
   @media (max-width: 767.98px) { flex: none; }
   
-  margin: 0 2rem;
-  @media (max-width: 991.98px) { margin: 0 1rem; }
+  margin: 0 1.5rem;
+  @media (max-width: 991.98px) { margin: 0 0 0 1rem; }
   @media (max-width: 767.98px) { margin: 0; }
 
   nb-list-item {
