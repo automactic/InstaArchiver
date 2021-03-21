@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'profiles', component: ProfilesComponent, children: [
     { path: ':username', component: ProfileDetailComponent }
   ] },
-  { path: '',   redirectTo: '/archive', pathMatch: 'full' },
+  { path: '',   redirectTo: '/posts', pathMatch: 'full' },
 ];
 
 @NgModule({

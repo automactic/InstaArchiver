@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
+import { NbMenuItem } from '@nebular/theme';
 
 import { Post, PostItem, PostService } from '../services/post.service';
 import { ProfileService } from '../services/profile.service';
@@ -20,6 +21,40 @@ export class PostsComponent {
   month?: string;
   loading = true;
   posts: Post[] = [];
+
+  items: NbMenuItem[] = [
+    {
+      title: 'Profile',
+      expanded: true,
+      badge: {
+        text: '30',
+        status: 'primary',
+      },
+      children: [
+        {
+          title: 'Messages',
+          badge: {
+            text: '99+',
+            status: 'danger',
+          },
+        },
+        {
+          title: 'Notifications',
+          badge: {
+            dotMode: true,
+            status: 'warning',
+          },
+        },
+        {
+          title: 'Emails',
+          badge: {
+            text: 'new',
+            status: 'success',
+          },
+        },
+      ],
+    },
+  ];
   
   constructor(
     private route: ActivatedRoute, 
@@ -41,6 +76,14 @@ export class PostsComponent {
       this.loading = false;
       this.posts = response.posts;
     })
+  }
+
+  clearSelectedProfile() {
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { username: null}, 
+      queryParamsHandling: 'merge' 
+    });
   }
 
   selectedProfileChanged(username: string) {
@@ -77,12 +120,14 @@ export class PostsComponent {
   }
 
   delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
+    this.loading = true;
     this.postService.delete(post.shortcode, item.index).subscribe( _ => {
       if (post.items.length == 1) {
         this.posts.splice(postIndex, 1);
       } else {
         post.items.splice(itemIndex, 1);
       }
+      this.loading = false;
     })
   }
 }

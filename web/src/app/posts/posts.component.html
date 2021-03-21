@@ -1,6 +1,36 @@
 <div class="posts">
   <div class="filter">
-    <nb-card>
+    <nb-card class="profile-list">
+      <nb-card-header> 
+        <div>Profile</div>
+        <button 
+          nbButton 
+          status="primary" 
+          size="tiny" 
+          (click)="clearSelectedProfile()"
+          [disabled]="username == null"
+        >All</button>
+      </nb-card-header>
+      <nb-list>
+        <nb-list-item 
+          *ngFor="let profile of profileService.profiles" 
+          [routerLink]=""
+          [queryParams]="{username: profile.username}" 
+          [queryParamsHandling]="'merge'"
+          routerLinkActive="active">
+          <nb-user 
+            [onlyPicture]="true"
+            [picture]="profileService.getProfileImagePath(profile.image_filename)"
+            shape="rectangle">
+          </nb-user>
+          <div>
+            <div><b>{{ profile.display_name }}</b></div>
+            <div>{{ profile.username }}</div>
+          </div>
+        </nb-list-item>
+      </nb-list>
+    </nb-card>
+    <nb-card class="profile-selector">
       <nb-card-header>Profile</nb-card-header>
       <nb-card-body>
         <nb-select 
@@ -15,7 +45,7 @@
         </nb-select>
       </nb-card-body>
     </nb-card>
-    <nb-card class="time_range">
+    <nb-card class="time-range-selector">
       <nb-card-header>Time Range</nb-card-header>
       <nb-card-body>
         <nb-select 
@@ -25,7 +55,7 @@
           [selected]="year" 
           (selectedChange)="selectedYearChanged($event)"
         >
-          <nb-option>All Time</nb-option>
+          <nb-option>All Years</nb-option>
           <nb-option value="2021">2021</nb-option>
           <nb-option value="2020">2020</nb-option>
           <nb-option value="2019">2019</nb-option>
@@ -75,12 +105,20 @@
                 </div>
               </nb-accordion-item-header>
               <nb-accordion-item-body>
-                <div>{{ post.caption }}</div>
+                <div><b>{{ post.shortcode }}</b></div>
+                <div class="caption">{{ post.caption }}</div>
               </nb-accordion-item-body>
             </nb-accordion-item>
           </nb-accordion>
         </nb-card>
       </nb-list-item>
     </nb-list>
+  </div>
+  <div class="filter trailing">
+    <nb-card>
+      <nb-card-header>Time Range</nb-card-header>
+      <nb-menu [items]="items">
+      </nb-menu>
+    </nb-card>
   </div>
 </div>
