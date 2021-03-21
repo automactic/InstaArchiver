@@ -30,6 +30,19 @@ div.posts > div.filter {
     margin-bottom: 0.5rem;
   }
 }
+nb-card.profiles {
+  nb-list-item:focus {
+    outline: none;
+  }
+  
+  nb-list-item:hover {
+    background-color: #EFF5FB;
+  }
+  
+  nb-list-item.active {
+    background-color: #E0ECF8;
+  }
+}
 div.posts > div.list {
   flex: 6;
   @media (max-width: 767.98px) { flex: none; }
