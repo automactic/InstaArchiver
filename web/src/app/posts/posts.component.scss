@@ -101,6 +101,9 @@ div.posts > div.list {
       }
     }
     nb-accordion-item-body {
+      div.shortcode {
+        margin-bottom: 0.25rem;
+      }
       div {
         word-break: break-word;
       }
