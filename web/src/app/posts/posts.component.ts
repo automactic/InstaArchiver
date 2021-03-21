@@ -120,12 +120,14 @@ export class PostsComponent {
   }
 
   delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
+    this.loading = true;
     this.postService.delete(post.shortcode, item.index).subscribe( _ => {
       if (post.items.length == 1) {
         this.posts.splice(postIndex, 1);
       } else {
         post.items.splice(itemIndex, 1);
       }
+      this.loading = false;
     })
   }
 }
