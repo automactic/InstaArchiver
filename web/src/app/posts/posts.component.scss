@@ -16,6 +16,11 @@ div.posts > div.filter {
   @media (max-width: 991.98px) { height: calc(100vh - 7.25rem) }
   @media (max-width: 767.98px) { height: auto }
 
+  nb-card {
+    max-height: 100%;
+    @media (max-width: 767.98px) { max-height: 20rem }
+  }
+  
   nb-card.time_range nb-card-body nb-select:first-of-type {
     margin-bottom: 0.5rem;
   }

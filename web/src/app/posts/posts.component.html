@@ -1,19 +1,30 @@
 <div class="posts">
   <div class="filter">
     <nb-card>
-      <nb-card-header>Profile</nb-card-header>
-      <nb-card-body>
-        <nb-select 
-          fullWidth 
-          placeholder="All" 
-          size="medium" 
-          [selected]="username" 
-          (selectedChange)="selectedProfileChanged($event)"
-        >
-          <nb-option>All</nb-option>
-          <nb-option *ngFor="let profile of profileService.profiles" [value]="profile.username">{{ profile.display_name }}</nb-option>
-        </nb-select>
-      </nb-card-body>
+      <nb-card-header>Profiles</nb-card-header>
+      <nb-list>
+        <nb-list-item
+          [routerLink]=""
+          [queryParams]="{username: null}" 
+          [queryParamsHandling]="'merge'"
+        ><b>All</b></nb-list-item>
+        <nb-list-item 
+          *ngFor="let profile of profileService.profiles" 
+          [routerLink]=""
+          [queryParams]="{username: profile.username}" 
+          [queryParamsHandling]="'merge'"
+          routerLinkActive="active">
+          <nb-user 
+            [onlyPicture]="true"
+            [picture]="profileService.getProfileImagePath(profile.image_filename)"
+            shape="rectangle">
+          </nb-user>
+          <div>
+            <div><b>{{ profile.display_name }}</b></div>
+            <div>{{ profile.username }}</div>
+          </div>
+        </nb-list-item>
+      </nb-list>
     </nb-card>
   </div>
   <div class="list">
