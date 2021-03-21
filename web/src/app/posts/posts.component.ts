@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
+import { NbMenuItem } from '@nebular/theme';
 
 import { Post, PostItem, PostService } from '../services/post.service';
 import { ProfileService } from '../services/profile.service';
@@ -20,6 +21,40 @@ export class PostsComponent {
   month?: string;
   loading = true;
   posts: Post[] = [];
+
+  items: NbMenuItem[] = [
+    {
+      title: 'Profile',
+      expanded: true,
+      badge: {
+        text: '30',
+        status: 'primary',
+      },
+      children: [
+        {
+          title: 'Messages',
+          badge: {
+            text: '99+',
+            status: 'danger',
+          },
+        },
+        {
+          title: 'Notifications',
+          badge: {
+            dotMode: true,
+            status: 'warning',
+          },
+        },
+        {
+          title: 'Emails',
+          badge: {
+            text: 'new',
+            status: 'success',
+          },
+        },
+      ],
+    },
+  ];
   
   constructor(
     private route: ActivatedRoute, 

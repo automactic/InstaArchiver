@@ -101,42 +101,8 @@
   <div class="filter trailing">
     <nb-card>
       <nb-card-header>Time Range</nb-card-header>
-      <nb-card-body>
-        <nb-select 
-          fullWidth 
-          placeholder="All Years" 
-          size="medium"
-          [selected]="year" 
-          (selectedChange)="selectedYearChanged($event)"
-        >
-          <nb-option>All Time</nb-option>
-          <nb-option value="2021">2021</nb-option>
-          <nb-option value="2020">2020</nb-option>
-          <nb-option value="2019">2019</nb-option>
-        </nb-select>
-        <nb-select 
-          fullWidth 
-          placeholder="All Months" 
-          size="medium"
-          [disabled]="year == null"
-          [selected]="month" 
-          (selectedChange)="selectedMonthChanged($event)"
-        >
-          <nb-option>All Months</nb-option>
-          <nb-option value="1">January</nb-option>
-          <nb-option value="2">February</nb-option>
-          <nb-option value="3">March</nb-option>
-          <nb-option value="4">April</nb-option>
-          <nb-option value="5">May</nb-option>
-          <nb-option value="6">June</nb-option>
-          <nb-option value="7">July</nb-option>
-          <nb-option value="8">August</nb-option>
-          <nb-option value="9">September</nb-option>
-          <nb-option value="10">October</nb-option>
-          <nb-option value="11">November</nb-option>
-          <nb-option value="12">December</nb-option>
-        </nb-select>
-      </nb-card-body>
+      <nb-menu [items]="items">
+      </nb-menu>
     </nb-card>
   </div>
 </div>
