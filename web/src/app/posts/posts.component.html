@@ -1,13 +1,17 @@
 <div class="posts">
   <div class="filter">
     <nb-card>
-      <nb-card-header>Profiles</nb-card-header>
+      <nb-card-header> 
+        <div>Profile</div>
+        <button 
+          nbButton 
+          status="primary" 
+          size="tiny" 
+          (click)="clearSelectedProfile()"
+          [disabled]="username == null"
+        >All</button>
+      </nb-card-header>
       <nb-list>
-        <nb-list-item
-          [routerLink]=""
-          [queryParams]="{username: null}" 
-          [queryParamsHandling]="'merge'"
-        ><b>All</b></nb-list-item>
         <nb-list-item 
           *ngFor="let profile of profileService.profiles" 
           [routerLink]=""

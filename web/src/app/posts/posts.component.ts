@@ -43,6 +43,14 @@ export class PostsComponent {
     })
   }
 
+  clearSelectedProfile() {
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { username: null}, 
+      queryParamsHandling: 'merge' 
+    });
+  }
+
   selectedProfileChanged(username: string) {
     this.router.navigate([], { 
       relativeTo: this.route, 
