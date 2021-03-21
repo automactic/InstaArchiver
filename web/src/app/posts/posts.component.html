@@ -15,6 +15,36 @@
         </nb-select>
       </nb-card-body>
     </nb-card>
+  </div>
+  <div class="list">
+    <nb-list nbInfiniteList [threshold]="1500" [listenWindowScroll]="true" (bottomThreshold)="loadNext()">
+      <nb-list-item *ngFor="let post of posts; let postIndex=index;">
+        <nb-card>
+          <div *ngFor="let item of post.items; let itemIndex=index;" class="media">
+            <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
+            <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
+              <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
+            </video>
+            <button nbButton (click)="delete(post, item, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+          </div>
+          <nb-accordion>
+            <nb-accordion-item>
+              <nb-accordion-item-header>
+                <div>
+                  <div><b>{{ this.profileService.display_names.get(post.username) }}</b></div>
+                  <div>{{ post.timestamp | date:'medium' }}</div>
+                </div>
+              </nb-accordion-item-header>
+              <nb-accordion-item-body>
+                <div>{{ post.caption }}</div>
+              </nb-accordion-item-body>
+            </nb-accordion-item>
+          </nb-accordion>
+        </nb-card>
+      </nb-list-item>
+    </nb-list>
+  </div>
+  <div class="filter">
     <nb-card class="time_range">
       <nb-card-header>Time Range</nb-card-header>
       <nb-card-body>
@@ -54,33 +84,5 @@
         </nb-select>
       </nb-card-body>
     </nb-card>
-  </div>
-  <div class="list">
-    <nb-list nbInfiniteList [threshold]="1500" [listenWindowScroll]="true" (bottomThreshold)="loadNext()">
-      <nb-list-item *ngFor="let post of posts; let postIndex=index;">
-        <nb-card>
-          <div *ngFor="let item of post.items; let itemIndex=index;" class="media">
-            <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
-            <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
-              <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
-            </video>
-            <button nbButton (click)="delete(post, item, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button>
-          </div>
-          <nb-accordion>
-            <nb-accordion-item>
-              <nb-accordion-item-header>
-                <div>
-                  <div><b>{{ this.profileService.display_names.get(post.username) }}</b></div>
-                  <div>{{ post.timestamp | date:'medium' }}</div>
-                </div>
-              </nb-accordion-item-header>
-              <nb-accordion-item-body>
-                <div>{{ post.caption }}</div>
-              </nb-accordion-item-body>
-            </nb-accordion-item>
-          </nb-accordion>
-        </nb-card>
-      </nb-list-item>
-    </nb-list>
   </div>
 </div>
