@@ -1,6 +1,6 @@
 div.posts {
   display: flex;
-  @media (max-width: 767.98px) { flex-direction: column }
+  @media (max-width: 767.98px) { flex-direction: column; }
 }
 div.filter {
   flex: 4;
@@ -10,11 +10,11 @@ div.filter {
   position: sticky;
   top: 7rem;
   @media (max-width: 991.98px) { top: 6.25rem; }
-  @media (max-width: 767.98px) { position: static }
+  @media (max-width: 767.98px) { position: static; }
 
   height: calc(100vh - 8.75rem);
-  @media (max-width: 991.98px) { height: calc(100vh - 7.25rem) }
-  @media (max-width: 767.98px) { height: auto }
+  @media (max-width: 991.98px) { height: calc(100vh - 7.25rem); }
+  @media (max-width: 767.98px) { height: auto; }
 }
 div.trailing {
   @media (max-width: 991.98px) { display: none; }
@@ -22,7 +22,7 @@ div.trailing {
 
 nb-card {
   margin-bottom: 1.5rem;
-  @media (max-width: 991.98px) { margin-bottom: 1rem;}
+  @media (max-width: 991.98px) { margin-bottom: 1rem; }
 }
 nb-card.profile-list {
   @media (max-width: 767.98px) { display: none; }
@@ -101,10 +101,8 @@ div.posts > div.list {
       }
     }
     nb-accordion-item-body {
-      div.shortcode {
-        margin-bottom: 0.25rem;
-      }
-      div {
+      div.caption {
+        margin-top: 0.25rem;
         word-break: break-word;
       }
     }
