@@ -21,40 +21,6 @@ export class PostsComponent {
   month?: string;
   loading = true;
   posts: Post[] = [];
-
-  items: NbMenuItem[] = [
-    {
-      title: 'Profile',
-      expanded: true,
-      badge: {
-        text: '30',
-        status: 'primary',
-      },
-      children: [
-        {
-          title: 'Messages',
-          badge: {
-            text: '99+',
-            status: 'danger',
-          },
-        },
-        {
-          title: 'Notifications',
-          badge: {
-            dotMode: true,
-            status: 'warning',
-          },
-        },
-        {
-          title: 'Emails',
-          badge: {
-            text: 'new',
-            status: 'success',
-          },
-        },
-      ],
-    },
-  ];
   
   constructor(
     private route: ActivatedRoute, 
@@ -72,7 +38,7 @@ export class PostsComponent {
         return this.postService.list(0, 5, this.username, this.year, this.month);
       })
     ).subscribe(response => {
-      window.scrollTo({ top: 0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.loading = false;
       this.posts = response.posts;
     })
@@ -81,7 +47,7 @@ export class PostsComponent {
   clearSelectedProfile() {
     this.router.navigate([], { 
       relativeTo: this.route, 
-      queryParams: { username: null}, 
+      queryParams: { username: null }, 
       queryParamsHandling: 'merge' 
     });
   }
@@ -89,15 +55,19 @@ export class PostsComponent {
   selectedProfileChanged(username: string) {
     this.router.navigate([], { 
       relativeTo: this.route, 
-      queryParams: { username: username}, 
+      queryParams: { username: username }, 
       queryParamsHandling: 'merge' 
     });
   }
 
   selectedYearChanged(year: string) {
+    var queryParams: Record<string, string | null> = { year: year };
+    if (year == null) {
+      queryParams.month = null;
+    }
     this.router.navigate([], { 
       relativeTo: this.route, 
-      queryParams: { year: year}, 
+      queryParams: queryParams, 
       queryParamsHandling: 'merge' 
     });
   }
@@ -105,7 +75,7 @@ export class PostsComponent {
   selectedMonthChanged(month: string) {
     this.router.navigate([], { 
       relativeTo: this.route, 
-      queryParams: { month: month}, 
+      queryParams: { month: month }, 
       queryParamsHandling: 'merge' 
     });
   }
