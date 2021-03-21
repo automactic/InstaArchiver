@@ -30,6 +30,21 @@
         </nb-list-item>
       </nb-list>
     </nb-card>
+    <nb-card class="profile-selector">
+      <nb-card-header>Profile</nb-card-header>
+      <nb-card-body>
+        <nb-select 
+          fullWidth 
+          placeholder="All" 
+          size="medium" 
+          [selected]="username" 
+          (selectedChange)="selectedProfileChanged($event)"
+        >
+          <nb-option>All</nb-option>
+          <nb-option *ngFor="let profile of profileService.profiles" [value]="profile.username">{{ profile.display_name }}</nb-option>
+        </nb-select>
+      </nb-card-body>
+    </nb-card>
     <nb-card class="time-range-selector">
       <nb-card-header>Time Range</nb-card-header>
       <nb-card-body>
@@ -40,7 +55,7 @@
           [selected]="year" 
           (selectedChange)="selectedYearChanged($event)"
         >
-          <nb-option>All Time</nb-option>
+          <nb-option>All Years</nb-option>
           <nb-option value="2021">2021</nb-option>
           <nb-option value="2020">2020</nb-option>
           <nb-option value="2019">2019</nb-option>
