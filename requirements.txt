@@ -5,7 +5,7 @@ asyncpg~=0.22
 databases~=0.4
 fastapi~=0.63
 fastapi-utils~=0.2
-instaloader~=4.6
+instaloader~=4.7
 psycopg2-binary~=2.8
 SQLAlchemy<1.4
 sqlalchemy-utils~=0.36
