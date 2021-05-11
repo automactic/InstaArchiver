@@ -39,7 +39,7 @@ class BaseService:
         instance = instaloader.Instaloader()
         if username := os.getenv('INSTAGRAM_USERNAME'):
             try:
-                instance.load_session_from_file(username)
+                instance.load_session_from_file(username, os.getenv('INSTALOADER_SESSION_FILE'))
                 logger.info(f'Loaded Instagram session for user {username}.')
             except FileNotFoundError:
                 if password := os.getenv('INSTAGRAM_PASSWORD'):
