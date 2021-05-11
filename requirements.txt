@@ -1,11 +1,11 @@
 aiofiles~=0.6
 aiohttp~=3.7
-alembic~=1.5
+alembic~=1.6
 asyncpg~=0.22
 databases~=0.4
-fastapi~=0.63
+fastapi~=0.64
 fastapi-utils~=0.2
 instaloader~=4.7
 psycopg2-binary~=2.8
-SQLAlchemy<1.4
-sqlalchemy-utils~=0.36
+SQLAlchemy~=1.4
+sqlalchemy-utils~=0.37
