@@ -166,10 +166,9 @@ class PostService(BaseService):
         # get the post iterator
         loop = asyncio.get_running_loop()
         try:
-            profile_func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, profile_func, self.instaloader.context, request.username)
-            post_func = profile.get_saved_posts if request.saved_only else profile.get_posts
-            post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, post_func)
+            func = instaloader.Profile.from_username
+            profile = await loop.run_in_executor(None, func, self.instaloader.context, request.username)
+            post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Failed to create posts from time range. Profile {request.username} does not exist.')
             return
