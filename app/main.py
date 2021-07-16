@@ -91,7 +91,7 @@ def create_post_from_time_range(request: PostArchiveRequest.FromTimeRange, backg
 @app.post('/api/posts/from_saved/')
 def create_post_from_saved(background_tasks: BackgroundTasks):
     service = PostService(database, http_session)
-    background_tasks.add_task(service.create_from_saved)
+    background_tasks.add_task(service.archive_saved)
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
