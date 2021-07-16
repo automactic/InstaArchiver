@@ -25,8 +25,10 @@ target_metadata = None
 # ... etc.
 
 # assemble the database url
-hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-url = f'postgresql://postgres:postgres@{hostname}/insta_archiver'
+url = (
+    f"postgresql://{os.getenv('DATABASE_USERNAME', 'postgres')}:{os.getenv('DATABASE_PASSWORD', 'postgres')}"
+    f"@{os.getenv('DATABASE_HOSTNAME', 'localhost')}:{os.getenv('DATABASE_PORT', 5432)}/insta_archiver"
+)
 
 # create database
 if not database_exists(url):

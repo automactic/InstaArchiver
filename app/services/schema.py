@@ -1,21 +1,12 @@
 import os
 
-import sqlalchemy
 from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, Float, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
 
-database_hostname = os.getenv('DATABASE_HOSTNAME', 'localhost')
-database_url = f'postgresql://postgres:postgres@{database_hostname}/insta_archiver'
-
-
-def create_engine() -> sqlalchemy.engine.Engine:
-    return sqlalchemy.create_engine(database_url)
-
-
-async def create_connection() -> sqlalchemy.engine.Connection:
-    engine = create_engine()
-    with engine.connect() as connection:
-        yield connection
+database_url = (
+    f"postgresql://{os.getenv('DATABASE_USERNAME', 'postgres')}:{os.getenv('DATABASE_PASSWORD', 'postgres')}"
+    f"@{os.getenv('DATABASE_HOSTNAME', 'localhost')}:{os.getenv('DATABASE_PORT', 5432)}/insta_archiver"
+)
 
 
 metadata = MetaData()
