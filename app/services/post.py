@@ -95,6 +95,17 @@ class PostService(BaseService):
 
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
 
+    async def exists(self, shortcode: str) -> bool:
+        """Check if a post exists.
+
+        :param shortcode: shortcode of the post to check
+        :return: if the post exists
+        """
+
+        statement = sa.select([schema.posts.c.shortcode]).where(schema.posts.c.shortcode == shortcode)
+        exists_statement = sa.select([sa.exists(statement)])
+        return await self.database.fetch_val(query=exists_statement)
+
     async def delete(self, shortcode: str, index: Optional[int] = None):
         """Delete post and post items
 
@@ -190,7 +201,9 @@ class PostService(BaseService):
 
             await self.create_from_instaloader(post)
 
-    async def create_from_saved(self):
+    async def archive_saved(self):
+        """Archive saved posts in the account that is currently logged in."""
+
         # get the post iterator
         loop = asyncio.get_running_loop()
         username = self.instaloader.context.username
@@ -209,8 +222,10 @@ class PostService(BaseService):
             except StopIteration:
                 break
 
+            # archive unsaved posts
+            if await self.exists(post.shortcode):
+                break
             await self.create_from_instaloader(post)
-            break
 
     async def create_from_instaloader(self, post: instaloader.Post) -> Post:
         """Create a post from a instaloader post object.
