@@ -88,6 +88,13 @@ def create_post_from_time_range(request: PostArchiveRequest.FromTimeRange, backg
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
+@app.post('/api/posts/from_saved/')
+def create_post_from_saved(background_tasks: BackgroundTasks):
+    service = PostService(database, http_session)
+    background_tasks.add_task(service.create_from_saved)
+    return Response(status_code=HTTPStatus.ACCEPTED)
+
+
 @app.delete('/api/posts/{shortcode:str}/')
 async def delete_post(shortcode: str):
     await PostService(database, http_session).delete(shortcode)
