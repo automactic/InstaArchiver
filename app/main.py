@@ -12,7 +12,7 @@ from fastapi.responses import Response, FileResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi_utils.tasks import repeat_every
 
-from entities.posts import PostListResult, PostCreationFromShortcode, PostCreationFromTimeRange
+from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
 from services import schema, AutoArchiveService
 from services.exceptions import PostNotFound
@@ -82,9 +82,9 @@ def create_post_from_shortcode(request: PostCreationFromShortcode, background_ta
 
 
 @app.post('/api/posts/from_time_range/')
-def create_post_from_time_range(request: PostCreationFromTimeRange, background_tasks: BackgroundTasks):
+def create_post_from_time_range(request: PostArchiveRequest.FromTimeRange, background_tasks: BackgroundTasks):
     service = PostService(database, http_session)
-    background_tasks.add_task(service.create_from_time_range, request.username, request.start, request.end)
+    background_tasks.add_task(service.create_from_time_range, request)
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 

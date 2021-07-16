@@ -10,7 +10,7 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.posts import Post, PostItem, PostType, PostItemType, PostListResult
+from entities.posts import Post, PostItem, PostType, PostItemType, PostListResult, PostArchiveRequest
 from services import schema
 from services.base import BaseService
 from services.profile import ProfileService
@@ -157,22 +157,21 @@ class PostService(BaseService):
         except Exception:
             logger.warning(f'Failed to retrieved Post: {shortcode}')
 
-    async def create_from_time_range(self, username: str, start: datetime, end: datetime):
+    async def create_from_time_range(self, request: PostArchiveRequest.FromTimeRange):
         """Create posts from a profile within a time range.
 
-        :param username: username of the profile to archive posts
-        :param start: start of the time range to archive posts
-        :param end: end of the time range to archive posts
+        :param request: post archive request
         """
 
         # get the post iterator
         loop = asyncio.get_running_loop()
         try:
-            func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
-            post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_posts)
+            profile_func = instaloader.Profile.from_username
+            profile = await loop.run_in_executor(None, profile_func, self.instaloader.context, request.username)
+            post_func = profile.get_saved_posts if request.saved_only else profile.get_posts
+            post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, post_func)
         except instaloader.ProfileNotExistsException:
-            logger.warning(f'Failed to create posts from time range. Profile {username} does not exist.')
+            logger.warning(f'Failed to create posts from time range. Profile {request.username} does not exist.')
             return
 
         while True:
@@ -183,11 +182,11 @@ class PostService(BaseService):
                 break
 
             # if post is later than the end date, that means we have yet to reach posts within the time range
-            if post.date_utc >= end:
+            if post.date_utc >= request.end:
                 continue
 
             # if post is earlier than the start date, that means we have iterated through posts within the time range
-            if post.date_utc < start:
+            if post.date_utc < request.start:
                 break
 
             await self.create_from_instaloader(post)

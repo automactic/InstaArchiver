@@ -46,7 +46,9 @@ class PostCreationFromShortcode(BaseModel):
     shortcode: str
 
 
-class PostCreationFromTimeRange(BaseModel):
-    username: str
-    start: datetime
-    end: datetime
+class PostArchiveRequest:
+    class FromTimeRange(BaseModel):
+        username: str  # username of the profile to archive posts
+        start: datetime  # start of the time range to archive posts
+        end: datetime  # end of the time range to archive posts
+        saved_only: Optional[bool] = False  # if True, only posts that are marked saved by the user will be archived
