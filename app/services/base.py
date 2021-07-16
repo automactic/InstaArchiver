@@ -21,6 +21,7 @@ class BaseService:
         self.database = database
         self.http_session = http_session
 
+        self.sessions_dir = Path('/sessions')
         self.media_dir = Path('/media')
         self.profile_images_dir = self.media_dir.joinpath('profile_images')
         self.post_dir = self.media_dir.joinpath('posts')
@@ -39,7 +40,7 @@ class BaseService:
         instance = instaloader.Instaloader()
         if username := os.getenv('INSTAGRAM_USERNAME'):
             try:
-                instance.load_session_from_file(username, os.getenv('INSTALOADER_SESSION_FILE'))
+                instance.load_session_from_file(username, str(self.sessions_dir.joinpath(f'{username}.session')))
                 logger.info(f'Loaded Instagram session for user {username}.')
             except FileNotFoundError:
                 if password := os.getenv('INSTAGRAM_PASSWORD'):
