@@ -39,20 +39,22 @@ class BaseService:
     def instaloader(self):
         instance = instaloader.Instaloader()
         if username := os.getenv('INSTAGRAM_USERNAME'):
+            path = str(self.sessions_dir.joinpath(f'{username}.session'))
             try:
-                instance.load_session_from_file(username, str(self.sessions_dir.joinpath(f'{username}.session')))
+                instance.load_session_from_file(username, path)
                 logger.info(f'Loaded Instagram session for user {username}.')
             except FileNotFoundError:
                 if password := os.getenv('INSTAGRAM_PASSWORD'):
                     try:
                         instance.login(username, password)
-                        instance.save_session_to_file()
+                        instance.save_session_to_file(path)
                         logger.info(f'Logged in to Instagram as user {username}.')
-                    except (instaloader.InvalidArgumentException,
-                            instaloader.BadCredentialsException,
-                            instaloader.ConnectionException,
-                            instaloader.TwoFactorAuthRequiredException) as e:
+                    except instaloader.TwoFactorAuthRequiredException:
+                        logger.error('Failed logging in to Instagram: two factor auth is not supported.')
+                    except instaloader.InstaloaderException as e:
                         logger.error(f'Failed logging in to Instagram: {e}.')
+                else:
+                    logger.info(f'Unable to load Instagram session for user {username}.')
         return instance
 
     def _set_file_ownership(self, path: Path):
