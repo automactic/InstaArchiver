@@ -206,13 +206,12 @@ class PostService(BaseService):
 
         # get the post iterator
         loop = asyncio.get_running_loop()
-        username = self.instaloader.context.username
         try:
             func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
+            profile = await loop.run_in_executor(None, func, self.instaloader.context, self.instagram_username)
             post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_saved_posts)
         except instaloader.ProfileNotExistsException:
-            logger.warning(f'Failed to create posts from saved. Profile {username} does not exist.')
+            logger.warning(f'Failed to create posts from saved. Profile {self.instagram_username} does not exist.')
             return
 
         while True:

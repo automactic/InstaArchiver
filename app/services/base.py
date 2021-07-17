@@ -21,11 +21,15 @@ class BaseService:
         self.database = database
         self.http_session = http_session
 
+        # File IO Paths
         self.sessions_dir = Path('/sessions')
         self.media_dir = Path('/media')
         self.profile_images_dir = self.media_dir.joinpath('profile_images')
         self.post_dir = self.media_dir.joinpath('posts')
         self.thumb_images_dir = self.media_dir.joinpath('thumb_images')
+
+        # Environment Variables
+        self.instagram_username = os.getenv('INSTAGRAM_USERNAME')
         try:
             self.user_id = int(os.getenv('USER_ID'))
         except ValueError:
@@ -38,21 +42,23 @@ class BaseService:
     @cached_property
     def instaloader(self):
         instance = instaloader.Instaloader()
-        if username := os.getenv('INSTAGRAM_USERNAME'):
+        if username := self.instagram_username:
+            path = str(self.sessions_dir.joinpath(f'{username}.session'))
             try:
-                instance.load_session_from_file(username, str(self.sessions_dir.joinpath(f'{username}.session')))
+                instance.load_session_from_file(username, path)
                 logger.info(f'Loaded Instagram session for user {username}.')
             except FileNotFoundError:
                 if password := os.getenv('INSTAGRAM_PASSWORD'):
                     try:
                         instance.login(username, password)
-                        instance.save_session_to_file()
+                        instance.save_session_to_file(path)
                         logger.info(f'Logged in to Instagram as user {username}.')
-                    except (instaloader.InvalidArgumentException,
-                            instaloader.BadCredentialsException,
-                            instaloader.ConnectionException,
-                            instaloader.TwoFactorAuthRequiredException) as e:
+                    except instaloader.TwoFactorAuthRequiredException:
+                        logger.error('Failed logging in to Instagram: two factor auth is not supported.')
+                    except instaloader.InstaloaderException as e:
                         logger.error(f'Failed logging in to Instagram: {e}.')
+                else:
+                    logger.info(f'Unable to load Instagram session for user {username}.')
         return instance
 
     def _set_file_ownership(self, path: Path):
