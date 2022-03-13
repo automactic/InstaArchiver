@@ -1,16 +1,16 @@
 import logging
 import mimetypes
 import os
+import pathlib
 import shutil
 from datetime import datetime
 from functools import cached_property
 from pathlib import Path
 from typing import Optional
 
-import aiofiles
 import aiohttp
 import instaloader
-import yarl
+import requests
 from databases import Database
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,9 @@ class BaseService:
         if self.user_id or self.group_id:
             shutil.chown(path, self.user_id, self.group_id)
 
-    async def _download(self, url: str, working_dir: Path, filename: str, timestamp: Optional[datetime] = None):
+    def _download(
+        self, url: str, working_dir: Path, filename: str, timestamp: Optional[datetime] = None
+    ) -> pathlib.Path:
         """Download a file from url to working dir with filename and optionally an access and update time.
 
         :param url: the url to retrieve the file
@@ -80,25 +82,26 @@ class BaseService:
         :return file_path: the path of the saved image or video
         """
 
-        async with self.http_session.get(yarl.URL(url, encoded=True)) as response:
-            # prepare working dir
-            working_dir.mkdir(parents=True, exist_ok=True)
-            self._set_file_ownership(working_dir)
+        # retrieve file
+        response = requests.get(url)
 
-            # prepare destination path
-            extension = mimetypes.guess_extension(response.content_type)
-            file_path = working_dir.joinpath(filename).with_suffix(extension)
+        # prepare working dir
+        working_dir.mkdir(parents=True, exist_ok=True)
+        self._set_file_ownership(working_dir)
 
-            # save the file
-            async with aiofiles.open(file_path, 'wb') as file:
-                data = await response.read()
-                await file.write(data)
+        # prepare destination path
+        extension = mimetypes.guess_extension(response.headers['content-type'])
+        file_path = working_dir.joinpath(filename).with_suffix(extension)
 
-            # set file access and update time
-            if timestamp:
-                os.utime(file_path, (timestamp.timestamp(), timestamp.timestamp()))
+        # save file data
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
 
-            # set file ownership
-            self._set_file_ownership(file_path)
+        # set file access and update time
+        if timestamp:
+            os.utime(file_path, (timestamp.timestamp(), timestamp.timestamp()))
 
-            return file_path
+        # set file ownership
+        self._set_file_ownership(file_path)
+
+        return file_path

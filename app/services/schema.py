@@ -8,7 +8,6 @@ database_url = (
     f"@{os.getenv('DATABASE_HOSTNAME', 'localhost')}:{os.getenv('DATABASE_PORT', 5432)}/insta_archiver"
 )
 
-
 metadata = MetaData()
 
 profiles = Table(

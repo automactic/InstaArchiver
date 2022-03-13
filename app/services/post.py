@@ -282,7 +282,7 @@ class PostService(BaseService):
         post_filename = f'{post.timestamp.strftime("%Y-%m-%dT%H-%M-%S")}_[{post.shortcode}]'
         for item, download_task in zip(items, download_tasks):
             filename = f'{post_filename}_{item.index}' if len(items) > 1 else post_filename
-            file_path = await self._download(
+            file_path = self._download(
                 download_task.url,
                 self.post_dir.joinpath(post.username),
                 filename,
@@ -290,7 +290,7 @@ class PostService(BaseService):
             )
             item.filename = file_path.name
             if download_task.thumb_url:
-                file_path = await self._download(
+                file_path = self._download(
                     download_task.thumb_url,
                     self.thumb_images_dir.joinpath(post.username),
                     filename,
