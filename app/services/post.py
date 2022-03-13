@@ -210,6 +210,8 @@ class PostService(BaseService):
             func = instaloader.Profile.from_username
             profile = await loop.run_in_executor(None, func, self.instaloader.context, self.instagram_username)
             post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_saved_posts)
+            logger.info('debug: iterating through saved posts')
+            logger.debug('iterating through saved posts')
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Failed to create posts from saved. Profile {self.instagram_username} does not exist.')
             return
@@ -218,6 +220,7 @@ class PostService(BaseService):
             # fetch the next post
             try:
                 post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+                logger.info(f'fetched post: {post.shortcode}')
             except StopIteration:
                 break
 

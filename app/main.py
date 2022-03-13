@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
@@ -19,7 +20,7 @@ from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
