@@ -103,8 +103,7 @@ class PostService(BaseService):
         """
 
         statement = sa.select([schema.posts.c.shortcode]).where(schema.posts.c.shortcode == shortcode)
-        exists_statement = sa.select([sa.exists(statement)])
-        return await self.database.fetch_val(query=exists_statement)
+        return await self.database.fetch_one(query=statement) is not None
 
     async def delete(self, shortcode: str, index: Optional[int] = None):
         """Delete post and post items
@@ -210,7 +209,6 @@ class PostService(BaseService):
             func = instaloader.Profile.from_username
             profile = await loop.run_in_executor(None, func, self.instaloader.context, self.instagram_username)
             post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_saved_posts)
-            logger.info('debug: iterating through saved posts')
             logger.debug('iterating through saved posts')
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Failed to create posts from saved. Profile {self.instagram_username} does not exist.')
