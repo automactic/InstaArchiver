@@ -201,8 +201,11 @@ class PostService(BaseService):
 
             await self.create_from_instaloader(post)
 
-    async def archive_saved(self):
-        """Archive saved posts in the account that is currently logged in."""
+    async def archive_saved(self, count: Optional[int] = None):
+        """Archive saved posts in the account that is currently logged in.
+
+        :param count: number of most recent posts to archive before stopping
+        """
 
         # get the post iterator
         loop = asyncio.get_running_loop()
@@ -214,22 +217,34 @@ class PostService(BaseService):
             logger.warning(f'Failed to create posts from saved. Profile {self.instagram_username} does not exist.')
             return
 
-        counter = 0
+        total_counter = 0
+        archived_counter = 0
         while True:
             # fetch the next post
             try:
                 post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+                total_counter += 1
                 logger.debug(f'Fetched post: {post.shortcode}')
             except StopIteration:
                 break
 
-            # archive unsaved posts
+            # if the current post already exists,
+            # end the loop if not trying to archive certain amount of most recent posts
             if await self.exists(post.shortcode):
-                break
-            await self.create_from_instaloader(post)
-            counter += 1
+                if count is None:
+                    break
+                else:
+                    continue
 
-        logger.info(f'Archived {counter} saved post(s).')
+            # archive unsaved post and increment the counter
+            await self.create_from_instaloader(post)
+            archived_counter += 1
+
+            # break if already iterated through enough posts
+            if count and total_counter >= count:
+                break
+
+        logger.info(f'Archived {archived_counter} saved post(s).')
 
     async def create_from_instaloader(self, post: instaloader.Post) -> Post:
         """Create a post from a instaloader post object.

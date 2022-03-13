@@ -51,3 +51,6 @@ class PostArchiveRequest:
         username: str  # username of the profile to archive posts
         start: datetime  # start of the time range to archive posts
         end: datetime  # end of the time range to archive posts
+
+    class FromSaved(BaseModel):
+        count: Optional[int] = None  # number of most recent posts to archive before stopping
