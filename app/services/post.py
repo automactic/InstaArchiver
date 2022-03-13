@@ -103,7 +103,8 @@ class PostService(BaseService):
         """
 
         statement = sa.select([schema.posts.c.shortcode]).where(schema.posts.c.shortcode == shortcode)
-        return await self.database.fetch_one(query=statement) is not None
+        exists_statement = sa.select([sa.exists(statement)])
+        return await self.database.fetch_val(query=exists_statement)
 
     async def delete(self, shortcode: str, index: Optional[int] = None):
         """Delete post and post items
@@ -209,16 +210,16 @@ class PostService(BaseService):
             func = instaloader.Profile.from_username
             profile = await loop.run_in_executor(None, func, self.instaloader.context, self.instagram_username)
             post_iterator: instaloader.NodeIterator = await loop.run_in_executor(None, profile.get_saved_posts)
-            logger.debug('iterating through saved posts')
         except instaloader.ProfileNotExistsException:
             logger.warning(f'Failed to create posts from saved. Profile {self.instagram_username} does not exist.')
             return
 
+        counter = 0
         while True:
             # fetch the next post
             try:
                 post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
-                logger.info(f'fetched post: {post.shortcode}')
+                logger.debug(f'Fetched post: {post.shortcode}')
             except StopIteration:
                 break
 
@@ -226,6 +227,9 @@ class PostService(BaseService):
             if await self.exists(post.shortcode):
                 break
             await self.create_from_instaloader(post)
+            counter += 1
+
+        logger.info(f'Archived {counter} saved post(s).')
 
     async def create_from_instaloader(self, post: instaloader.Post) -> Post:
         """Create a post from a instaloader post object.
