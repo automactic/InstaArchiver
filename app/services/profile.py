@@ -31,7 +31,7 @@ class ProfileService(BaseService):
             return
 
         # save profile image
-        image_path = await self._download(profile.profile_pic_url, self.profile_images_dir, profile.username)
+        image_path = self._download(profile.profile_pic_url, self.profile_images_dir, profile.username)
 
         # upsert profile
         values = {
