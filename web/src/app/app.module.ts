@@ -1,64 +1,23 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NbEvaIconsModule } from '@nebular/eva-icons';
-import {
-  NbAccordionModule,
-  NbActionsModule,
-  NbButtonModule,
-  NbCardModule,
-  NbIconModule,
-  NbInputModule,
-  NbLayoutModule,
-  NbListModule,
-  NbMenuModule,
-  NbSelectModule,
-  NbSidebarModule,
-  NbThemeModule,
-  NbToggleModule,
-  NbUserModule
-} from '@nebular/theme';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ArchiveComponent } from './archive/archive.component';
-import { PostsComponent } from './posts/posts.component';
-import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
-import { ProfilesComponent } from './profiles/profiles.component';
-
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NbThemeModule, NbLayoutModule } from '@nebular/theme';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    ArchiveComponent,
-    PostsComponent,
-    ProfilesComponent,
-    ProfileDetailComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpClientModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
-    FontAwesomeModule,
-    NbEvaIconsModule,
-    NbAccordionModule,
-    NbActionsModule,
-    NbButtonModule,
-    NbCardModule,
-    NbIconModule,
-    NbInputModule,
-    NbLayoutModule,
-    NbListModule,
-    NbMenuModule.forRoot(),
-    NbSelectModule,
-    NbSidebarModule.forRoot(),
+    NoopAnimationsModule,
     NbThemeModule.forRoot({ name: 'default' }),
-    NbToggleModule,
-    NbUserModule,
+    NbLayoutModule,
+    NbEvaIconsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
