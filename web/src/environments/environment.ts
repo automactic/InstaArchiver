@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiRoot: 'http://localhost:37500'
+  apiRoot: 'http://diskstation:37500'
 };
 
 /*
