@@ -9,12 +9,12 @@
         [queryParamsHandling]="'merge'"
         routerLinkActive="active">
         <nb-user 
-          [onlyPicture]="false"
+          [onlyPicture]="true"
           [picture]="profileService.getProfileImagePath(profile.image_filename)"
-          [name]="profile.display_name"
           size="small"
           shape="rectangle">
         </nb-user>
+        <div class="profile_name">{{ profile.display_name }}</div>
       </nb-list-item>
     </nb-list>
   </nb-sidebar>

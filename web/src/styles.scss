@@ -1,1 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'themes' as *;
+@use '@nebular/theme/styles/globals' as *;
+@include nb-install() {
+  @include nb-theme-global();
+}
+
+.nb-theme-default nb-sidebar .scrollable {
+    padding: 0;
+}
