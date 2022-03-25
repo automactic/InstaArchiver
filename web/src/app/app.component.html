@@ -1,6 +1,23 @@
 <nb-layout>
-  <nb-sidebar>Profile list</nb-sidebar>
-  <nb-layout-header subheader>InstaArchiver</nb-layout-header>
+  <nb-layout-header fixed>InstaArchiver</nb-layout-header>
+  <nb-sidebar>
+    <nb-list>
+      <nb-list-item 
+        *ngFor="let profile of profileService.profiles" 
+        [routerLink]=""
+        [queryParams]="{username: profile.username}" 
+        [queryParamsHandling]="'merge'"
+        routerLinkActive="active">
+        <nb-user 
+          [onlyPicture]="false"
+          [picture]="profileService.getProfileImagePath(profile.image_filename)"
+          [name]="profile.display_name"
+          size="small"
+          shape="rectangle">
+        </nb-user>
+      </nb-list-item>
+    </nb-list>
+  </nb-sidebar>
   <nb-layout-column>posts grid</nb-layout-column>
   <nb-layout-column>posts detail</nb-layout-column>
 </nb-layout>

@@ -5,7 +5,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { NbThemeModule, NbLayoutModule, NbSidebarModule } from '@nebular/theme';
+import { 
+  NbCardModule,
+  NbThemeModule, 
+  NbLayoutModule, 
+  NbListModule, 
+  NbSidebarModule, 
+  NbUserModule 
+} from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 @NgModule({
@@ -17,9 +24,12 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     HttpClientModule,
     AppRoutingModule,
     NoopAnimationsModule,
+    NbCardModule,
     NbThemeModule.forRoot({ name: 'default' }),
     NbLayoutModule,
+    NbListModule,
     NbSidebarModule.forRoot(),
+    NbUserModule,
     NbEvaIconsModule
   ],
   providers: [],
