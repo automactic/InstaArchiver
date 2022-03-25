@@ -10,3 +10,6 @@ nb-list-item div.profile_name {
 nb-list-item:hover {
     background-color:nb-theme(color-basic-hover);
 }
+nb-list-item.active {
+    background-color:nb-theme(color-basic-active);
+}

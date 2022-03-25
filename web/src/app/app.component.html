@@ -4,9 +4,7 @@
     <nb-list>
       <nb-list-item 
         *ngFor="let profile of profileService.profiles" 
-        [routerLink]=""
-        [queryParams]="{username: profile.username}" 
-        [queryParamsHandling]="'merge'"
+        routerLink="/{{profile.username}}"
         routerLinkActive="active">
         <nb-user 
           [onlyPicture]="true"
