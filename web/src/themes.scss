@@ -2,3 +2,12 @@
 @use '@nebular/theme/styles/theming' as *;
 @use '@nebular/theme/styles/themes/default';
 @use '@nebular/theme/styles/themes/dark';
+
+$nb-themes: nb-register-theme(
+  (
+    color-basic-hover: color-basic-700,
+    color-basic-active: color-basic-600,
+  ),
+  dark,
+  dark
+);

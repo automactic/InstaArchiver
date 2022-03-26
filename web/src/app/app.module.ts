@@ -29,7 +29,7 @@ import { PostsComponent } from './posts/posts.component';
     NoopAnimationsModule,
     NbActionsModule,
     NbCardModule,
-    NbThemeModule.forRoot({ name: 'default' }),
+    NbThemeModule.forRoot({ name: 'dark' }),
     NbLayoutModule,
     NbListModule,
     NbSidebarModule.forRoot(),
