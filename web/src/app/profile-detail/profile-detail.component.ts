@@ -17,7 +17,7 @@ export class ProfileDetailComponent {
     profileService: ProfileService,
     private windowService: NbWindowService,
   ) {
-    this.profileService = profileService;
+    this.profileService = profileService
   }
 
   openEditWindow(username: string, display_name: string) {
@@ -26,7 +26,7 @@ export class ProfileDetailComponent {
       maximize: false,
       fullScreen: false,
       close: true,
-    };
+    }
     const context = { username: username, display_name: display_name }
     this.windowService.open(
       ProfileEditComponent, 
