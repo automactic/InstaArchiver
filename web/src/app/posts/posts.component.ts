@@ -33,14 +33,18 @@ export class PostsComponent {
     );
   }
 
-  openEditWindow(username: string) {
+  openEditWindow(username: string, display_name: string) {
     const config: NbWindowControlButtonsConfig = {
       minimize: false,
       maximize: false,
       fullScreen: false,
       close: true,
     };
-    this.windowService.open(ProfileEditComponent, { title: `Edit Profile: ${username}`, buttons: config });
+    const context = { username: username, display_name: display_name }
+    this.windowService.open(
+      ProfileEditComponent, 
+      { title: `Edit Profile: ${username}`, buttons: config, context: context }
+    );
   }
 
   openInstagramProfile(username: string) {

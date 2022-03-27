@@ -60,8 +60,9 @@ export class ProfileService {
     return this.httpClient.get<Profile>(url);
   }
 
-  updateConfiguration(username: string, configuration: ProfileConfiguration) {
+  update(username: string, display_name: string) {
     let url = `${environment.apiRoot}/api/profiles/${username}/`;
+    let configuration = { display_name: display_name }
     this.httpClient.patch<Profile>(url, configuration).subscribe(profile => {
       let index = this.profiles.findIndex(( item => {return item.username == profile.username}));
       if (index != -1) {

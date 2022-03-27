@@ -1,17 +1,20 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { 
   NbActionsModule,
-  NbCardModule,
-  NbThemeModule, 
+  NbButtonModule,
+  NbCardModule, 
+  NbInputModule,
   NbLayoutModule, 
   NbListModule, 
   NbSidebarModule, 
+  NbThemeModule,
   NbUserModule ,
   NbWindowModule,
 } from '@nebular/theme';
@@ -27,11 +30,14 @@ import { ProfileEditComponent } from './profile-edit/profile-edit.component';
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
     AppRoutingModule,
     NoopAnimationsModule,
     NbActionsModule,
+    NbButtonModule,
     NbCardModule,
+    NbInputModule,
     NbThemeModule.forRoot({ name: 'default' }),
     NbWindowModule.forRoot({}),
     NbLayoutModule,
