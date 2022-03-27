@@ -19,7 +19,7 @@
     </nb-list>
   </nb-sidebar>
   <nb-layout-column style="padding: 1.5rem">
-    <posts-grid [username]="username"></posts-grid>
+    <posts-grid></posts-grid>
     <profile-detail [profile]="profile" *ngIf="profile$ | async as profile"></profile-detail>
   </nb-layout-column>
 </nb-layout>

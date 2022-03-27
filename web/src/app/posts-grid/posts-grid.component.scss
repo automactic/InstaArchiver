@@ -1,4 +1,10 @@
 nb-card {
   min-height: calc(100vh - 8rem);
   margin: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  div > img {
+    width: 10rem;
+  }
 }
