@@ -13,6 +13,7 @@
         shape="rectangle" size="large">
       </nb-user>
       <nb-actions size="small">
+        <nb-action icon="edit-outline" title="Edit Profile" (click)="openInstagramProfile(profile.username)"></nb-action>
         <nb-action icon="external-link" title="Open Instagram Profile" (click)="openInstagramProfile(profile.username)"></nb-action>
       </nb-actions>
     </nb-card-header>
@@ -24,6 +25,10 @@
       <div class="row">
         <p class="title"><b>Full Name</b></p>
         <p class="detail">{{ profile.full_name }}</p>
+      </div>
+      <div class="row">
+        <p class="title"><b>Display Name</b></p>
+        <p class="detail">{{ profile.display_name }}</p>
       </div>
       <div class="row">
         <p class="title"><b>Biography</b></p>
