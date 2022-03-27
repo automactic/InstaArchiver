@@ -5,10 +5,10 @@ div.container {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 0.5rem;
 
   div {
-    flex-basis: 25%;
-    padding: 0.25rem;
+    flex: 1 0 20%;
     overflow: hidden;
     aspect-ratio: 1;
   }
