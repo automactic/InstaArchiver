@@ -2,10 +2,8 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { NbWindowService, NbWindowControlButtonsConfig } from '@nebular/theme';
 
-import { ProfileService, Profile, ProfileConfiguration } from '../services/profile.service';
-import { ProfileEditComponent } from '../profile-edit/profile-edit.component'
+import { ProfileService, Profile } from '../services/profile.service';
 
 @Component({
   selector: 'app-posts',
@@ -13,23 +11,22 @@ import { ProfileEditComponent } from '../profile-edit/profile-edit.component'
   styleUrls: ['./posts.component.scss']
 })
 export class PostsComponent {
-  profileService: ProfileService;
-  username?: string;
-  profile$: Observable<Profile>;
+  profileService: ProfileService
+  username?: string
+  profile$: Observable<Profile>
 
   constructor(
-    private route: ActivatedRoute, 
-    private windowService: NbWindowService, 
+    private route: ActivatedRoute,  
     profileService: ProfileService
   ) {
-    this.profileService = profileService;
+    this.profileService = profileService
     this.route.paramMap.subscribe(param => {
-      this.username = param.get("username") ?? undefined;
+      this.username = param.get('username') ?? undefined;
     })
     this.profile$ = this.route.paramMap.pipe(
       switchMap(params => {
-        return this.profileService.get(params.get("username") ?? "")
+        return this.profileService.get(params.get('username') ?? '')
       })
-    );
+    )
   }
 }

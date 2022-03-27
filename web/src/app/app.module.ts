@@ -22,13 +22,15 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { PostsComponent } from './posts/posts.component';
 import { ProfileEditComponent } from './profile-edit/profile-edit.component';
 import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
+import { PostsGridComponent } from './posts-grid/posts-grid.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PostsComponent,
     ProfileEditComponent,
-    ProfileDetailComponent
+    ProfileDetailComponent,
+    PostsGridComponent
   ],
   imports: [
     BrowserModule,

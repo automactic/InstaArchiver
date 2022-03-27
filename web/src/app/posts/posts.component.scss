@@ -1,14 +1,12 @@
 div.container {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
-nb-card.grid {
-    flex: 3;
-    min-height: calc(100vh - 8rem);
-    margin: 0;
+posts-grid {
+  flex: 3;
 }
 
 profile-detail {
-    flex: 2;
+  flex: 2;
 }

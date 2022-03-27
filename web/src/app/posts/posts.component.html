@@ -1,8 +1,4 @@
 <div class="container">
-  <nb-card class="grid">
-    <nb-card-body>
-      <div>{{ username }}</div>
-    </nb-card-body>
-  </nb-card>
+  <posts-grid [username]="username"></posts-grid>
   <profile-detail [profile]="profile" *ngIf="profile$ | async as profile"></profile-detail>
 </div>
