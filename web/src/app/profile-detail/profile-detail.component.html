@@ -1,0 +1,44 @@
+<nb-card *ngIf="profile">
+  <nb-card-header>
+    <nb-user 
+      [name]="profile.display_name" 
+      [title]="profile.username" 
+      [picture]="profileService.getProfileImagePath(profile.image_filename)"
+      shape="rectangle" size="large">
+    </nb-user>
+    <nb-actions size="small">
+      <nb-action icon="edit-outline" title="Edit Profile" (click)="openEditWindow(profile.username, profile.display_name)"></nb-action>
+      <nb-action icon="external-link" title="Open Instagram Profile" (click)="openInstagramProfile(profile.username)"></nb-action>
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <div class="row">
+      <p class="title"><b>Username</b></p>
+      <p class="detail">{{ profile.username }}</p>
+    </div>
+    <div class="row">
+      <p class="title"><b>Full Name</b></p>
+      <p class="detail">{{ profile.full_name }}</p>
+    </div>
+    <div class="row">
+      <p class="title"><b>Display Name</b></p>
+      <p class="detail">{{ profile.display_name }}</p>
+    </div>
+    <div class="row">
+      <p class="title"><b>Biography</b></p>
+      <p class="detail">{{ profile.biography }}</p>
+    </div>
+    <div class="row" *ngIf="profile.posts as posts">
+      <p class="title"><b>Count</b></p>
+      <p class="detail">{{ posts.count }}</p>
+    </div>
+    <div class="row" *ngIf="profile.posts?.earliest_timestamp as earliest_timestamp">
+      <p class="title"><b>Earliest</b></p>
+      <p class="detail">{{ earliest_timestamp | date:'medium' }}</p>
+    </div>
+    <div class="row" *ngIf="profile.posts?.latest_timestamp as latest_timestamp">
+      <p class="title"><b>Latest</b></p>
+      <p class="detail">{{ latest_timestamp | date:'medium' }}</p>
+    </div>
+  </nb-card-body>
+</nb-card>

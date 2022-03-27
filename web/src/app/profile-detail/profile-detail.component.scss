@@ -1,0 +1,16 @@
+nb-card {
+  min-height: calc(100vh - 8rem);
+  margin: 0;
+}
+
+nb-card-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+nb-card-body div.row {
+  display: flex;
+  p.title { flex: 5; margin-right: 1rem;}
+  p.detail { flex: 15 }
+  p {margin: 0.5rem 0;}
+}
