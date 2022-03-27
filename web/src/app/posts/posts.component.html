@@ -1,4 +1,25 @@
-<div class="container">
-  <posts-grid [username]="username"></posts-grid>
-  <profile-detail [profile]="profile" *ngIf="profile$ | async as profile"></profile-detail>
-</div>
+<nb-layout>
+  <nb-layout-header fixed>InstaArchiver</nb-layout-header>
+  <nb-sidebar>
+    <nb-list>
+      <nb-list-item 
+        *ngFor="let profile of profileService.profiles" 
+        [routerLink]="['/posts']"
+        [queryParams]="{username: profile.username}" 
+        [queryParamsHandling]="'merge'"
+        routerLinkActive="active">
+        <nb-user 
+          [onlyPicture]="true"
+          [picture]="profileService.getProfileImagePath(profile.image_filename)"
+          size="small"
+          shape="rectangle">
+        </nb-user>
+        <div class="profile_name">{{ profile.display_name }}</div>
+      </nb-list-item>
+    </nb-list>
+  </nb-sidebar>
+  <nb-layout-column style="padding: 1.5rem">
+    <posts-grid [username]="username"></posts-grid>
+    <profile-detail [profile]="profile" *ngIf="profile$ | async as profile"></profile-detail>
+  </nb-layout-column>
+</nb-layout>

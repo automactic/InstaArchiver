@@ -4,7 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { PostsComponent } from './posts/posts.component';
 
 const routes: Routes = [
-  { path: ':username', component: PostsComponent }
+  { path: 'posts', component: PostsComponent },
+  { path: '',   redirectTo: '/posts', pathMatch: 'full' },
 ];
 
 @NgModule({
@@ -12,3 +13,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+ 

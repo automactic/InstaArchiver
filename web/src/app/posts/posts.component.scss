@@ -1,3 +1,31 @@
+@use '../../themes.scss' as *;
+
+@include nb-install-component() {
+  nb-sidebar nb-list-item:hover {
+    background-color: nb-theme(color-basic-hover);
+  }
+    
+  nb-sidebar nb-list-item.active {
+    background-color: nb-theme(color-basic-active);
+  }
+}
+
+nb-sidebar {
+  nb-list-item {
+    padding: 0.75rem;
+  }
+
+  nb-list-item div.profile_name {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+}
+
+nb-layout-column {
+  display: flex;
+  gap: 1rem;
+}
+
 div.container {
   display: flex;
   gap: 1rem;
