@@ -1,5 +1,5 @@
-<nb-card>
+<div class="container">
   <div *ngFor="let post of posts">
     <img *ngIf="post.items[0].type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, post.items[0].filename)">
   </div>
-</nb-card>
+</div>
