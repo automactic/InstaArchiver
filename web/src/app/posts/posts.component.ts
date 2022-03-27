@@ -2,8 +2,10 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { NbWindowService, NbWindowControlButtonsConfig } from '@nebular/theme';
 
 import { ProfileService, Profile, ProfileConfiguration } from '../services/profile.service';
+import { ProfileEditComponent } from '../profile-edit/profile-edit.component'
 
 @Component({
   selector: 'app-posts',
@@ -15,7 +17,11 @@ export class PostsComponent {
   username?: string;
   profile$: Observable<Profile>;
 
-  constructor(private route: ActivatedRoute, profileService: ProfileService) {
+  constructor(
+    private route: ActivatedRoute, 
+    private windowService: NbWindowService, 
+    profileService: ProfileService
+  ) {
     this.profileService = profileService;
     this.route.paramMap.subscribe(param => {
       this.username = param.get("username") ?? undefined;
@@ -25,6 +31,16 @@ export class PostsComponent {
         return this.profileService.get(params.get("username") ?? "")
       })
     );
+  }
+
+  openEditWindow(username: string) {
+    const config: NbWindowControlButtonsConfig = {
+      minimize: false,
+      maximize: false,
+      fullScreen: false,
+      close: true,
+    };
+    this.windowService.open(ProfileEditComponent, { title: `Edit Profile: ${username}`, buttons: config });
   }
 
   openInstagramProfile(username: string) {

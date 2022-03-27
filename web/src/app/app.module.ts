@@ -12,15 +12,18 @@ import {
   NbLayoutModule, 
   NbListModule, 
   NbSidebarModule, 
-  NbUserModule 
+  NbUserModule ,
+  NbWindowModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { PostsComponent } from './posts/posts.component';
+import { ProfileEditComponent } from './profile-edit/profile-edit.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PostsComponent
+    PostsComponent,
+    ProfileEditComponent
   ],
   imports: [
     BrowserModule,
@@ -30,6 +33,7 @@ import { PostsComponent } from './posts/posts.component';
     NbActionsModule,
     NbCardModule,
     NbThemeModule.forRoot({ name: 'default' }),
+    NbWindowModule.forRoot({}),
     NbLayoutModule,
     NbListModule,
     NbSidebarModule.forRoot(),
