@@ -42,7 +42,7 @@ import { PostsGridComponent } from './posts-grid/posts-grid.component';
     NbButtonModule,
     NbCardModule,
     NbInputModule,
-    NbThemeModule.forRoot({ name: 'default' }),
+    NbThemeModule.forRoot({ name: 'dark' }),
     NbWindowModule.forRoot({}),
     NbLayoutModule,
     NbListModule,
