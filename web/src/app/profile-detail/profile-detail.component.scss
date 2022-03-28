@@ -1,6 +1,9 @@
 nb-card {
-  min-height: calc(100vh - 8rem);
+  max-height: calc(100vh - 8rem);
   margin: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 6.25rem;
 }
 
 nb-card-header {

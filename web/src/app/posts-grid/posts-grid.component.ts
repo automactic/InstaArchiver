@@ -27,7 +27,7 @@ export class PostsGridComponent {
         this.username = queryParams.get('username') ?? undefined;
         this.year = queryParams.get('year') ?? undefined;
         this.month = queryParams.get('month') ?? undefined;
-        return this.postService.list(0, 24, this.username, this.year, this.month);
+        return this.postService.list(0, 96, this.username, this.year, this.month);
       })
     ).subscribe(response => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
