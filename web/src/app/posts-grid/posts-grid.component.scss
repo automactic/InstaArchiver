@@ -4,12 +4,15 @@ div.container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
   gap: 0.5rem;
 
   div {
     flex: 1 0 20%;
     overflow: hidden;
+    max-width: calc(25% - 0.375rem);
     aspect-ratio: 1;
   }
   div > img {
