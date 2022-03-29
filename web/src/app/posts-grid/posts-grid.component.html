@@ -1,5 +1,10 @@
 <div class="container">
-  <div *ngFor="let post of posts">
+  <div 
+    *ngFor="let post of posts"
+    [routerLink]="['/posts']"
+    [queryParams]="{selected: post.shortcode}" 
+    [queryParamsHandling]="'merge'"
+    routerLinkActive="active">
     <img *ngIf="post.items[0].type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, post.items[0].filename)">
     <img *ngIf="post.items[0].type == 'video'" loading="lazy" [src]="postService.getPosterPath(post.username, post.items[0].thumb_image_filename)">
   </div>
