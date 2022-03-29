@@ -35,12 +35,23 @@ nb-sidebar {
 nb-layout-column {
   display: flex;
   gap: 1rem;
+  align-items: flex-start;
 }
 
 posts-grid {
   flex: 3;
 }
 
-profile-detail {
+nb-card.detail {
   flex: 2;
+  max-height: calc(100vh - 8rem);
+  margin: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 6.25rem;
+  
+  nb-card-header {
+    display: flex;
+    justify-content: space-between;
+  }
 }

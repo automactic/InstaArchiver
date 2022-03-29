@@ -56,6 +56,25 @@
   </nb-sidebar>
   <nb-layout-column style="padding: 1.5rem">
     <posts-grid></posts-grid>
-    <profile-detail [profile]="profile" *ngIf="profile$ | async as profile"></profile-detail>
+    <nb-card class="detail" *ngIf="profile$ | async as profile">
+      <nb-card-header>
+        <nb-user 
+          [name]="profile.display_name" 
+          [title]="profile.username" 
+          [picture]="profileService.getProfileImagePath(profile.image_filename)"
+          shape="rectangle" size="large">
+        </nb-user>
+        <nb-actions size="small">
+          <nb-action icon="edit-outline" title="Edit Profile" (click)="openEditWindow(profile.username, profile.display_name)"></nb-action>
+          <nb-action icon="external-link" title="Open Instagram Profile" (click)="openInstagramProfile(profile.username)"></nb-action>
+        </nb-actions>
+      </nb-card-header>
+      <nb-card-body>
+        <div *ngIf="selectedShortcode; else elseBlock">{{selectedShortcode}}</div>
+        <ng-template #elseBlock>
+          <profile-detail [profile]="profile"></profile-detail>
+        </ng-template>
+      </nb-card-body>
+    </nb-card>
   </nb-layout-column>
 </nb-layout>
