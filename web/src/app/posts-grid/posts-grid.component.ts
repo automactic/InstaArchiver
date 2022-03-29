@@ -24,7 +24,11 @@ export class PostsGridComponent {
     this.postService = postService
     this.route.queryParamMap.pipe(
       filter(queryParams => {
-        return queryParams.get('username') != this.username
+        return (
+          queryParams.get('username') != this.username ||
+          queryParams.get('year') != this.year ||
+          queryParams.get('month') != this.month
+        )
       }),
       switchMap(queryParams => {
         this.username = queryParams.get('username') ?? undefined

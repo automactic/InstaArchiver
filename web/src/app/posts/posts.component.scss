@@ -10,6 +10,17 @@
   }
 }
 
+nb-layout-header {
+  h4 {
+    width: 16.25rem;
+  }
+
+  div.filter {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
 nb-sidebar {
   nb-list-item {
     padding: 0.75rem;
