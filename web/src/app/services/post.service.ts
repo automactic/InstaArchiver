@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
@@ -32,6 +33,8 @@ export interface ListPostsResponse {
   providedIn: 'root'
 })
 export class PostService {
+  private posts = new Map<string, Post>()
+
   constructor(private httpClient: HttpClient) { }
 
   list(offset: number = 0, limit: number = 10, username?: string, year?: string, month?: string) {
@@ -45,7 +48,16 @@ export class PostService {
       params['start_time'] = new Date(+year, 0, 1).toISOString();
       params['end_time'] = new Date(+year + 1, 0, 1).toISOString();
     }
-    return this.httpClient.get<ListPostsResponse>(url, {params: params});
+    return this.httpClient.get<ListPostsResponse>(url, {params: params}).pipe(
+      tap(response => {
+        this.posts.clear()
+        response.posts.forEach(post => { this.posts.set(post.shortcode, post) })
+      })
+    );
+  }
+
+  get(shortcode: string) {
+    return this.posts.get(shortcode)
   }
 
   delete(shortcode: string, itemIndex: number) {

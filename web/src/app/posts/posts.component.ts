@@ -19,7 +19,7 @@ export class PostsComponent {
   username?: string
   year?: string
   month?: string
-  selectedShortcode?: string
+  selected?: string
 
   constructor(
     private route: ActivatedRoute,
@@ -37,7 +37,7 @@ export class PostsComponent {
       this.username = queryParams.get('username') ?? undefined
       this.year = queryParams.get('year') ?? undefined
       this.month = queryParams.get('month') ?? undefined
-      this.selectedShortcode = queryParams.get('selected') ?? undefined
+      this.selected = queryParams.get('selected') ?? undefined
     })
   }
 
