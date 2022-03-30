@@ -49,9 +49,13 @@ nb-card.detail {
   position: -webkit-sticky;
   position: sticky;
   top: 6.25rem;
-  
+
   nb-card-header {
     display: flex;
     justify-content: space-between;
   }
+}
+
+post-detail {
+  overflow: scroll;
 }
