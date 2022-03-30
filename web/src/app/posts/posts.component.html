@@ -41,7 +41,7 @@
       <nb-list-item 
         *ngFor="let profile of profileService.profiles" 
         [routerLink]="['/posts']"
-        [queryParams]="{username: profile.username}" 
+        [queryParams]="{username: profile.username, selected: null}" 
         [queryParamsHandling]="'merge'"
         routerLinkActive="active">
         <nb-user 
