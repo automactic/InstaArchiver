@@ -24,6 +24,7 @@ import { PostsComponent } from './posts/posts.component';
 import { ProfileEditComponent } from './profile-edit/profile-edit.component';
 import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
+import { PostDetailComponent } from './post-detail/post-detail.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { PostsGridComponent } from './posts-grid/posts-grid.component';
     PostsComponent,
     ProfileEditComponent,
     ProfileDetailComponent,
-    PostsGridComponent
+    PostsGridComponent,
+    PostDetailComponent
   ],
   imports: [
     BrowserModule,

@@ -61,7 +61,7 @@ export class PostsComponent {
     });
   }
 
-  openEditWindow(username: string, display_name: string) {
+  editProfile(username: string, display_name: string) {
     const config: NbWindowControlButtonsConfig = {
       minimize: false,
       maximize: false,
@@ -77,5 +77,13 @@ export class PostsComponent {
 
   openInstagramProfile(username: string) {
     window.open(`https://www.instagram.com/${username}/`, '_blank')
+  }
+
+  closePost() {
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { selected: null }, 
+      queryParamsHandling: 'merge' 
+    });
   }
 }
