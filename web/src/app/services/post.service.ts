@@ -69,6 +69,11 @@ export class PostService {
         let post = this.posts.get(shortcode)
         if (post?.items.length == 1) {
           this.posts.delete(shortcode)
+          this.shortcodes.forEach((item, index, array) => {
+            if (item == shortcode) {
+              array.splice(index, 1)
+            }
+          })
         } else {
           post?.items.forEach((item, index, array) => {
             if (item.index == itemIndex) {
