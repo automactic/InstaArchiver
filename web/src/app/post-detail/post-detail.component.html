@@ -1,11 +1,5 @@
-<div *ngIf="post">
+<ng-template [ngIf]="post">
   <div class="media">
-    <!-- <ng-template ngFor let-item [ngForOf]="post.items" let-i="index">
-      <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
-      <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
-        <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
-      </video>
-    </ng-template> -->
     <div *ngFor="let item of post.items; index as i" class="item">
       <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
       <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
@@ -18,4 +12,4 @@
     <b>{{ post.timestamp | date }}</b>
     <div>{{ post.caption }}</div>
   </div>
-</div>
+</ng-template>

@@ -34,6 +34,7 @@ export interface ListPostsResponse {
 })
 export class PostService {
   private posts = new Map<string, Post>()
+  shortcodes: string[] = []
 
   constructor(private httpClient: HttpClient) { }
 
@@ -52,6 +53,7 @@ export class PostService {
       tap(response => {
         this.posts.clear()
         response.posts.forEach(post => { this.posts.set(post.shortcode, post) })
+        this.shortcodes = response.posts.map(post => post.shortcode)
       })
     );
   }
@@ -66,7 +68,7 @@ export class PostService {
       tap(_ => {
         let post = this.posts.get(shortcode)
         if (post?.items.length == 1) {
-          
+          this.posts.delete(shortcode)
         } else {
           post?.items.forEach((item, index, array) => {
             if (item.index == itemIndex) {
