@@ -1,5 +1,13 @@
-// import Nebular Theme System and the default theme
-@import '~@nebular/theme/styles/theming';
-@import '~@nebular/theme/styles/themes/default';
-@import '~@nebular/theme/styles/themes/dark';
-@import '~@nebular/theme/styles/themes/cosmic';
+@forward '@nebular/theme/styles/theming';
+@use '@nebular/theme/styles/theming' as *;
+@use '@nebular/theme/styles/themes/default';
+@use '@nebular/theme/styles/themes/dark';
+
+$nb-themes: nb-register-theme(
+  (
+    color-basic-hover: color-basic-700,
+    color-basic-active: color-basic-600,
+  ),
+  dark,
+  dark
+);

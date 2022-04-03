@@ -1,0 +1,32 @@
+div.media {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+div.item {
+  position: relative;
+  > button {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    display: none;
+    z-index: 2;
+  }
+}
+
+div.item:hover > button {
+  display:block;
+}
+
+img {
+  width: 100%;
+}
+
+video {
+  max-width: 100%;
+}
+
+div.caption {
+  padding: 1rem;
+}

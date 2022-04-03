@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import { tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
@@ -32,25 +34,65 @@ export interface ListPostsResponse {
   providedIn: 'root'
 })
 export class PostService {
-  constructor(private httpClient: HttpClient) { }
+  private posts = new Map<string, Post>()
+  shortcodes: string[] = []
+
+  constructor(
+    private httpClient: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router, 
+  ) { }
 
   list(offset: number = 0, limit: number = 10, username?: string, year?: string, month?: string) {
     let url = `${environment.apiRoot}/api/posts/`;
     let params: Record<string, string> = { offset: String(offset), limit: String(limit) };
-    if (username) { params.username = username }
+    if (username) { params['username'] = username }
     if (year && month) {
-      params.start_time = new Date(+year, +month - 1, 1).toISOString();
-      params.end_time = new Date(+month == 12 ? +year + 1 : +year, +month == 12 ? 0 : +month, 1).toISOString();
+      params['start_time'] = new Date(+year, +month - 1, 1).toISOString();
+      params['end_time'] = new Date(+month == 12 ? +year + 1 : +year, +month == 12 ? 0 : +month, 1).toISOString();
     } else if ( year && !month ) {
-      params.start_time = new Date(+year, 0, 1).toISOString();
-      params.end_time = new Date(+year + 1, 0, 1).toISOString();
+      params['start_time'] = new Date(+year, 0, 1).toISOString();
+      params['end_time'] = new Date(+year + 1, 0, 1).toISOString();
     }
-    return this.httpClient.get<ListPostsResponse>(url, {params: params});
+    return this.httpClient.get<ListPostsResponse>(url, {params: params}).pipe(
+      tap(response => {
+        this.posts.clear()
+        response.posts.forEach(post => { this.posts.set(post.shortcode, post) })
+        this.shortcodes = response.posts.map(post => post.shortcode)
+      })
+    );
+  }
+
+  get(shortcode: string) {
+    return this.posts.get(shortcode)
   }
 
   delete(shortcode: string, itemIndex: number) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
-    return this.httpClient.delete(url);
+    return this.httpClient.delete(url).pipe(
+      tap(_ => {
+        let post = this.posts.get(shortcode)
+        if (post?.items.length == 1) {
+          this.posts.delete(shortcode)
+          this.shortcodes.forEach((item, index, array) => {
+            if (item == shortcode) {
+              array.splice(index, 1)
+            }
+          })
+          this.router.navigate([], { 
+            relativeTo: this.route, 
+            queryParams: { selected: null }, 
+            queryParamsHandling: 'merge' 
+          })
+        } else {
+          post?.items.forEach((item, index, array) => {
+            if (item.index == itemIndex) {
+              array.splice(index, 1)
+            }
+          })
+        }
+      })
+    )
   }
 
   getMediaPath(username: string, filename: string): string {

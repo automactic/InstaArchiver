@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { ProfileService } from './services/profile.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +8,12 @@ import { faInstagram } from '@fortawesome/free-brands-svg-icons';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  faInstagram = faInstagram;
+  title = 'InstaArchiver';
+  profileService: ProfileService;
+
+  constructor(
+    profileService: ProfileService
+  ) {
+    this.profileService = profileService;
+  }
 }

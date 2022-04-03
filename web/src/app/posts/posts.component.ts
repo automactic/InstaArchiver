@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { NbMenuItem } from '@nebular/theme';
+import { NbWindowService, NbWindowControlButtonsConfig } from '@nebular/theme';
 
-import { Post, PostItem, PostService } from '../services/post.service';
-import { ProfileService } from '../services/profile.service';
-
+import { ProfileService, Profile } from '../services/profile.service';
+import { ProfileEditComponent } from '../profile-edit/profile-edit.component';
 
 @Component({
   selector: 'app-posts',
@@ -13,57 +13,38 @@ import { ProfileService } from '../services/profile.service';
   styleUrls: ['./posts.component.scss']
 })
 export class PostsComponent {
-  postService: PostService;
-  profileService: ProfileService;
+  profileService: ProfileService
 
-  username?: string;
-  year?: string;
-  month?: string;
-  loading = true;
-  posts: Post[] = [];
-  
+  profile$: Observable<Profile>
+  username?: string
+  year?: string
+  month?: string
+  selected?: string
+
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private router: Router, 
-    postService: PostService, 
+    private windowService: NbWindowService,
     profileService: ProfileService
   ) {
-    this.postService = postService;
-    this.profileService = profileService;
-    this.route.queryParamMap.pipe(
-      switchMap(queryParam => {
-        this.username = queryParam.get("username") ?? undefined;
-        this.year = queryParam.get("year") ?? undefined;
-        this.month = queryParam.get("month") ?? undefined;
-        return this.postService.list(0, 5, this.username, this.year, this.month);
+    this.profileService = profileService
+    this.profile$ = this.route.queryParamMap.pipe(
+      switchMap(queryParams => {
+        return this.profileService.get(queryParams.get('username') ?? '')
       })
-    ).subscribe(response => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      this.loading = false;
-      this.posts = response.posts;
+    )
+    this.route.queryParamMap.subscribe(queryParams => {
+      this.username = queryParams.get('username') ?? undefined
+      this.year = queryParams.get('year') ?? undefined
+      this.month = queryParams.get('month') ?? undefined
+      this.selected = queryParams.get('selected') ?? undefined
     })
-  }
-
-  clearSelectedProfile() {
-    this.router.navigate([], { 
-      relativeTo: this.route, 
-      queryParams: { username: null }, 
-      queryParamsHandling: 'merge' 
-    });
-  }
-
-  selectedProfileChanged(username: string) {
-    this.router.navigate([], { 
-      relativeTo: this.route, 
-      queryParams: { username: username }, 
-      queryParamsHandling: 'merge' 
-    });
   }
 
   selectedYearChanged(year: string) {
     var queryParams: Record<string, string | null> = { year: year };
     if (year == null) {
-      queryParams.month = null;
+      queryParams['month'] = null;
     }
     this.router.navigate([], { 
       relativeTo: this.route, 
@@ -80,24 +61,29 @@ export class PostsComponent {
     });
   }
 
-  loadNext() {
-    if (this.loading) { return }
-    this.loading = true;
-    this.postService.list(this.posts.length, 5, this.username, this.year, this.month).subscribe( response_data => {
-      this.posts.push(...response_data.posts);
-      this.loading = false;
-    })
+  editProfile(username: string, display_name: string) {
+    const config: NbWindowControlButtonsConfig = {
+      minimize: false,
+      maximize: false,
+      fullScreen: false,
+      close: true,
+    }
+    const context = { username: username, display_name: display_name }
+    this.windowService.open(
+      ProfileEditComponent, 
+      { title: `Edit Profile: ${username}`, buttons: config, context: context }
+    )
   }
 
-  delete(post: Post, item: PostItem, postIndex: number, itemIndex: number) {
-    this.loading = true;
-    this.postService.delete(post.shortcode, item.index).subscribe( _ => {
-      if (post.items.length == 1) {
-        this.posts.splice(postIndex, 1);
-      } else {
-        post.items.splice(itemIndex, 1);
-      }
-      this.loading = false;
+  openInstagramProfile(username: string) {
+    window.open(`https://www.instagram.com/${username}/`, '_blank')
+  }
+
+  closePost() {
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { selected: null }, 
+      queryParamsHandling: 'merge' 
     })
   }
 }

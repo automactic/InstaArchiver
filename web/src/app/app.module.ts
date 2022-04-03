@@ -1,64 +1,60 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NbEvaIconsModule } from '@nebular/eva-icons';
-import {
-  NbAccordionModule,
-  NbActionsModule,
-  NbButtonModule,
-  NbCardModule,
-  NbIconModule,
-  NbInputModule,
-  NbLayoutModule,
-  NbListModule,
-  NbMenuModule,
-  NbSelectModule,
-  NbSidebarModule,
-  NbThemeModule,
-  NbToggleModule,
-  NbUserModule
-} from '@nebular/theme';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ArchiveComponent } from './archive/archive.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { 
+  NbActionsModule,
+  NbButtonModule,
+  NbCardModule, 
+  NbIconModule,
+  NbInputModule,
+  NbLayoutModule, 
+  NbListModule, 
+  NbSelectModule,
+  NbSidebarModule, 
+  NbThemeModule,
+  NbUserModule ,
+  NbWindowModule,
+} from '@nebular/theme';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { PostsComponent } from './posts/posts.component';
+import { ProfileEditComponent } from './profile-edit/profile-edit.component';
 import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
-import { ProfilesComponent } from './profiles/profiles.component';
-
+import { PostsGridComponent } from './posts-grid/posts-grid.component';
+import { PostDetailComponent } from './post-detail/post-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ArchiveComponent,
     PostsComponent,
-    ProfilesComponent,
+    ProfileEditComponent,
     ProfileDetailComponent,
+    PostsGridComponent,
+    PostDetailComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
-    FontAwesomeModule,
-    NbEvaIconsModule,
-    NbAccordionModule,
+    NoopAnimationsModule,
     NbActionsModule,
     NbButtonModule,
     NbCardModule,
     NbIconModule,
     NbInputModule,
+    NbThemeModule.forRoot({ name: 'default' }),
+    NbWindowModule.forRoot({}),
     NbLayoutModule,
     NbListModule,
-    NbMenuModule.forRoot(),
     NbSelectModule,
     NbSidebarModule.forRoot(),
-    NbThemeModule.forRoot({ name: 'default' }),
-    NbToggleModule,
     NbUserModule,
+    NbEvaIconsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
