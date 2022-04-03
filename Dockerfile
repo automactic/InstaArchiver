@@ -4,7 +4,7 @@ RUN npm install -g @angular/cli
 COPY web /web
 WORKDIR /web
 RUN npm install
-RUN ng build --prod
+RUN ng build
 
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-slim
