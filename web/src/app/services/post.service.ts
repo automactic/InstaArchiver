@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
@@ -36,7 +37,11 @@ export class PostService {
   private posts = new Map<string, Post>()
   shortcodes: string[] = []
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router, 
+  ) { }
 
   list(offset: number = 0, limit: number = 10, username?: string, year?: string, month?: string) {
     let url = `${environment.apiRoot}/api/posts/`;
@@ -73,6 +78,11 @@ export class PostService {
             if (item == shortcode) {
               array.splice(index, 1)
             }
+          })
+          this.router.navigate([], { 
+            relativeTo: this.route, 
+            queryParams: { selected: null }, 
+            queryParamsHandling: 'merge' 
           })
         } else {
           post?.items.forEach((item, index, array) => {

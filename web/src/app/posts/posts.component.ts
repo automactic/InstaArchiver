@@ -84,6 +84,6 @@ export class PostsComponent {
       relativeTo: this.route, 
       queryParams: { selected: null }, 
       queryParamsHandling: 'merge' 
-    });
+    })
   }
 }
