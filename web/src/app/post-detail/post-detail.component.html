@@ -1,9 +1,12 @@
-<div *ngIf="shortcode && postService.get(shortcode) as post">
-  <div *ngFor="let item of post.items; let itemIndex=index;">
+<div *ngIf="post" class="media">
+  <ng-template ngFor let-item [ngForOf]="post.items" let-i="index">
     <img *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
     <video *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
       <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
     </video>
-    <!-- <button nbButton (click)="delete(post, item, postIndex, itemIndex)"><nb-icon icon="trash-2-outline"></nb-icon></button> -->
+  </ng-template>
+  <div class="caption">
+    <b>{{ post.timestamp | date }}</b>
+    <div>{{ post.caption }}</div>
   </div>
 </div>
