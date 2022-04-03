@@ -62,7 +62,20 @@ export class PostService {
 
   delete(shortcode: string, itemIndex: number) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
-    return this.httpClient.delete(url);
+    return this.httpClient.delete(url).pipe(
+      tap(_ => {
+        let post = this.posts.get(shortcode)
+        if (post?.items.length == 1) {
+          
+        } else {
+          post?.items.forEach((item, index, array) => {
+            if (item.index == itemIndex) {
+              array.splice(index, 1)
+            }
+          })
+        }
+      })
+    )
   }
 
   getMediaPath(username: string, filename: string): string {
