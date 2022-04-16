@@ -29,4 +29,8 @@ video {
 
 div.caption {
   padding: 1rem;
+  div {
+    max-width: 35rem;
+    word-wrap: break-word;
+  }
 }
