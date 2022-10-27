@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import random
 import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -199,7 +200,12 @@ class PostService(BaseService):
             if post.date_utc < request.start:
                 break
 
+            # save post
             await self.create_from_instaloader(post)
+
+            # sleep for a random amount of time
+            max_sleep = os.environ.get('MAX_SLEEP', 60)
+            await asyncio.sleep(random.randint(0, max_sleep))
 
     async def archive_saved(self, count: Optional[int] = None):
         """Archive saved posts in the account that is currently logged in.
@@ -239,6 +245,10 @@ class PostService(BaseService):
             # archive unsaved post and increment the counter
             await self.create_from_instaloader(post)
             archived_counter += 1
+
+            # sleep for a random amount of time
+            max_sleep = os.environ.get('MAX_SLEEP', 60)
+            await asyncio.sleep(random.randint(0, max_sleep))
 
             # break if already iterated through enough posts
             if count and total_counter >= count:
