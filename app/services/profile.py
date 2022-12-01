@@ -61,21 +61,43 @@ class ProfileService(BaseService):
         exists_statement = sa.select([sa.exists(statement)])
         return await self.database.fetch_val(query=exists_statement)
 
-    async def list(self, offset: int = 0, limit: int = 100) -> ProfileListResult:
+    async def list(self, search: Optional[str] = None, offset: int = 0, limit: int = 100) -> ProfileListResult:
         """List profiles.
 
+        :param search: search text filter list of profiles
         :param offset: the number of profiles to skip
         :param limit: the number of profiles to fetch
         :return: the list query result
         """
 
-        statement = schema.profiles.select(offset=offset, limit=limit).order_by(schema.profiles.c.display_name)
-        profiles = [Profile(**profile) for profile in await self.database.fetch_all(statement)]
+        # fetch data
+        base_query = schema.profiles.select()
+        if search:
+            conditions = [
+                schema.profiles.c.username.ilike(f'%{search}%'),
+                schema.profiles.c.full_name.ilike(f'%{search}%'),
+                schema.profiles.c.display_name.ilike(f'%{search}%'),
+            ]
+            base_query = base_query.where(sa.or_(*conditions))
+        base_query = base_query.order_by(schema.profiles.c.display_name).cte('base_query')
+        query = sa.select('*').select_from(
+            sa.outerjoin(
+                sa.select('*').select_from(base_query).limit(limit).offset(offset).alias('profiles_query'),
+                sa.select([sa.func.count().label('total_count')]).select_from(base_query).alias('total_count_query'),
+                onclause=sa.sql.true(),
+                full=True,
+            )
+        )
+        rows = await self.database.fetch_all(query)
 
-        statement = sa.select([sa.func.count()]).select_from(schema.profiles)
-        count = await self.database.fetch_val(statement)
+        # process result
+        profiles, total_count = [], 0
+        for row in rows:
+            if isinstance(row._mapping['total_count'], int):
+                total_count = row._mapping['total_count']
+            profiles.append(Profile(**row._mapping))
 
-        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=count)
+        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
 
     async def get(self, username: str) -> Optional[ProfileDetail]:
         """Get a single profile.
