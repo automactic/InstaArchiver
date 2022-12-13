@@ -196,12 +196,12 @@ class PostService(BaseService):
 
             # if post is later than the end date, that means we have yet to reach posts within the time range
             if post.date_utc >= request.end:
-                logger.debug('post is later than the end date.')
+                logger.debug(f'post date {post.date_utc} is later than the end date.')
                 continue
 
             # if post is earlier than the start date, that means we have iterated through posts within the time range
             if post.date_utc < request.start:
-                logger.debug('post is earlier than the start date.')
+                logger.debug(f'post date {post.date_utc} is earlier than the start date.')
                 break
 
             # save post
