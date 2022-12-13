@@ -10,8 +10,6 @@ class Profile(BaseModel):
     display_name: str
     biography: Optional[str] = None
     image_filename: str
-    auto_archive: bool = False
-    last_archive_timestamp: Optional[datetime] = None
 
 
 class PostsSummary(BaseModel):
@@ -33,4 +31,3 @@ class ProfileListResult(BaseModel):
 
 class ProfileUpdates(BaseModel):
     display_name: Optional[str]
-    auto_archive: Optional[bool]

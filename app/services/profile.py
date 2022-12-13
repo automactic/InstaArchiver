@@ -39,7 +39,6 @@ class ProfileService(BaseService):
             'full_name': profile.full_name,
             'display_name': profile.full_name,
             'biography': profile.biography,
-            'auto_archive': False,
             'image_filename': image_path.parts[-1]
         }
         updates = values.copy()
@@ -112,8 +111,6 @@ class ProfileService(BaseService):
             schema.profiles.c.display_name,
             schema.profiles.c.biography,
             schema.profiles.c.image_filename,
-            schema.profiles.c.auto_archive,
-            schema.profiles.c.last_archive_timestamp,
             sa.func.count(schema.posts.c.shortcode).label('post_count'),
             sa.func.min(schema.posts.c.timestamp).label('earliest_timestamp'),
             sa.func.max(schema.posts.c.timestamp).label('latest_timestamp'),
@@ -131,8 +128,6 @@ class ProfileService(BaseService):
                 display_name=result['display_name'],
                 biography=result['biography'],
                 image_filename=result['image_filename'],
-                auto_archive=result['auto_archive'],
-                last_archive_timestamp=result['last_archive_timestamp'],
                 posts=PostsSummary(
                     count=result['post_count'],
                     earliest_timestamp=result['earliest_timestamp'].replace(tzinfo=timezone.utc),

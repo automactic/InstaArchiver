@@ -185,6 +185,7 @@ class PostService(BaseService):
             logger.warning(f'Failed to create posts from time range. Profile {request.username} does not exist.')
             return
 
+        count = 0
         while True:
             # fetch the next post
             try:
@@ -206,6 +207,9 @@ class PostService(BaseService):
             # sleep for a random amount of time
             max_sleep = os.environ.get('MAX_SLEEP', 60)
             await asyncio.sleep(random.randint(0, max_sleep))
+        logger.info(
+            f'Saved {count} post(s) for profile {request.username} from {request.start} to {request.end}.'
+        )
 
     async def archive_saved(self, count: Optional[int] = None):
         """Archive saved posts in the account that is currently logged in.

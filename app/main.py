@@ -11,11 +11,10 @@ import databases
 from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.responses import Response, FileResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from fastapi_utils.tasks import repeat_every
 
 from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
-from services import schema, AutoArchiveService
+from services import schema
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
@@ -37,12 +36,6 @@ async def startup():
 async def shutdown():
     await database.disconnect()
     await http_session.close()
-
-
-@app.on_event('startup')
-@repeat_every(seconds=60, wait_first=True)
-async def auto_archive():
-    await AutoArchiveService(database, http_session).update_profiles()
 
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
