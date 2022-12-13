@@ -191,18 +191,22 @@ class PostService(BaseService):
             try:
                 post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
             except StopIteration:
+                logger.debug('Unable to get the next post.')
                 break
 
             # if post is later than the end date, that means we have yet to reach posts within the time range
             if post.date_utc >= request.end:
+                logger.debug('post is later than the end date.')
                 continue
 
             # if post is earlier than the start date, that means we have iterated through posts within the time range
             if post.date_utc < request.start:
+                logger.debug('post is earlier than the start date.')
                 break
 
             # save post
             await self.create_from_instaloader(post)
+            count += 1
 
             # sleep for a random amount of time
             max_sleep = os.environ.get('MAX_SLEEP', 60)
