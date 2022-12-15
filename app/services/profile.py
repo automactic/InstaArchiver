@@ -39,7 +39,8 @@ class ProfileService(BaseService):
             'full_name': profile.full_name,
             'display_name': profile.full_name,
             'biography': profile.biography,
-            'image_filename': image_path.parts[-1]
+            'image_filename': image_path.parts[-1],
+            'auto_archive': False,
         }
         updates = values.copy()
         updates.pop('username')
