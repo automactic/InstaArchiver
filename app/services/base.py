@@ -108,5 +108,5 @@ class BaseService:
 
     def delete_file(self, working_dir: Path, *path_components):
         path = working_dir.joinpath(*path_components)
-        shutil.chown(path, os.getuid(), os.getgid())
+        self._set_file_ownership(path)
         path.unlink()
