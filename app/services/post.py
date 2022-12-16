@@ -132,9 +132,9 @@ class PostService(BaseService):
                 if index is not None and item['index'] != index:
                     continue
                 if filename := item['filename']:
-                    self._delete(self.post_dir, item['username'], filename)
+                    self.delete_file(self.post_dir, item['username'], filename)
                 if thumb_image_filename := item['thumb_image_filename']:
-                    self._delete(self.thumb_images_dir, item['username'], thumb_image_filename)
+                    self.delete_file(self.thumb_images_dir, item['username'], thumb_image_filename)
 
             # delete post(if post has only one item left) and post item records
             if index is not None:

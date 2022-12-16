@@ -106,7 +106,7 @@ class BaseService:
 
         return file_path
 
-    def _delete(self, working_dir: Path, *path_components):
+    def delete_file(self, working_dir: Path, *path_components):
         path = working_dir.joinpath(*path_components)
         shutil.chown(path, os.getuid(), os.getgid())
         path.unlink()
