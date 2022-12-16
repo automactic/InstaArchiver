@@ -105,3 +105,8 @@ class BaseService:
         self._set_file_ownership(file_path)
 
         return file_path
+
+    def delete_file(self, working_dir: Path, *path_components):
+        path = working_dir.joinpath(*path_components)
+        self._set_file_ownership(path)
+        path.unlink()
