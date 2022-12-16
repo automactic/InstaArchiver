@@ -57,6 +57,12 @@ async def update_profile(username: str, updates: ProfileUpdates):
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
+@app.delete('/api/profiles/{username:str}/')
+async def delete_profile(username: str):
+    await ProfileService(database, http_session).delete(username)
+    return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
 @app.get('/api/posts/', response_model=PostListResult)
 async def list_posts(
         offset: Optional[int] = 0,
