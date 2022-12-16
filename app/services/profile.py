@@ -162,9 +162,12 @@ class ProfileService(BaseService):
         """
 
         # delete files
-        self.delete_file(self.profile_images_dir, f'{username}.jpg')
-        shutil.rmtree(self.thumb_images_dir.joinpath(username))
-        shutil.rmtree(self.post_dir.joinpath(username))
+        try:
+            self.delete_file(self.profile_images_dir, f'{username}.jpg')
+            shutil.rmtree(self.thumb_images_dir.joinpath(username))
+            shutil.rmtree(self.post_dir.joinpath(username))
+        except FileNotFoundError:
+            pass
 
         # delete records in database
         schema.profiles.delete()
