@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import shutil
 from datetime import timezone
 from typing import Optional
 
@@ -151,4 +152,23 @@ class ProfileService(BaseService):
         statement = sa.update(schema.profiles) \
             .where(schema.profiles.c.username == username) \
             .values(**updates)
+        await self.database.execute(statement)
+
+    async def delete(self, username: str):
+        """
+        Delete a profile.
+
+        :param username: username of the profile to delete
+        """
+
+        # delete files
+        self.delete_file(self.profile_images_dir, f'{username}.jpg')
+        shutil.rmtree(self.thumb_images_dir.joinpath(username))
+        shutil.rmtree(self.post_dir.joinpath(username))
+
+        # delete records in database
+        schema.profiles.delete()
+        statement = sa.delete(schema.profiles) \
+            .where(schema.profiles.c.username == username) \
+            .returning(schema.profiles.c.username)
         await self.database.execute(statement)
