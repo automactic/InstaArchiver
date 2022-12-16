@@ -19,8 +19,6 @@ profiles = Table(
     Column('biography', String, index=True, nullable=True),
     Column('image_filename', String, index=True, nullable=False),
     Column('auto_archive', Boolean, index=True, nullable=False),
-    Column('last_archive_timestamp', DateTime, index=True, nullable=True),
-    Column('last_archive_latest_post_timestamp', DateTime, index=True, nullable=True),
 )
 
 posts = Table(
