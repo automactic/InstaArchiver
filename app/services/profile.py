@@ -81,22 +81,27 @@ class ProfileService(BaseService):
             ]
             base_query = base_query.where(sa.or_(*conditions))
         base_query = base_query.order_by(schema.profiles.c.display_name).cte('base_query')
-        query = sa.select('*').select_from(
-            sa.outerjoin(
-                sa.select('*').select_from(base_query).limit(limit).offset(offset).alias('profiles_query'),
-                sa.select([sa.func.count().label('total_count')]).select_from(base_query).alias('total_count_query'),
-                onclause=sa.sql.true(),
-                full=True,
-            )
-        )
+        profiles_query = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
+            schema.profiles.c.biography,
+            schema.profiles.c.image_filename,
+        ]).select_from(base_query).limit(limit).offset(offset).cte('profiles_query')
+        count_query = sa.select([sa.func.count().label('total_count')]).select_from(base_query).cte('count_query')
+        query = sa.select([
+            profiles_query.c.username,
+            profiles_query.c.full_name,
+            profiles_query.c.display_name,
+            profiles_query.c.biography,
+            profiles_query.c.image_filename,
+            count_query.c.total_count
+        ]).select_from(sa.outerjoin(profiles_query, count_query, onclause=sa.sql.true(), full=True))
         rows = await self.database.fetch_all(query)
 
         # process result
-        profiles, total_count = [], 0
-        for row in rows:
-            if isinstance(row._mapping['total_count'], int):
-                total_count = row._mapping['total_count']
-            profiles.append(Profile(**row._mapping))
+        total_count = rows[0]['total_count']
+        profiles = [Profile(**dict(row)) for row in rows] if total_count > 0 else []
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
 
