@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import insert
 from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates
 from services import schema
 from services.base import BaseService
-
+from collections import defaultdict
 logger = logging.getLogger(__name__)
 
 
@@ -160,8 +160,7 @@ class ProfileService(BaseService):
         await self.database.execute(statement)
 
     async def delete(self, username: str):
-        """
-        Delete a profile.
+        """Delete a profile.
 
         :param username: username of the profile to delete
         """
@@ -180,3 +179,47 @@ class ProfileService(BaseService):
             .where(schema.profiles.c.username == username) \
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
+
+    async def get_statistics(self):
+        """Get profile statistics."""
+
+        # get data
+        profiles = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.display_name,
+            sa.func.min(schema.posts.c.timestamp).label('first_post_timestamp'),
+            sa.func.max(schema.posts.c.timestamp).label('last_post_timestamp'),
+            sa.func.count().label('total_count')
+        ]).select_from(
+            schema.profiles.join(schema.posts, schema.profiles.c.username == schema.posts.c.username)
+        ).group_by(
+            schema.profiles.c.username
+        ).alias('profiles')
+        quarters = sa.select([
+            schema.posts.c.username,
+            sa.func.cast(sa.func.date_part('year', schema.posts.c.timestamp), sa.INT).label('year'),
+            sa.func.cast(sa.func.date_part('quarter', schema.posts.c.timestamp), sa.INT).label('quarter'),
+            sa.func.count().label('count'),
+        ]).select_from(schema.posts).group_by(
+            schema.posts.c.username, sa.literal_column('year'), sa.literal_column('quarter')
+        ).alias('quarters')
+        statement = sa.select([
+            profiles.c.username,
+            profiles.c.display_name,
+            profiles.c.first_post_timestamp,
+            profiles.c.last_post_timestamp,
+            profiles.c.total_count,
+            quarters.c.year,
+            quarters.c.quarter,
+            quarters.c.count,
+        ]).select_from(
+            quarters.outerjoin(profiles, quarters.c.username == profiles.c.username)
+        ).order_by(profiles.c.display_name)
+        rows = await self.database.fetch_all(statement)
+
+        profile_statistics = defaultdict(list)
+        # for row in rows:
+        #
+
+
+        return [dict(row) for row in rows]
