@@ -96,7 +96,9 @@ class ProfileService(BaseService):
             profiles_query.c.biography,
             profiles_query.c.image_filename,
             count_query.c.total_count
-        ]).select_from(sa.outerjoin(profiles_query, count_query, onclause=sa.sql.true(), full=True))
+        ]).select_from(
+            sa.outerjoin(profiles_query, count_query, onclause=sa.sql.true(), full=True)
+        ).order_by(profiles_query.c.display_name)
         rows = await self.database.fetch_all(query)
 
         # process result
