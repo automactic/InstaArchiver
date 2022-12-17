@@ -63,6 +63,11 @@ async def delete_profile(username: str):
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
+@app.get('/api/profile_statistics/')
+async def get_profile_statistics():
+    return await ProfileService(database, http_session).get_statistics()
+
+
 @app.get('/api/posts/', response_model=PostListResult)
 async def list_posts(
     offset: Optional[int] = 0,

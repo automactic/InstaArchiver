@@ -8,10 +8,10 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates
+from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStatistics
 from services import schema
 from services.base import BaseService
-from collections import defaultdict
+
 logger = logging.getLogger(__name__)
 
 
@@ -186,6 +186,7 @@ class ProfileService(BaseService):
         # get data
         profiles = sa.select([
             schema.profiles.c.username,
+            schema.profiles.c.full_name,
             schema.profiles.c.display_name,
             sa.func.min(schema.posts.c.timestamp).label('first_post_timestamp'),
             sa.func.max(schema.posts.c.timestamp).label('last_post_timestamp'),
@@ -205,6 +206,7 @@ class ProfileService(BaseService):
         ).alias('quarters')
         statement = sa.select([
             profiles.c.username,
+            profiles.c.full_name,
             profiles.c.display_name,
             profiles.c.first_post_timestamp,
             profiles.c.last_post_timestamp,
@@ -217,9 +219,20 @@ class ProfileService(BaseService):
         ).order_by(profiles.c.display_name)
         rows = await self.database.fetch_all(statement)
 
-        profile_statistics = defaultdict(list)
-        # for row in rows:
-        #
+        # format result
+        statistics = {}
+        for row in rows:
+            username = row['username']
+            if username not in statistics:
+                statistics[username] = ProfileStatistics(
+                    username=row['username'],
+                    full_name=row['full_name'],
+                    display_name=row['display_name'],
+                    first_post_timestamp=row['first_post_timestamp'],
+                    last_post_timestamp=row['last_post_timestamp'],
+                    total_count=row['total_count'],
+                    counts={},
+                )
+            statistics[username].counts[f'{row["year"]}-{row["quarter"]}'] = row['count']
 
-
-        return [dict(row) for row in rows]
+        return list(statistics.values())
