@@ -31,3 +31,13 @@ class ProfileListResult(BaseModel):
 
 class ProfileUpdates(BaseModel):
     display_name: Optional[str]
+
+
+class ProfileStatistics(BaseModel):
+    username: str
+    full_name: str
+    display_name: str
+    first_post_timestamp: Optional[datetime]
+    last_post_timestamp: Optional[datetime]
+    total_count: int
+    counts: dict

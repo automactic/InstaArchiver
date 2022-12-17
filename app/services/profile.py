@@ -8,7 +8,7 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates
+from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStatistics
 from services import schema
 from services.base import BaseService
 
@@ -81,22 +81,27 @@ class ProfileService(BaseService):
             ]
             base_query = base_query.where(sa.or_(*conditions))
         base_query = base_query.order_by(schema.profiles.c.display_name).cte('base_query')
-        query = sa.select('*').select_from(
-            sa.outerjoin(
-                sa.select('*').select_from(base_query).limit(limit).offset(offset).alias('profiles_query'),
-                sa.select([sa.func.count().label('total_count')]).select_from(base_query).alias('total_count_query'),
-                onclause=sa.sql.true(),
-                full=True,
-            )
-        )
+        profiles_query = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
+            schema.profiles.c.biography,
+            schema.profiles.c.image_filename,
+        ]).select_from(base_query).limit(limit).offset(offset).cte('profiles_query')
+        count_query = sa.select([sa.func.count().label('total_count')]).select_from(base_query).cte('count_query')
+        query = sa.select([
+            profiles_query.c.username,
+            profiles_query.c.full_name,
+            profiles_query.c.display_name,
+            profiles_query.c.biography,
+            profiles_query.c.image_filename,
+            count_query.c.total_count
+        ]).select_from(sa.outerjoin(profiles_query, count_query, onclause=sa.sql.true(), full=True))
         rows = await self.database.fetch_all(query)
 
         # process result
-        profiles, total_count = [], 0
-        for row in rows:
-            if isinstance(row._mapping['total_count'], int):
-                total_count = row._mapping['total_count']
-            profiles.append(Profile(**row._mapping))
+        total_count = rows[0]['total_count']
+        profiles = [Profile(**dict(row)) for row in rows] if total_count > 0 else []
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
 
@@ -155,8 +160,7 @@ class ProfileService(BaseService):
         await self.database.execute(statement)
 
     async def delete(self, username: str):
-        """
-        Delete a profile.
+        """Delete a profile.
 
         :param username: username of the profile to delete
         """
@@ -175,3 +179,60 @@ class ProfileService(BaseService):
             .where(schema.profiles.c.username == username) \
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
+
+    async def get_statistics(self):
+        """Get profile statistics."""
+
+        # get data
+        profiles = sa.select([
+            schema.profiles.c.username,
+            schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
+            sa.func.min(schema.posts.c.timestamp).label('first_post_timestamp'),
+            sa.func.max(schema.posts.c.timestamp).label('last_post_timestamp'),
+            sa.func.count().label('total_count')
+        ]).select_from(
+            schema.profiles.join(schema.posts, schema.profiles.c.username == schema.posts.c.username)
+        ).group_by(
+            schema.profiles.c.username
+        ).alias('profiles')
+        quarters = sa.select([
+            schema.posts.c.username,
+            sa.func.cast(sa.func.date_part('year', schema.posts.c.timestamp), sa.INT).label('year'),
+            sa.func.cast(sa.func.date_part('quarter', schema.posts.c.timestamp), sa.INT).label('quarter'),
+            sa.func.count().label('count'),
+        ]).select_from(schema.posts).group_by(
+            schema.posts.c.username, sa.literal_column('year'), sa.literal_column('quarter')
+        ).alias('quarters')
+        statement = sa.select([
+            profiles.c.username,
+            profiles.c.full_name,
+            profiles.c.display_name,
+            profiles.c.first_post_timestamp,
+            profiles.c.last_post_timestamp,
+            profiles.c.total_count,
+            quarters.c.year,
+            quarters.c.quarter,
+            quarters.c.count,
+        ]).select_from(
+            quarters.outerjoin(profiles, quarters.c.username == profiles.c.username)
+        ).order_by(profiles.c.display_name)
+        rows = await self.database.fetch_all(statement)
+
+        # format result
+        statistics = {}
+        for row in rows:
+            username = row['username']
+            if username not in statistics:
+                statistics[username] = ProfileStatistics(
+                    username=row['username'],
+                    full_name=row['full_name'],
+                    display_name=row['display_name'],
+                    first_post_timestamp=row['first_post_timestamp'],
+                    last_post_timestamp=row['last_post_timestamp'],
+                    total_count=row['total_count'],
+                    counts={},
+                )
+            statistics[username].counts[f'{row["year"]}-{row["quarter"]}'] = row['count']
+
+        return list(statistics.values())
