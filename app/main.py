@@ -65,11 +65,11 @@ async def delete_profile(username: str):
 
 @app.get('/api/posts/', response_model=PostListResult)
 async def list_posts(
-        offset: Optional[int] = 0,
-        limit: int = 10,
-        username: Optional[str] = None,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
+    offset: Optional[int] = 0,
+    limit: int = 10,
+    username: Optional[str] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
 ):
     return await PostService(database, http_session).list(offset, limit, username, start_time, end_time)
 
