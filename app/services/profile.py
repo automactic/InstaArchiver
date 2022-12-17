@@ -80,25 +80,18 @@ class ProfileService(BaseService):
                 schema.profiles.c.display_name.ilike(f'%{search}%'),
             ]
             base_query = base_query.where(sa.or_(*conditions))
-        base_query = base_query.order_by(schema.profiles.c.display_name).cte('base_query')
-        profiles_query = sa.select([
-            schema.profiles.c.username,
-            schema.profiles.c.full_name,
-            schema.profiles.c.display_name,
-            schema.profiles.c.biography,
-            schema.profiles.c.image_filename,
-        ]).select_from(base_query).limit(limit).offset(offset).cte('profiles_query')
+        base_query = base_query.cte('base_query')
         count_query = sa.select([sa.func.count().label('total_count')]).select_from(base_query).cte('count_query')
         query = sa.select([
-            profiles_query.c.username,
-            profiles_query.c.full_name,
-            profiles_query.c.display_name,
-            profiles_query.c.biography,
-            profiles_query.c.image_filename,
+            base_query.c.username,
+            base_query.c.full_name,
+            base_query.c.display_name,
+            base_query.c.biography,
+            base_query.c.image_filename,
             count_query.c.total_count
         ]).select_from(
-            sa.outerjoin(profiles_query, count_query, onclause=sa.sql.true(), full=True)
-        ).order_by(profiles_query.c.display_name)
+            sa.outerjoin(base_query, count_query, onclause=sa.sql.true(), full=True)
+        ).order_by(base_query.c.display_name).offset(offset).limit(limit)
         rows = await self.database.fetch_all(query)
 
         # process result
