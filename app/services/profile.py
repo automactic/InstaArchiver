@@ -223,8 +223,8 @@ class ProfileService(BaseService):
                     username=row['username'],
                     full_name=row['full_name'],
                     display_name=row['display_name'],
-                    first_post_timestamp=row['first_post_timestamp'],
-                    last_post_timestamp=row['last_post_timestamp'],
+                    first_post_timestamp=row['first_post_timestamp'].replace(tzinfo=timezone.utc),
+                    last_post_timestamp=row['last_post_timestamp'].replace(tzinfo=timezone.utc),
                     total_count=row['total_count'],
                     counts={},
                 )
