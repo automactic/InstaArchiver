@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 import instaloader
+import pydantic
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
@@ -26,12 +27,12 @@ class DownloadTask:
 
 class PostService(BaseService):
     async def list(
-            self,
-            offset: int = 0,
-            limit: int = 10,
-            username: Optional[str] = None,
-            start_time: Optional[datetime] = None,
-            end_time: Optional[datetime] = None,
+        self,
+        offset: int = 0,
+        limit: int = 10,
+        username: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
     ) -> PostListResult:
         """List posts.
 
@@ -43,55 +44,68 @@ class PostService(BaseService):
         :return: the list query result
         """
 
-        posts_statement = sa.select([schema.posts.c.shortcode]).select_from(schema.posts)
+        # build base query
+        condition = []
         if username:
-            posts_statement = posts_statement.where(schema.posts.c.username == username)
+            condition.append(schema.posts.c.username == username)
         if start_time:
             start_time = datetime.utcfromtimestamp(start_time.timestamp())
-            posts_statement = posts_statement.where(schema.posts.c.timestamp >= start_time)
+            condition.append(schema.posts.c.timestamp >= start_time)
         if end_time:
             end_time = datetime.utcfromtimestamp(end_time.timestamp())
-            posts_statement = posts_statement.where(schema.posts.c.timestamp < end_time)
-        posts_statement = posts_statement.order_by(schema.posts.c.timestamp.desc()).offset(offset).limit(limit)
-        statement = sa.select([
-            schema.posts.c.shortcode,
-            schema.posts.c.username,
-            schema.posts.c.timestamp,
-            schema.posts.c.type,
-            schema.posts.c.caption,
-            schema.posts.c.caption_hashtags,
-            schema.posts.c.caption_mentions,
+            condition.append(schema.posts.c.timestamp < end_time)
+        base_query = schema.posts.select().where(sa.and_(*condition)).cte('base_query')
+
+        # build post and count query
+        posts_query = base_query.select().order_by(base_query.c.timestamp.desc()) \
+            .offset(offset).limit(limit).cte('posts_query')
+        count_query = sa.select(sa.func.count().label('total_count')).select_from(base_query).cte('count_query')
+
+        # build final query
+        query = sa.select(
+            posts_query.c.shortcode.label('shortcode'),
+            posts_query.c.username.label('username'),
+            posts_query.c.timestamp.label('timestamp'),
+            posts_query.c.type.label('type'),
+            posts_query.c.caption.label('caption'),
+            posts_query.c.caption_hashtags.label('caption_hashtags'),
+            posts_query.c.caption_mentions.label('caption_mentions'),
             schema.post_items.c.index.label('item_index'),
             schema.post_items.c.type.label('item_type'),
             schema.post_items.c.duration.label('item_duration'),
             schema.post_items.c.filename.label('item_filename'),
             schema.post_items.c.thumb_image_filename.label('item_thumb_image_filename'),
-        ]).select_from(
-            schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.shortcode)
-        ).where(
-            schema.post_items.c.shortcode.in_(posts_statement)
-        ).order_by(
-            schema.posts.c.timestamp.desc(), schema.post_items.c.index.asc()
+            count_query.c.total_count.label('total_count'),
+        ).select_from(
+            posts_query.outerjoin(
+                schema.post_items,
+                posts_query.c.shortcode == schema.post_items.c.shortcode,
+                full=False,
+            ).outerjoin(count_query, sa.sql.true(), full=True)
         )
 
-        posts = []
-        for result in await self.database.fetch_all(statement):
-            item = PostItem(
-                index=result['item_index'],
-                type=result['item_type'],
-                duration=result['item_duration'],
-                filename=result['item_filename'],
-                thumb_image_filename=result['item_thumb_image_filename'],
-            )
-            if posts and posts[-1].shortcode == result['shortcode']:
+        # format the results
+        posts, count = [], 0
+        for result in await self.database.fetch_all(query):
+            count = result['total_count']
+            if not posts or posts[-1].shortcode != result['shortcode']:
+                try:
+                    post = Post(items=[], **dict(result))
+                    post.timestamp = post.timestamp.replace(tzinfo=timezone.utc)
+                    posts.append(post)
+                except pydantic.error_wrappers.ValidationError:
+                    continue
+            try:
+                item = PostItem(
+                    index=result['item_index'],
+                    type=result['item_type'],
+                    duration=result['item_duration'],
+                    filename=result['item_filename'],
+                    thumb_image_filename=result['item_thumb_image_filename'],
+                )
                 posts[-1].items.append(item)
-            else:
-                post = Post(items=[item], **result)
-                post.timestamp = post.timestamp.replace(tzinfo=timezone.utc)
-                posts.append(post)
-
-        statement = sa.select([sa.func.count()]).select_from(schema.posts)
-        count = await self.database.fetch_val(statement)
+            except pydantic.error_wrappers.ValidationError:
+                continue
 
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
 
