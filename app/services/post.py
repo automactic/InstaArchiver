@@ -82,7 +82,7 @@ class PostService(BaseService):
                 posts_query.c.shortcode == schema.post_items.c.shortcode,
                 full=False,
             ).outerjoin(count_query, sa.sql.true(), full=True)
-        )
+        ).order_by(posts_query.c.timestamp.desc(), schema.post_items.c.index.asc())
 
         # format the results
         posts, count = [], 0
