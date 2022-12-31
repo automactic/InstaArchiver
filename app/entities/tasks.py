@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from uuid import uuid4
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -8,7 +8,7 @@ from .enums import TaskType, TaskStatus
 
 
 class Task(BaseModel):
-    id: uuid4
+    id: UUID
     username: str
     type: TaskType
     status: TaskStatus
