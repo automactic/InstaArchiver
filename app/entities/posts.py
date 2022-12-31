@@ -1,19 +1,9 @@
 from datetime import datetime
-from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
 
-
-class PostType(Enum):
-    IMAGE = 'image'
-    VIDEO = 'video'
-    SIDECAR = 'sidecar'
-
-
-class PostItemType(Enum):
-    IMAGE = 'image'
-    VIDEO = 'video'
+from .enums import PostType, PostItemType
 
 
 class PostItem(BaseModel):
