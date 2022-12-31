@@ -21,7 +21,7 @@ def upgrade():
     op.create_table(
         'posts',
         Column('shortcode', String, primary_key=True),
-        Column('username', String, ForeignKey('profiles.username'), index=True),
+        Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True),
         Column('timestamp', DateTime, index=True, nullable=False),
         Column('type', String, index=True, nullable=False),
         Column('caption', String, index=True, nullable=True),

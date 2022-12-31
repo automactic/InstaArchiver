@@ -149,7 +149,7 @@ class PostService(BaseService):
                 if thumb_image_filename := item['thumb_image_filename']:
                     self.delete_file(self.thumb_images_dir, item['username'], thumb_image_filename)
 
-            # delete post(if post has only one item left) and post item records
+            # delete post(if deleting post or post has only one item left) and post item records
             if index is not None:
                 where_clause = sa.and_(
                     schema.post_items.c.shortcode == shortcode,
@@ -159,7 +159,7 @@ class PostService(BaseService):
                 where_clause = schema.post_items.c.shortcode == shortcode
             delete_statement = sa.delete(schema.post_items).where(where_clause)
             await self.database.execute(delete_statement)
-            if len(post_items) == 1:
+            if len(post_items) == 1 or index is None:
                 delete_statement = sa.delete(schema.posts).where(schema.posts.c.shortcode == shortcode)
                 await self.database.execute(delete_statement)
 
