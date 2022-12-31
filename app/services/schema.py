@@ -1,7 +1,7 @@
 import os
-
+import uuid
 from sqlalchemy import MetaData, Table, Column, ForeignKey, Integer, Float, String, Boolean, DateTime
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 database_url = (
     f"postgresql://{os.getenv('DATABASE_USERNAME', 'postgres')}:{os.getenv('DATABASE_PASSWORD', 'postgres')}"
@@ -25,7 +25,7 @@ posts = Table(
     'posts',
     metadata,
     Column('shortcode', String, primary_key=True),
-    Column('username', String, ForeignKey('profiles.username'), index=True),
+    Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True),
     Column('timestamp', DateTime, index=True, nullable=False),
     Column('type', String, index=True, nullable=False),
     Column('caption', String, index=True, nullable=True),
@@ -36,10 +36,22 @@ posts = Table(
 post_items = Table(
     'post_items',
     metadata,
-    Column('shortcode', String, ForeignKey('posts.shortcode'), primary_key=True),
+    Column('shortcode', String, ForeignKey('posts.shortcode', ondelete='CASCADE'), primary_key=True),
     Column('index', Integer, primary_key=True),
     Column('type', String, index=True, nullable=False),
     Column('duration', Float, index=True, nullable=True),
     Column('filename', String, index=True, nullable=False),
     Column('thumb_image_filename', String, nullable=True),
+)
+
+tasks = Table(
+    'tasks',
+    metadata,
+    Column('id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True, nullable=True),
+    Column('type', String, index=True),
+    Column('status', String, index=True, nullable=False),
+    Column('created', DateTime, index=True, nullable=False),
+    Column('started', DateTime, nullable=True),
+    Column('completed', DateTime, nullable=True),
 )
