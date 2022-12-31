@@ -17,12 +17,12 @@ class Task(BaseModel):
     completed: Optional[datetime] = None
 
 
+class TaskCreateRequest(BaseModel):
+    usernames: List[str]
+
+
 class TaskListResponse(BaseModel):
     tasks: List[Task]
     limit: int
     offset: int
     count: int
-
-
-class TaskCreateRequest(BaseModel):
-    usernames: List[str]
