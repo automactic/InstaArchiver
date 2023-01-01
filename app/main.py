@@ -113,7 +113,7 @@ async def delete_post_item(shortcode: str, index: int):
 
 
 @app.post('/api/tasks/')
-def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundTasks):
+async def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundTasks):
     await TaskCRUDService(database, http_session).create(request)
     background_tasks.add_task(TaskExecutor(database, http_session).run_tasks)
     return Response(status_code=HTTPStatus.CREATED)
