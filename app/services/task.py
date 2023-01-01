@@ -3,7 +3,7 @@ import logging
 import os
 import random
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import uuid4
 
 import instaloader
@@ -44,7 +44,7 @@ class TaskCRUDService(BaseService):
         return tasks
 
     async def list(
-        self, offset: int = 0, limit: int = 10, status: Optional[TaskStatus] = None, is_ascending: bool = True
+        self, offset: int = 0, limit: int = 10, status: List[TaskStatus] = None, is_ascending: bool = True
     ):
         """List tasks.
 
@@ -58,7 +58,7 @@ class TaskCRUDService(BaseService):
         # build base query
         condition = []
         if status:
-            condition.append(schema.tasks.c.status == status)
+            condition.append(schema.tasks.c.status.in_(status))
         base_query = schema.tasks.select().where(sa.and_(*condition)).cte('base_query')
 
         # build count query
@@ -97,7 +97,7 @@ class TaskCRUDService(BaseService):
         :return: next task to execute
         """
 
-        result = await self.list(offset=0, limit=1, status=TaskStatus.PENDING, is_ascending=True)
+        result = await self.list(offset=0, limit=1, status=[TaskStatus.PENDING], is_ascending=True)
         return result.tasks[0] if result.tasks else None
 
     async def set_in_progress(self, task) -> Task:

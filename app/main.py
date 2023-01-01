@@ -12,6 +12,7 @@ from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.responses import Response, FileResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
+from entities.enums import TaskStatus
 from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
 from entities.tasks import TaskCreateRequest, TaskListResponse
@@ -114,8 +115,16 @@ async def delete_post_item(shortcode: str, index: int):
 
 @app.post('/api/tasks/')
 async def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundTasks):
-    await TaskCRUDService(database, http_session).create(request)
-    background_tasks.add_task(TaskExecutor(database, http_session).run_tasks)
+    # get non-terminal tasks
+    service = TaskCRUDService(database, http_session)
+    non_terminal_tasks = await service.list(limit=1, status=[TaskStatus.PENDING, TaskStatus.IN_PROGRESS])
+
+    # create new tasks
+    await service.create(request)
+
+    # start task executor, but only if there was no non-terminal tasks before task creation
+    if non_terminal_tasks.count == 0:
+        background_tasks.add_task(TaskExecutor(database, http_session).run_tasks)
     return Response(status_code=HTTPStatus.CREATED)
 
 
