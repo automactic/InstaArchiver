@@ -14,10 +14,12 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
+from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
+from services.task import TaskCRUDService, TaskExecutor
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
@@ -108,6 +110,18 @@ async def delete_post(shortcode: str):
 @app.delete('/api/posts/{shortcode:str}/{index:int}/')
 async def delete_post_item(shortcode: str, index: int):
     await PostService(database, http_session).delete(shortcode, index)
+
+
+@app.post('/api/tasks/')
+def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundTasks):
+    await TaskCRUDService(database, http_session).create(request)
+    background_tasks.add_task(TaskExecutor(database, http_session).run_tasks)
+    return Response(status_code=HTTPStatus.CREATED)
+
+
+@app.get('/api/tasks/', response_model=TaskListResponse)
+async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100):
+    return await TaskCRUDService(database, http_session).list(offset, limit, is_ascending=False)
 
 
 @app.get('/media/{path:path}')

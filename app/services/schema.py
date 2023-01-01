@@ -47,7 +47,7 @@ post_items = Table(
 tasks = Table(
     'tasks',
     metadata,
-    Column('id', UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column('id', UUID(as_uuid=False), primary_key=True, default=uuid.uuid4),
     Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True, nullable=True),
     Column('type', String, index=True),
     Column('status', String, index=True, nullable=False),

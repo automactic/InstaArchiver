@@ -11,7 +11,8 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.posts import Post, PostItem, PostType, PostItemType, PostListResult, PostArchiveRequest
+from entities.enums import PostType, PostItemType
+from entities.posts import Post, PostItem, PostListResult, PostArchiveRequest
 from services import schema
 from services.base import BaseService
 from services.profile import ProfileService
