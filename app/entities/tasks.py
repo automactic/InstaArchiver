@@ -16,6 +16,9 @@ class Task(BaseModel):
     started: Optional[datetime] = None
     completed: Optional[datetime] = None
 
+    def __str__(self):
+        return f'Task {self.type} | {self.username} | {self.status}'
+
 
 class TaskCreateRequest(BaseModel):
     usernames: List[str]
