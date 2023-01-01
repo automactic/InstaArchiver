@@ -15,9 +15,13 @@ class Task(BaseModel):
     created: datetime
     started: Optional[datetime] = None
     completed: Optional[datetime] = None
+    post_count: Optional[int] = 0
 
     def __str__(self):
-        return f'Task {self.type} | {self.username} | {self.status}'
+        parts = [f'Task {self.type}', self.username, self.status]
+        if self.status == TaskStatus.SUCCEEDED:
+            parts.append(f'post count: {self.post_count}')
+        return ' | '.join(parts)
 
 
 class TaskCreateRequest(BaseModel):
