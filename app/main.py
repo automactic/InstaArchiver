@@ -120,7 +120,7 @@ def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundTasks):
 
 
 @app.get('/api/tasks/', response_model=TaskListResponse)
-async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 10):
+async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100):
     return await TaskCRUDService(database, http_session).list(offset, limit, is_ascending=False)
 
 
