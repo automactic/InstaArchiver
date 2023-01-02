@@ -54,4 +54,5 @@ tasks = Table(
     Column('created', DateTime, index=True, nullable=False),
     Column('started', DateTime, nullable=True),
     Column('completed', DateTime, nullable=True),
+    Column('post_count', Integer, nullable=True),
 )
