@@ -169,7 +169,7 @@ class TaskExecutor(BaseService):
                 elif task.type == TaskType.SAVED_POSTS:
                     await self._run_saved_posts_task(task)
                 elif task.type == TaskType.TIME_RANGE:
-                    await self._run_time_range_task()
+                    await self._run_time_range_task(task)
                 task = await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
             except:
@@ -182,20 +182,19 @@ class TaskExecutor(BaseService):
         max_sleep = os.environ.get('MAX_SLEEP', 60)
         await asyncio.sleep(random.randint(0, max_sleep))
 
-    async def _get_post_iterator(self, username) -> instaloader.NodeIterator:
-        """Get the post iterator for a user.
+    async def _get_profile(self, username) -> instaloader.Profile:
+        """Get instaloader profile for a user.
 
-        :param username: name of the user whose posts to iterate
-        :return: the post iterator
+        :param username: name of the user whose profile to get
+        :return: the instaloader profile
         """
 
         loop = asyncio.get_running_loop()
         try:
             func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
-            return await loop.run_in_executor(None, profile.get_posts)
+            return await loop.run_in_executor(None, func, self.instaloader.context, username)
         except instaloader.ProfileNotExistsException:
-            logger.debug(f'Failed to get post iterator. Profile {username} does not exist.')
+            logger.debug(f'Task failed. Profile {username} does not exist.')
             raise
 
     async def _run_catch_up_task(self, task: Task):
@@ -205,7 +204,8 @@ class TaskExecutor(BaseService):
         """
 
         loop = asyncio.get_running_loop()
-        post_iterator = await self._get_post_iterator(task.username)
+        profile = await self._get_profile(task.username)
+        post_iterator = await loop.run_in_executor(None, profile.get_posts)
 
         while True:
             # sleep for a random amount of time
