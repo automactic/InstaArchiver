@@ -166,6 +166,10 @@ class TaskExecutor(BaseService):
             try:
                 if task.type == TaskType.CATCH_UP:
                     await self._run_catch_up_task(task)
+                elif task.type == TaskType.SAVED_POSTS:
+                    await self._run_saved_posts_task(task)
+                elif task.type == TaskType.TIME_RANGE:
+                    await self._run_time_range_task()
                 task = await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
             except:
@@ -225,3 +229,15 @@ class TaskExecutor(BaseService):
             # save post
             await self.post_crud_service.create_from_instaloader(post)
             task.post_count += 1
+
+    async def _run_saved_posts_task(self, task: Task):
+        """Run saved posts task.
+
+        :param task: the task to run
+        """
+    
+    async def _run_time_range_task(self, task: Task):
+        """Run time range task.
+        
+        :param task: the task to run
+        """
