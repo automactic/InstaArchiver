@@ -74,6 +74,7 @@ class TaskCRUDService(BaseService):
             base_query.c.created.label('created'),
             base_query.c.started.label('started'),
             base_query.c.completed.label('completed'),
+            base_query.c.post_count.label('post_count'),
             count_query.c.total_count.label('total_count'),
         ).select_from(
             base_query.outerjoin(count_query, sa.sql.true(), full=True)
@@ -193,7 +194,7 @@ class TaskExecutor(BaseService):
             logger.debug(f'Failed to get post iterator. Profile {username} does not exist.')
             raise
 
-    async def _run_catch_up_task(self, task):
+    async def _run_catch_up_task(self, task: Task):
         """Run catch-up task.
 
         :param task: the task to run
@@ -223,3 +224,4 @@ class TaskExecutor(BaseService):
 
             # save post
             await self.post_crud_service.create_from_instaloader(post)
+            task.post_count += 1
