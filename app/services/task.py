@@ -28,16 +28,29 @@ class TaskCRUDService(BaseService):
         :return: tasks that are created
         """
 
-        tasks = [
-            Task(
-                id=uuid4(),
-                username=username,
-                type=TaskType.CATCH_UP,
-                status=TaskStatus.PENDING,
-                created=datetime.utcnow(),
-            )
-            for username in request.usernames
-        ]
+        if request.type == TaskType.CATCH_UP:
+            tasks = [
+                Task(
+                    id=uuid4(),
+                    username=username,
+                    type=TaskType.CATCH_UP,
+                    status=TaskStatus.PENDING,
+                    created=datetime.utcnow(),
+                )
+                for username in request.usernames
+            ]
+        elif request.type == TaskType.SAVED_POSTS:
+            tasks = [
+                Task(
+                    id=uuid4(),
+                    username=None,
+                    type=TaskType.SAVED_POSTS,
+                    status=TaskStatus.PENDING,
+                    created=datetime.utcnow(),
+                )
+            ]
+        else:
+            tasks = []
         values = [task.dict(exclude_unset=True) for task in tasks]
         statement = insert(schema.tasks).values(values).on_conflict_do_nothing()
         await self.database.execute(statement)
@@ -170,6 +183,8 @@ class TaskExecutor(BaseService):
                     await self._run_saved_posts_task(task)
                 elif task.type == TaskType.TIME_RANGE:
                     await self._run_time_range_task(task)
+                else:
+                    raise NotImplemented('Unrecognized task type')
                 task = await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
             except:
