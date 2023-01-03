@@ -127,7 +127,7 @@ class TaskCRUDService(BaseService):
         task.status = TaskStatus.SUCCEEDED
         task.completed = datetime.utcnow()
 
-        updates = {'status': task.status, 'completed': task.completed}
+        updates = {'status': task.status, 'completed': task.completed, 'post_count': task.post_count}
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
@@ -143,7 +143,7 @@ class TaskCRUDService(BaseService):
         task.status = TaskStatus.FAILED
         task.completed = datetime.utcnow()
 
-        updates = {'status': task.status, 'completed': task.completed}
+        updates = {'status': task.status, 'completed': task.completed, 'post_count': task.post_count}
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
