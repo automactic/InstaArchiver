@@ -194,7 +194,7 @@ class TaskExecutor(BaseService):
             func = instaloader.Profile.from_username
             return await loop.run_in_executor(None, func, self.instaloader.context, username)
         except instaloader.ProfileNotExistsException:
-            logger.debug(f'Task failed. Profile {username} does not exist.')
+            logger.debug(f'Profile {username} does not exist.')
             raise
 
     async def _run_catch_up_task(self, task: Task):
@@ -235,7 +235,30 @@ class TaskExecutor(BaseService):
 
         :param task: the task to run
         """
-    
+
+        loop = asyncio.get_running_loop()
+        profile = await self._get_profile(self.instagram_username)
+        post_iterator = await loop.run_in_executor(None, profile.get_saved_posts)
+
+        while True:
+            # sleep for a random amount of time
+            await self._sleep()
+
+            # fetch the next post
+            try:
+                post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+            except StopIteration:
+                logger.debug('Unable to get the next post.')
+                break
+
+            # complete task if a post already exists
+            if await self.post_crud_service.exists(post.shortcode):
+                break
+
+            # save post
+            await self.post_crud_service.create_from_instaloader(post)
+            task.post_count += 1
+
     async def _run_time_range_task(self, task: Task):
         """Run time range task.
         
