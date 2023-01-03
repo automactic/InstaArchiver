@@ -14,6 +14,8 @@ class PostItemType(Enum):
 
 class TaskType(str, Enum):
     CATCH_UP = 'catch_up'
+    SAVED_POSTS = 'saved_posts'
+    TIME_RANGE = 'time_range'
 
 
 class TaskStatus(str, Enum):

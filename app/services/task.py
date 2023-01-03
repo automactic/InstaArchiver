@@ -28,16 +28,29 @@ class TaskCRUDService(BaseService):
         :return: tasks that are created
         """
 
-        tasks = [
-            Task(
-                id=uuid4(),
-                username=username,
-                type=TaskType.CATCH_UP,
-                status=TaskStatus.PENDING,
-                created=datetime.utcnow(),
-            )
-            for username in request.usernames
-        ]
+        if request.type == TaskType.CATCH_UP:
+            tasks = [
+                Task(
+                    id=uuid4(),
+                    username=username,
+                    type=TaskType.CATCH_UP,
+                    status=TaskStatus.PENDING,
+                    created=datetime.utcnow(),
+                )
+                for username in request.usernames
+            ]
+        elif request.type == TaskType.SAVED_POSTS:
+            tasks = [
+                Task(
+                    id=uuid4(),
+                    username=None,
+                    type=TaskType.SAVED_POSTS,
+                    status=TaskStatus.PENDING,
+                    created=datetime.utcnow(),
+                )
+            ]
+        else:
+            tasks = []
         values = [task.dict(exclude_unset=True) for task in tasks]
         statement = insert(schema.tasks).values(values).on_conflict_do_nothing()
         await self.database.execute(statement)
@@ -74,6 +87,7 @@ class TaskCRUDService(BaseService):
             base_query.c.created.label('created'),
             base_query.c.started.label('started'),
             base_query.c.completed.label('completed'),
+            base_query.c.post_count.label('post_count'),
             count_query.c.total_count.label('total_count'),
         ).select_from(
             base_query.outerjoin(count_query, sa.sql.true(), full=True)
@@ -126,7 +140,7 @@ class TaskCRUDService(BaseService):
         task.status = TaskStatus.SUCCEEDED
         task.completed = datetime.utcnow()
 
-        updates = {'status': task.status, 'completed': task.completed}
+        updates = {'status': task.status, 'completed': task.completed, 'post_count': task.post_count}
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
@@ -142,7 +156,7 @@ class TaskCRUDService(BaseService):
         task.status = TaskStatus.FAILED
         task.completed = datetime.utcnow()
 
-        updates = {'status': task.status, 'completed': task.completed}
+        updates = {'status': task.status, 'completed': task.completed, 'post_count': task.post_count}
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
@@ -165,6 +179,12 @@ class TaskExecutor(BaseService):
             try:
                 if task.type == TaskType.CATCH_UP:
                     await self._run_catch_up_task(task)
+                elif task.type == TaskType.SAVED_POSTS:
+                    await self._run_saved_posts_task(task)
+                elif task.type == TaskType.TIME_RANGE:
+                    await self._run_time_range_task(task)
+                else:
+                    raise NotImplemented('Unrecognized task type')
                 task = await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
             except:
@@ -177,30 +197,30 @@ class TaskExecutor(BaseService):
         max_sleep = os.environ.get('MAX_SLEEP', 60)
         await asyncio.sleep(random.randint(0, max_sleep))
 
-    async def _get_post_iterator(self, username) -> instaloader.NodeIterator:
-        """Get the post iterator for a user.
+    async def _get_profile(self, username) -> instaloader.Profile:
+        """Get instaloader profile for a user.
 
-        :param username: name of the user whose posts to iterate
-        :return: the post iterator
+        :param username: name of the user whose profile to get
+        :return: the instaloader profile
         """
 
         loop = asyncio.get_running_loop()
         try:
             func = instaloader.Profile.from_username
-            profile = await loop.run_in_executor(None, func, self.instaloader.context, username)
-            return await loop.run_in_executor(None, profile.get_posts)
+            return await loop.run_in_executor(None, func, self.instaloader.context, username)
         except instaloader.ProfileNotExistsException:
-            logger.debug(f'Failed to get post iterator. Profile {username} does not exist.')
+            logger.debug(f'Profile {username} does not exist.')
             raise
 
-    async def _run_catch_up_task(self, task):
+    async def _run_catch_up_task(self, task: Task):
         """Run catch-up task.
 
         :param task: the task to run
         """
 
         loop = asyncio.get_running_loop()
-        post_iterator = await self._get_post_iterator(task.username)
+        profile = await self._get_profile(task.username)
+        post_iterator = await loop.run_in_executor(None, profile.get_posts)
 
         while True:
             # sleep for a random amount of time
@@ -223,3 +243,39 @@ class TaskExecutor(BaseService):
 
             # save post
             await self.post_crud_service.create_from_instaloader(post)
+            task.post_count += 1
+
+    async def _run_saved_posts_task(self, task: Task):
+        """Run saved posts task.
+
+        :param task: the task to run
+        """
+
+        loop = asyncio.get_running_loop()
+        profile = await self._get_profile(self.instagram_username)
+        post_iterator = await loop.run_in_executor(None, profile.get_saved_posts)
+
+        while True:
+            # sleep for a random amount of time
+            await self._sleep()
+
+            # fetch the next post
+            try:
+                post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+            except StopIteration:
+                logger.debug('Unable to get the next post.')
+                break
+
+            # complete task if a post already exists
+            if await self.post_crud_service.exists(post.shortcode):
+                break
+
+            # save post
+            await self.post_crud_service.create_from_instaloader(post)
+            task.post_count += 1
+
+    async def _run_time_range_task(self, task: Task):
+        """Run time range task.
+        
+        :param task: the task to run
+        """
