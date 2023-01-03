@@ -28,7 +28,7 @@ class Task(BaseModel):
 
 class TaskCreateRequest(BaseModel):
     type: TaskType
-    usernames: List[str]
+    usernames: Optional[List[str]]
 
 
 class TaskListResponse(BaseModel):

@@ -231,6 +231,7 @@ class TaskExecutor(BaseService):
         loop = asyncio.get_running_loop()
         profile = await self._get_profile(task.username)
         post_iterator = await loop.run_in_executor(None, profile.get_posts)
+        task.post_count = 0
 
         while True:
             # sleep for a random amount of time
@@ -267,6 +268,7 @@ class TaskExecutor(BaseService):
         loop = asyncio.get_running_loop()
         profile = await self._get_profile(self.instagram_username)
         post_iterator = await loop.run_in_executor(None, profile.get_saved_posts)
+        task.post_count = 0
 
         while True:
             # sleep for a random amount of time
