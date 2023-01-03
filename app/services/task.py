@@ -162,6 +162,16 @@ class TaskCRUDService(BaseService):
 
         return task
 
+    async def set_post_count(self, task):
+        """Set task post count value.
+
+        :param task: the task to update
+        """
+
+        updates = {'post_count': task.post_count}
+        statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
+        await self.database.execute(statement)
+
 
 class TaskExecutor(BaseService):
     def __init__(self, *args, **kwargs):
@@ -245,6 +255,9 @@ class TaskExecutor(BaseService):
             await self.post_crud_service.create_from_instaloader(post)
             task.post_count += 1
 
+            # update post count
+            await self.task_crud_service.set_post_count(task)
+
     async def _run_saved_posts_task(self, task: Task):
         """Run saved posts task.
 
@@ -273,6 +286,9 @@ class TaskExecutor(BaseService):
             # save post
             await self.post_crud_service.create_from_instaloader(post)
             task.post_count += 1
+
+            # update post count
+            await self.task_crud_service.set_post_count(task)
 
     async def _run_time_range_task(self, task: Task):
         """Run time range task.

@@ -18,7 +18,9 @@ class Task(BaseModel):
     post_count: Optional[int] = 0
 
     def __str__(self):
-        parts = [f'Task {self.type}', self.username, self.status]
+        parts = [f'Task {self.type}', self.status]
+        if self.username:
+            parts.append(self.username)
         if self.status == TaskStatus.SUCCEEDED:
             parts.append(f'post count: {self.post_count}')
         return ' | '.join(parts)
