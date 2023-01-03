@@ -197,9 +197,9 @@ class TaskExecutor(BaseService):
                     raise NotImplemented('Unrecognized task type')
                 task = await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
-            except:
+            except Exception as e:
                 task = await self.task_crud_service.set_failed(task)
-                logger.error(f'Task failed: {task}')
+                logger.error(f'Task failed: {task}, {e}', exc_info=True)
 
     async def _sleep(self):
         """Sleep for a random amount of time."""

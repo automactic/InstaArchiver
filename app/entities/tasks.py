@@ -15,7 +15,7 @@ class Task(BaseModel):
     created: datetime
     started: Optional[datetime] = None
     completed: Optional[datetime] = None
-    post_count: Optional[int] = 0
+    post_count: Optional[int] = None
 
     def __str__(self):
         parts = [f'Task {self.type}', self.status]
