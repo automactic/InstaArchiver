@@ -49,10 +49,12 @@ tasks = Table(
     metadata,
     Column('id', UUID(as_uuid=False), primary_key=True, default=uuid.uuid4),
     Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True, nullable=True),
-    Column('type', String, index=True),
+    Column('type', String, index=True, nullable=False),
     Column('status', String, index=True, nullable=False),
     Column('created', DateTime, index=True, nullable=False),
     Column('started', DateTime, nullable=True),
     Column('completed', DateTime, nullable=True),
     Column('post_count', Integer, nullable=True),
+    Column('time_range_start', DateTime, nullable=True),
+    Column('time_range_end', DateTime, nullable=True),
 )
