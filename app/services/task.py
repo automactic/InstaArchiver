@@ -306,3 +306,35 @@ class TaskExecutor(BaseService):
         profile = await self._get_profile(task.username)
         post_iterator = await loop.run_in_executor(None, profile.get_saved_posts)
         task.post_count = 0
+
+        while True:
+            # sleep for a random amount of time
+            await self._sleep()
+
+            # fetch the next post
+            try:
+                post: instaloader.Post = await loop.run_in_executor(None, next, post_iterator)
+            except StopIteration:
+                logger.debug('Unable to get the next post.')
+                break
+
+            # skip pinned posts
+            if post.is_pinned:
+                continue
+
+            # if post is later than the end date, that means we have yet to reach posts within the time range
+            if post.date_utc >= task.time_range_end:
+                logger.debug(f'Post date {post.date_utc} is later than the end date.')
+                continue
+
+            # if post is earlier than the start date, that means we have iterated through posts within the time range
+            if post.date_utc < task.time_range_start:
+                logger.debug(f'Post date {post.date_utc} is earlier than the start date.')
+                break
+
+            # save post
+            await self.post_crud_service.create_from_instaloader(post)
+            task.post_count += 1
+
+            # update post count
+            await self.task_crud_service.set_post_count(task)
