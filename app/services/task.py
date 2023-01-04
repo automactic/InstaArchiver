@@ -28,14 +28,16 @@ class TaskCRUDService(BaseService):
         :return: tasks that are created
         """
 
-        if request.type == TaskType.CATCH_UP:
+        if request.type in [TaskType.CATCH_UP, TaskType.TIME_RANGE]:
             tasks = [
                 Task(
                     id=uuid4(),
                     username=username,
-                    type=TaskType.CATCH_UP,
+                    type=request.type,
                     status=TaskStatus.PENDING,
                     created=datetime.utcnow(),
+                    time_range_start=request.time_range_start,
+                    time_range_end=request.time_range_end,
                 )
                 for username in request.usernames
             ]
@@ -88,6 +90,8 @@ class TaskCRUDService(BaseService):
             base_query.c.started.label('started'),
             base_query.c.completed.label('completed'),
             base_query.c.post_count.label('post_count'),
+            base_query.c.time_range_start.label('time_range_start'),
+            base_query.c.time_range_end.label('time_range_end'),
             count_query.c.total_count.label('total_count'),
         ).select_from(
             base_query.outerjoin(count_query, sa.sql.true(), full=True)
@@ -297,3 +301,8 @@ class TaskExecutor(BaseService):
         
         :param task: the task to run
         """
+
+        loop = asyncio.get_running_loop()
+        profile = await self._get_profile(task.username)
+        post_iterator = await loop.run_in_executor(None, profile.get_saved_posts)
+        task.post_count = 0

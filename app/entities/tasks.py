@@ -16,6 +16,8 @@ class Task(BaseModel):
     started: Optional[datetime] = None
     completed: Optional[datetime] = None
     post_count: Optional[int] = None
+    time_range_start: Optional[datetime] = None
+    time_range_end: Optional[datetime] = None
 
     def __str__(self):
         parts = [f'Task {self.type}', self.status]
@@ -28,7 +30,9 @@ class Task(BaseModel):
 
 class TaskCreateRequest(BaseModel):
     type: TaskType
-    usernames: Optional[List[str]]
+    usernames: Optional[List[str]] = None
+    time_range_start: Optional[datetime] = None
+    time_range_end: Optional[datetime] = None
 
 
 class TaskListResponse(BaseModel):

@@ -55,7 +55,6 @@ tasks = Table(
     Column('started', DateTime, nullable=True),
     Column('completed', DateTime, nullable=True),
     Column('post_count', Integer, nullable=True),
-
     Column('time_range_start', DateTime, nullable=True),
     Column('time_range_end', DateTime, nullable=True),
 )
