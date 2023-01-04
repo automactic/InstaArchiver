@@ -118,7 +118,7 @@ class TaskCRUDService(BaseService):
         result = await self.list(offset=0, limit=1, status=[TaskStatus.PENDING], is_ascending=True)
         return result.tasks[0] if result.tasks else None
 
-    async def set_in_progress(self, task) -> Task:
+    async def set_in_progress(self, task):
         """Set task status to in_progress.
 
         :param task: the task to update
@@ -132,9 +132,7 @@ class TaskCRUDService(BaseService):
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
-        return task
-
-    async def set_succeeded(self, task) -> Task:
+    async def set_succeeded(self, task):
         """Set task status to succeeded.
 
         :param task: the task to update
@@ -148,9 +146,7 @@ class TaskCRUDService(BaseService):
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
 
-        return task
-
-    async def set_failed(self, task) -> Task:
+    async def set_failed(self, task):
         """Set task status to failed.
 
         :param task: the task to update
@@ -163,8 +159,6 @@ class TaskCRUDService(BaseService):
         updates = {'status': task.status, 'completed': task.completed, 'post_count': task.post_count}
         statement = sa.update(schema.tasks).where(schema.tasks.c.id == task.id).values(**updates)
         await self.database.execute(statement)
-
-        return task
 
     async def set_post_count(self, task):
         """Set task post count value.
@@ -187,7 +181,7 @@ class TaskExecutor(BaseService):
         """Run all tasks one after another."""
 
         while task := await self.task_crud_service.get_next():
-            task = await self.task_crud_service.set_in_progress(task)
+            await self.task_crud_service.set_in_progress(task)
             logger.debug(f'Executing task: {task}')
 
             try:
@@ -199,10 +193,10 @@ class TaskExecutor(BaseService):
                     await self._run_time_range_task(task)
                 else:
                     raise NotImplemented('Unrecognized task type')
-                task = await self.task_crud_service.set_succeeded(task)
+                await self.task_crud_service.set_succeeded(task)
                 logger.info(f'Task succeeded: {task}')
             except Exception as e:
-                task = await self.task_crud_service.set_failed(task)
+                await self.task_crud_service.set_failed(task)
                 logger.error(f'Task failed: {task}, {e}', exc_info=True)
 
     async def _sleep(self):
