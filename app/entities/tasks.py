@@ -10,6 +10,7 @@ from .enums import TaskType, TaskStatus
 class Task(BaseModel):
     id: UUID
     username: Optional[str]
+    user_display_name: Optional[str]
     type: TaskType
     status: TaskStatus
     created: datetime

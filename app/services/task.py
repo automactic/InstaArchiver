@@ -74,7 +74,7 @@ class TaskCRUDService(BaseService):
         condition = []
         if status:
             condition.append(schema.tasks.c.status.in_(status))
-        base_query = schema.tasks.select().where(sa.and_(*condition)).cte('base_query')
+        base_query = schema.tasks.select().where(*condition).cte('base_query')
 
         # build count query
         count_query = sa.select(sa.func.count().label('total_count')).select_from(base_query).cte('count_query')
@@ -82,19 +82,22 @@ class TaskCRUDService(BaseService):
         # build final query
         order_by_clause = base_query.c.created.asc() if is_ascending else base_query.c.created.desc()
         query = sa.select(
-            base_query.c.id.label('id'),
-            base_query.c.username.label('username'),
-            base_query.c.type.label('type'),
-            base_query.c.status.label('status'),
-            base_query.c.created.label('created'),
-            base_query.c.started.label('started'),
-            base_query.c.completed.label('completed'),
-            base_query.c.post_count.label('post_count'),
-            base_query.c.time_range_start.label('time_range_start'),
-            base_query.c.time_range_end.label('time_range_end'),
-            count_query.c.total_count.label('total_count'),
+            base_query.c.id,
+            base_query.c.username,
+            schema.profiles.c.display_name.label('user_display_name'),
+            base_query.c.type,
+            base_query.c.status,
+            base_query.c.created,
+            base_query.c.started,
+            base_query.c.completed,
+            base_query.c.post_count,
+            base_query.c.time_range_start,
+            base_query.c.time_range_end,
+            count_query.c.total_count,
         ).select_from(
-            base_query.outerjoin(count_query, sa.sql.true(), full=True)
+            base_query.outerjoin(
+                schema.profiles, base_query.c.username == schema.profiles.c.username, full=False
+            ).outerjoin(count_query, sa.sql.true(), full=True)
         ).order_by(order_by_clause).offset(offset).limit(limit)
 
         # format result
