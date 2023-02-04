@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import random
+import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
@@ -16,6 +17,7 @@ from entities.posts import Post, PostItem, PostListResult, PostArchiveRequest
 from services import schema
 from services.base import BaseService
 from services.profile import ProfileService
+from .exceptions import PostNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +122,34 @@ class PostService(BaseService):
         statement = sa.select([schema.posts.c.shortcode]).where(schema.posts.c.shortcode == shortcode)
         exists_statement = sa.select([sa.exists(statement)])
         return await self.database.fetch_val(query=exists_statement)
+
+    async def update_username(self, shortcode: str, username: str):
+        """Reassign post to another username.
+
+        :param shortcode: shortcode of the post
+        :param username: username the post will be associated with
+        """
+
+        # move files
+        statement = sa.select(schema.posts.c.username, schema.post_items.c.filename) \
+            .select_from(
+                schema.posts.join(schema.post_items, schema.posts.c.shortcode == schema.post_items.c.shortcode)
+            ).where(schema.posts.c.shortcode == shortcode)
+        rows = await self.database.fetch_all(statement)
+        for row in rows:
+            old_path = self.post_dir.joinpath(row['username'], row['filename'])
+            new_path = self.post_dir.joinpath(username)
+            print(old_path, new_path)
+            shutil.move(old_path, new_path)
+
+        # update database
+        statement = sa.update(schema.posts) \
+            .where(schema.posts.c.shortcode == shortcode) \
+            .values(username=username) \
+            .returning(schema.posts.c.shortcode)
+        updated = await self.database.fetch_val(statement)
+        if not updated:
+            raise PostNotFound(shortcode)
 
     async def delete(self, shortcode: str, index: Optional[int] = None):
         """Delete post and post items
