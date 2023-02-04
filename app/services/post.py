@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import random
-import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
@@ -138,8 +137,8 @@ class PostService(BaseService):
         rows = await self.database.fetch_all(statement)
         for row in rows:
             old_path = self.post_dir.joinpath(row['username'], row['filename'])
-            new_path = self.post_dir.joinpath(username)
-            shutil.move(old_path, new_path)
+            new_path = self.post_dir.joinpath(username, row['filename'])
+            old_path.rename(new_path)
 
         # update database
         statement = sa.update(schema.posts) \
