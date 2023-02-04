@@ -105,7 +105,10 @@ def create_post_from_saved(request: PostArchiveRequest.FromSaved, background_tas
 
 @app.delete('/api/posts/{shortcode:str}/')
 async def update_post(shortcode: str, request: PostUpdateRequest):
-    await PostService(database, http_session).update_username(shortcode, request.username)
+    try:
+        await PostService(database, http_session).update_username(shortcode, request.username)
+    except PostNotFound:
+        return Response(status_code=HTTPStatus.NOT_FOUND)
 
 
 @app.delete('/api/posts/{shortcode:str}/')
