@@ -51,7 +51,7 @@ export class ProfileService {
   }
 
   list() {
-    let url = `${environment.apiRoot}/api/profiles/`;
+    let url = `${environment.apiRoot}/api/profiles/?limit=200`;
     return this.httpClient.get<ListProfilesResponse>(url);
   }
 
