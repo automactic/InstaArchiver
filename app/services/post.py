@@ -139,7 +139,6 @@ class PostService(BaseService):
         for row in rows:
             old_path = self.post_dir.joinpath(row['username'], row['filename'])
             new_path = self.post_dir.joinpath(username)
-            print(old_path, new_path)
             shutil.move(old_path, new_path)
 
         # update database
