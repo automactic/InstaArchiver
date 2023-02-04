@@ -46,5 +46,5 @@ class PostArchiveRequest:
         count: Optional[int] = None  # number of most recent posts to archive before stopping
 
 
-class PostUpdateRequest:
+class PostUpdateRequest(BaseModel):
     username: str
