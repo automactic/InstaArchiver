@@ -103,7 +103,7 @@ def create_post_from_saved(request: PostArchiveRequest.FromSaved, background_tas
     return Response(status_code=HTTPStatus.ACCEPTED)
 
 
-@app.delete('/api/posts/{shortcode:str}/')
+@app.patch('/api/posts/{shortcode:str}/')
 async def update_post(shortcode: str, request: PostUpdateRequest):
     try:
         await PostService(database, http_session).update_username(shortcode, request.username)
