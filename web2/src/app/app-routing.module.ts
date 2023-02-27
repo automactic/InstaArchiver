@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PostDetailComponent } from './post-detail/post-detail.component';
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
 
 const routes: Routes = [
