@@ -6,10 +6,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
-  NbThemeModule,
+  NbButtonModule,
+  NbIconModule,
   NbLayoutModule,
   NbListModule,
   NbSidebarModule,
+  NbThemeModule,
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
@@ -23,10 +25,12 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    NbThemeModule.forRoot({ name: window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'default' }),
+    NbButtonModule,
+    NbIconModule,
     NbLayoutModule,
     NbListModule,
     NbSidebarModule.forRoot(),
+    NbThemeModule.forRoot({ name: window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'default' }),
     NbUserModule,
     NbEvaIconsModule
   ],

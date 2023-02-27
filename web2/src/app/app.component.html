@@ -1,6 +1,9 @@
 <nb-layout>
   <nb-layout-header fixed>
-    <button nbButton status="success" size="tiny" (click)="toggle()">Toggle</button>
+    <button nbButton ghost status="primary" size="large" (click)="toggle()">
+      <nb-icon icon="menu-outline"></nb-icon>
+    </button>
+    <h4>InstaArchiver</h4>
   </nb-layout-header>
   <nb-layout-column></nb-layout-column>
   <nb-sidebar responsive [(state)]="sidebarState">
