@@ -1,6 +1,7 @@
 @forward '@nebular/theme/styles/theming';
 @use '@nebular/theme/styles/theming' as *;
 @use '@nebular/theme/styles/themes/default';
+@use '@nebular/theme/styles/themes/dark';
 
 $nb-themes: nb-register-theme((
 
@@ -17,3 +18,9 @@ $nb-themes: nb-register-theme((
   // color-primary-900: #091c7a,
 
 ), default, default);
+
+$nb-themes: nb-register-theme(
+  (),
+  dark,
+  dark
+);

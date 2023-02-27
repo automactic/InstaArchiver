@@ -19,7 +19,7 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    NbThemeModule.forRoot({ name: 'default' }),
+    NbThemeModule.forRoot({ name: window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'default'}),
     NbLayoutModule,
     NbSidebarModule.forRoot(),
     NbEvaIconsModule
