@@ -5,6 +5,7 @@ div.container {
   gap: 1rem;
   height: calc(100vh - 5rem);
   overflow: scroll;
+  position: fixed;
 
   @media (max-width: 1500px) {
     padding: 0.5rem;

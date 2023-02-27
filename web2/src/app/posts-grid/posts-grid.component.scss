@@ -8,7 +8,6 @@ div.container {
 div.grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  height: calc(100vh - 5rem);
   overflow: scroll;
   padding: 1rem;
   gap: 1rem;
