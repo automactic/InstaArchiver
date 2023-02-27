@@ -12,12 +12,13 @@ import { ProfileService, ListProfilesResponse } from './services/profile.service
 })
 export class AppComponent {
   title = 'InstaArchiver'
-  response$?: Observable<ListProfilesResponse>;
+  response$?: Observable<ListProfilesResponse>
+  profileService: ProfileService
 
   constructor(
     private sidebarService: NbSidebarService, 
     private themeService: NbThemeService, 
-    private profileService: ProfileService
+    profileService: ProfileService
   ) {
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
       e.matches && this.themeService.changeTheme('default')
@@ -26,6 +27,7 @@ export class AppComponent {
       e.matches && this.themeService.changeTheme('dark')
     })
     this.response$ = profileService.list()
+    this.profileService = profileService
   }
 
   toggle() {

@@ -7,7 +7,12 @@
     <div *ngIf="response$ | async as response">
       <nb-list>
         <nb-list-item *ngFor="let profile of response.profiles">
-          <nb-user size="medium" shape="rectangle" [name]="profile.display_name"></nb-user>
+          <nb-user 
+            size="small" 
+            shape="rectangle" 
+            [name]="profile.display_name"
+            [picture]="profileService.getProfileImagePath(profile.image_filename)"
+          ></nb-user>
         </nb-list-item>
       </nb-list>
     </div>
