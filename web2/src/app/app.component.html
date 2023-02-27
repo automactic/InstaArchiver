@@ -3,7 +3,7 @@
     <button nbButton status="success" size="tiny" (click)="toggle()">Toggle</button>
   </nb-layout-header>
   <nb-layout-column></nb-layout-column>
-  <nb-sidebar>
+  <nb-sidebar responsive [(state)]="sidebarState">
     <div *ngIf="response$ | async as response">
       <nb-list>
         <nb-list-item *ngFor="let profile of response.profiles">
@@ -12,6 +12,7 @@
             shape="rectangle" 
             [name]="profile.display_name"
             [picture]="profileService.getProfileImagePath(profile.image_filename)"
+            [onlyPicture]="sidebarState != 'expanded'"
           ></nb-user>
         </nb-list-item>
       </nb-list>

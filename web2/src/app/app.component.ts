@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { NbSidebarService, NbThemeService } from '@nebular/theme';
+import { NbSidebarService, NbSidebarState, NbThemeService } from '@nebular/theme';
 
 import { ProfileService, ListProfilesResponse } from './services/profile.service';
 
@@ -14,6 +14,7 @@ export class AppComponent {
   title = 'InstaArchiver'
   response$?: Observable<ListProfilesResponse>
   profileService: ProfileService
+  sidebarState: NbSidebarState = 'expanded'
 
   constructor(
     private sidebarService: NbSidebarService, 
