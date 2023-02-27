@@ -11,6 +11,7 @@ div.grid {
   overflow: scroll;
   padding: 1rem;
   gap: 1rem;
+  flex: 13;
 
   @media (max-width: 1500px) {
     padding: 0.5rem;
@@ -37,7 +38,7 @@ div.grid {
 }
 
 div.detail {
-  flex: 1;
+  flex: 7;
   min-width: 25rem;
   max-width: 45rem;
 }

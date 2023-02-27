@@ -2,11 +2,11 @@
 
 @include nb-install-component() {
   nb-sidebar nb-list-item:hover {
-    background-color: nb-theme(color-primary-hover);
+    background-color: nb-theme(color-primary-transparent-hover);
   }
     
   nb-sidebar nb-list-item.active {
-    background-color: nb-theme(color-primary-active);
+    background-color: nb-theme(color-primary-transparent-active);
   }
 }
 
