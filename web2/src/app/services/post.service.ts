@@ -10,6 +10,7 @@ export interface Post {
   shortcode: string
   username: string
   timestamp: Date
+  type: string
   caption: string
 	items: PostItem[]
 }

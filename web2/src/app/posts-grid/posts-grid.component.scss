@@ -5,29 +5,44 @@ div.container {
   align-items: flex-start;
 }
 
-div.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  overflow: scroll;
-  padding: 1rem;
-  gap: 1rem;
-  flex: 13;
 
-  @media (max-width: 1500px) {
-    padding: 0.5rem;
-    gap: 0.5rem;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 0.75;
-    object-fit: cover;
-    border-radius: 0.25rem;
-  }
-}
 
 @include nb-install-component() {
+  div.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    overflow: scroll;
+    padding: 1rem;
+    gap: 1rem;
+    flex: 13;
+  
+    @media (max-width: 1500px) {
+      padding: 0.5rem;
+      gap: 0.5rem;
+    }
+  
+    img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 0.75;
+      object-fit: cover;
+      border-radius: 0.25rem;
+    }
+  
+    div.item {
+      position: relative;
+    }
+  
+    div.overlay {
+      position: absolute;
+      right: 0.25rem;
+      top: 0.25rem;
+      z-index: 2;
+      padding: 0.1rem;
+      border-radius: 0.25rem;
+      background-color: nb-theme(color-basic-400);
+    }
+  }
   .active {
     border: none;
     border-radius: 0.25rem;
