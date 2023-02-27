@@ -15,4 +15,14 @@ export class PostDetailComponent {
   constructor(private route: ActivatedRoute, postService: PostService) {
     this.postService = postService
   }
+
+  deleteItem(shortcode: string, itemIndex: number) {
+    this.postService.delete(shortcode, itemIndex).subscribe(_ => {
+      this.post?.items.forEach((item, index, array) => {
+        if (item.index == itemIndex) {
+          array.splice(index, 1)
+        }
+      })
+    })
+  }
 }

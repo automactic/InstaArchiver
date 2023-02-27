@@ -68,6 +68,7 @@ export class PostService {
 
   delete(shortcode: string, itemIndex: number) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
+    return this.httpClient.delete(url)
     // return this.httpClient.delete(url).pipe(
     //   tap(_ => {
     //     let post = this.posts.get(shortcode)
@@ -84,11 +85,11 @@ export class PostService {
     //         queryParamsHandling: 'merge' 
     //       })
     //     } else {
-    //       post?.items.forEach((item, index, array) => {
-    //         if (item.index == itemIndex) {
-    //           array.splice(index, 1)
-    //         }
-    //       })
+          // post?.items.forEach((item, index, array) => {
+          //   if (item.index == itemIndex) {
+          //     array.splice(index, 1)
+          //   }
+          // })
     //     }
     //   })
     // )

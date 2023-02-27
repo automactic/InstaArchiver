@@ -4,10 +4,10 @@
     <video mat-card-image *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
       <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
     </video>
-    <nb-card-footer>
+    <nb-card-footer class="media">
       <button nbButton ghost><nb-icon icon="star"></nb-icon></button>
       <div>Index: {{ index }}</div>
-      <button nbButton ghost status="danger"><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <button nbButton ghost status="danger" (click)="deleteItem(post.shortcode, item.index)"><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
   <nb-card>
