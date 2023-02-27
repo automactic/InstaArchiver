@@ -16,17 +16,24 @@ div.container {
 nb-card {
   img {
     width: 100%;
-    border-radius: 4px 4px;
+    border-radius: 4px 4px 0 0;
   }
   
   video {
     max-width: 100%;
     max-height: 60rem;
-    border-radius: 4px 4px;
+    border-radius: 4px 4px 0 0;
   }
 
   nb-card-header {
     display: flex;
     justify-content: space-between;
+  }
+
+  nb-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 1rem;
   }
 }
