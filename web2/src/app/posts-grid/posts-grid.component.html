@@ -1,6 +1,11 @@
 <div class="container">
   <div *ngIf="response$ | async as response" class="grid">
-    <div *ngFor="let post of response.posts" [routerLink]="[post.shortcode]" routerLinkActive="active">
+    <div 
+      *ngFor="let post of response.posts" 
+      [routerLink]="[post.shortcode]" 
+      queryParamsHandling="merge"
+      routerLinkActive="active"
+    >
       <img *ngIf="post.items[0].type == 'image'" loading="lazy"
         [src]="postService.getMediaPath(post.username, post.items[0].filename)">
       <img *ngIf="post.items[0].type == 'video'" loading="lazy"
