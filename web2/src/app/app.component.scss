@@ -9,3 +9,17 @@
     background-color: nb-theme(color-primary-active);
   }
 }
+
+nb-layout-header {
+  h4 {
+    width: 12.75rem;
+    @media (max-width: 1500px) {
+      width: 12.25rem;
+    }
+  }
+
+  div.filter {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
