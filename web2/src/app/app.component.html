@@ -5,11 +5,15 @@
     </button>
     <h4>InstaArchiver</h4>
   </nb-layout-header>
-  <nb-layout-column></nb-layout-column>
+  <nb-layout-column><router-outlet></router-outlet></nb-layout-column>
   <nb-sidebar responsive [(state)]="sidebarState">
     <div *ngIf="response$ | async as response">
       <nb-list>
-        <nb-list-item *ngFor="let profile of response.profiles">
+        <nb-list-item 
+          *ngFor="let profile of response.profiles"
+          [routerLink]="['/', profile.username]"
+          routerLinkActive="active"
+        >
           <nb-user 
             size="small" 
             shape="rectangle" 
