@@ -4,6 +4,7 @@
 @use '@nebular/theme/styles/themes/dark';
 
 $nb-themes: nb-register-theme((
+  card-margin-bottom: 0,
   layout-padding: 0,  
   list-item-padding: 0.75rem,
   user-name-text-font-weight: 600,
@@ -12,6 +13,7 @@ $nb-themes: nb-register-theme((
 ), default, default);
 
 $nb-themes: nb-register-theme((
+  card-margin-bottom: 0,
   layout-padding: 0,
   list-item-padding: 0.75rem,
   user-name-text-font-weight: 600,

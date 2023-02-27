@@ -1,1 +1,26 @@
-<p>post-detail works!</p>
+<div class="container" *ngIf="post else notFound">
+  <nb-card *ngFor="let item of post.items; index as index">
+    <img mat-card-image *ngIf="item.type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, item.filename)">
+    <video mat-card-image *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
+      <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
+    </video>
+    <nb-card-footer>Actions...</nb-card-footer>
+  </nb-card>
+  <nb-card>
+    <nb-card-header>
+      <div>{{ post.username }}</div>
+      <div>{{ post.timestamp | date }}</div>
+    </nb-card-header>
+    <nb-card-body>{{ post.caption }}</nb-card-body>
+    <nb-card-footer>{{ post.shortcode }}</nb-card-footer>
+  </nb-card>
+</div>
+<ng-template #notFound>
+  <div class="container">
+    <nb-card>
+      <nb-card-body>
+        Post cannot be found
+      </nb-card-body>
+    </nb-card>
+  </div>
+</ng-template>

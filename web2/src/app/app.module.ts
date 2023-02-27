@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   NbButtonModule,
+  NbCardModule,
   NbIconModule,
   NbLayoutModule,
   NbListModule,
@@ -30,6 +31,7 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     NbButtonModule,
+    NbCardModule,
     NbIconModule,
     NbLayoutModule,
     NbListModule,
