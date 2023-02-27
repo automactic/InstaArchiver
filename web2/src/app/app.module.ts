@@ -16,11 +16,13 @@ import {
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
+import { PostDetailComponent } from './post-detail/post-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PostsGridComponent
+    PostsGridComponent,
+    PostDetailComponent
   ],
   imports: [
     BrowserModule,
