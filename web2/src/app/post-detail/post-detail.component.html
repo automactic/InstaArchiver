@@ -4,7 +4,7 @@
     <video mat-card-image *ngIf="item.type == 'video'" preload="none" controls muted [poster]="postService.getPosterPath(post.username, item.thumb_image_filename)">
       <source [src]="postService.getMediaPath(post.username, item.filename)" type="video/mp4">
     </video>
-    <nb-card-footer>Actions...</nb-card-footer>
+    <nb-card-footer>Index: {{ index }}</nb-card-footer>
   </nb-card>
   <nb-card>
     <nb-card-header>

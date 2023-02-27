@@ -2,7 +2,8 @@
   <div *ngIf="response$ | async as response" class="grid">
     <div 
       *ngFor="let post of response.posts" 
-      [routerLink]="[post.shortcode]" 
+      [routerLink]="[]"
+      [queryParams]="{selected: post.shortcode}" 
       queryParamsHandling="merge"
       routerLinkActive="active"
     >
@@ -16,6 +17,6 @@
     </ng-template>
   </div>
   <div class="detail">
-    <router-outlet></router-outlet>
+    <post-detail *ngIf="selectedPost$ | async as selectedPost" [post]="selectedPost"></post-detail>
   </div>
 </div>

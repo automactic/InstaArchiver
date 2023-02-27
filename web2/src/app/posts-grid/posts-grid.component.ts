@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { filter, combineLatestWith, switchMap, tap } from 'rxjs/operators';
+import { filter, combineLatestWith, switchMap, tap, map } from 'rxjs/operators';
 
-import { PostService, ListPostsResponse } from '../services/post.service';
+import { PostService, ListPostsResponse, Post } from '../services/post.service';
 
 
 @Component({
@@ -12,10 +12,11 @@ import { PostService, ListPostsResponse } from '../services/post.service';
   styleUrls: ['./posts-grid.component.scss']
 })
 export class PostsGridComponent {
-  username?: string;
+  username?: string
   year?: string
   month?: string
-  response$?: Observable<ListPostsResponse>;
+  response$: Observable<ListPostsResponse>
+  selectedPost$: Observable<Post | undefined>
   postService: PostService;
 
   constructor(private route: ActivatedRoute, postService: PostService) {
@@ -37,6 +38,16 @@ export class PostsGridComponent {
       }),
       switchMap(_ => {
         return postService.list(0, 100, this.username, this.year, this.month)
+      })
+    )
+    this.selectedPost$ = this.route.queryParamMap.pipe(
+      map(queryParams => {
+        let selected = queryParams.get('selected')
+        if (selected) {
+          return this.postService.get(selected)
+        } else {
+          return undefined;
+        }
       })
     )
   }
