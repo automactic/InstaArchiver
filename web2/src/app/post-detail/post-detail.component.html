@@ -18,7 +18,7 @@
     <nb-card-body>{{ post.caption }}</nb-card-body>
     <nb-card-footer class="media">
       <div class="shortcode">{{ post.shortcode }}</div>
-      <button nbButton ghost status="danger" (click)="deletePost(post.shortcode)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <button nbButton ghost status="danger" (click)="postService.deletePost(post.shortcode)"><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
 </div>

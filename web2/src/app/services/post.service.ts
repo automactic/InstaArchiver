@@ -70,7 +70,27 @@ export class PostService {
 
   deletePost(shortcode: string) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/`;
-    return this.httpClient.delete(url)
+    this.httpClient.delete(url).subscribe(_ => {
+      this.posts.delete(shortcode)
+      this.shortcodes.forEach((item, index, array) => {
+        if (item == shortcode) {
+          array.splice(index, 1)
+          if (index == array.length - 1) {
+            this.router.navigate([], { 
+              relativeTo: this.route, 
+              queryParams: { selected: null }, 
+              queryParamsHandling: 'merge' 
+            })
+          } else {
+            this.router.navigate([], { 
+              relativeTo: this.route, 
+              queryParams: { selected: this.shortcodes[index + 1] }, 
+              queryParamsHandling: 'merge' 
+            })
+          }
+        }
+      })
+    })
   }
 
   deleteItem(shortcode: string, itemIndex: number) {
@@ -80,17 +100,17 @@ export class PostService {
     //   tap(_ => {
     //     let post = this.posts.get(shortcode)
     //     if (post?.items.length == 1) {
-    //       this.posts.delete(shortcode)
-    //       this.shortcodes.forEach((item, index, array) => {
-    //         if (item == shortcode) {
-    //           array.splice(index, 1)
-    //         }
-    //       })
-    //       this.router.navigate([], { 
-    //         relativeTo: this.route, 
-    //         queryParams: { selected: null }, 
-    //         queryParamsHandling: 'merge' 
-    //       })
+          // this.posts.delete(shortcode)
+          // this.shortcodes.forEach((item, index, array) => {
+          //   if (item == shortcode) {
+          //     array.splice(index, 1)
+          //   }
+          // })
+          // this.router.navigate([], { 
+          //   relativeTo: this.route, 
+          //   queryParams: { selected: null }, 
+          //   queryParamsHandling: 'merge' 
+          // })
     //     } else {
           // post?.items.forEach((item, index, array) => {
           //   if (item.index == itemIndex) {

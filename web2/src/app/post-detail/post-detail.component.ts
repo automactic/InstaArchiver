@@ -16,12 +16,6 @@ export class PostDetailComponent {
     this.postService = postService
   }
 
-  deletePost(shortcode: string) {
-    this.postService.deletePost(shortcode).subscribe(_ => {
-
-    })
-  }
-
   deleteItem(shortcode: string, itemIndex: number) {
     this.postService.deleteItem(shortcode, itemIndex).subscribe(_ => {
       this.post?.items.forEach((item, index, array) => {
