@@ -7,7 +7,7 @@
     <nb-card-footer class="media">
       <button nbButton ghost><nb-icon icon="star"></nb-icon></button>
       <div>Index: {{ index }}</div>
-      <button nbButton ghost status="danger" (click)="deleteItem(post.shortcode, item.index)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <button nbButton ghost status="danger" (click)="postService.deleteItem(post.shortcode, item.index)"><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
   <nb-card>

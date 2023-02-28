@@ -94,32 +94,19 @@ export class PostService {
   }
 
   deleteItem(shortcode: string, itemIndex: number) {
-    let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
-    return this.httpClient.delete(url)
-    // return this.httpClient.delete(url).pipe(
-    //   tap(_ => {
-    //     let post = this.posts.get(shortcode)
-    //     if (post?.items.length == 1) {
-          // this.posts.delete(shortcode)
-          // this.shortcodes.forEach((item, index, array) => {
-          //   if (item == shortcode) {
-          //     array.splice(index, 1)
-          //   }
-          // })
-          // this.router.navigate([], { 
-          //   relativeTo: this.route, 
-          //   queryParams: { selected: null }, 
-          //   queryParamsHandling: 'merge' 
-          // })
-    //     } else {
-          // post?.items.forEach((item, index, array) => {
-          //   if (item.index == itemIndex) {
-          //     array.splice(index, 1)
-          //   }
-          // })
-    //     }
-    //   })
-    // )
+    let post = this.posts.get(shortcode)
+    if (post?.items.length == 1) {
+      this.deletePost(shortcode)
+    } else {
+      let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
+      this.httpClient.delete(url).subscribe(_ => {
+        post?.items.forEach((item, index, array) => {
+          if (item.index == itemIndex) {
+            array.splice(index, 1)
+          }
+        })
+      })
+    }
   }
 
   getMediaPath(username: string, filename: string): string {
