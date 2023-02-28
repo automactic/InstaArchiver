@@ -36,6 +36,7 @@ export interface ListPostsResponse {
 })
 export class PostService {
   private posts = new Map<string, Post>()
+  shortcodes: string[] = []
 
   constructor(
     private httpClient: HttpClient,
@@ -56,9 +57,9 @@ export class PostService {
     }
     return this.httpClient.get<ListPostsResponse>(url, {params: params}).pipe(
       tap(response => {
-        response.posts.forEach(post => {
-          this.posts.set(post.shortcode, post)
-        })
+        this.posts.clear()
+        response.posts.forEach(post => this.posts.set(post.shortcode, post))
+        this.shortcodes = response.posts.map(post => post.shortcode)
       })
     );
   }
