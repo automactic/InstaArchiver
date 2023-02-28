@@ -16,7 +16,10 @@
       <div>{{ post.timestamp | date }}</div>
     </nb-card-header>
     <nb-card-body>{{ post.caption }}</nb-card-body>
-    <nb-card-footer>{{ post.shortcode }}</nb-card-footer>
+    <nb-card-footer class="media">
+      <div class="shortcode">{{ post.shortcode }}</div>
+      <button nbButton ghost status="danger" (click)="deletePost(post.shortcode)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+    </nb-card-footer>
   </nb-card>
 </div>
 <ng-template #notFound>

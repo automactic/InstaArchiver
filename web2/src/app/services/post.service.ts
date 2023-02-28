@@ -67,7 +67,12 @@ export class PostService {
     return this.posts.get(shortcode)
   }
 
-  delete(shortcode: string, itemIndex: number) {
+  deletePost(shortcode: string) {
+    let url = `${environment.apiRoot}/api/posts/${shortcode}/`;
+    return this.httpClient.delete(url)
+  }
+
+  deleteItem(shortcode: string, itemIndex: number) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
     return this.httpClient.delete(url)
     // return this.httpClient.delete(url).pipe(
