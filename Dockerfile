@@ -1,4 +1,4 @@
-FROM node:18 AS web
+FROM node:19 AS web
 
 RUN npm install -g @angular/cli
 COPY web /web
