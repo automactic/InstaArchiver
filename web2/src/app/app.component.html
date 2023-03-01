@@ -50,13 +50,15 @@
           [queryParams]="{selected: null}" 
           queryParamsHandling="merge"
           routerLinkActive="active"
+          [nbTooltip]="profile.display_name"
+          [nbTooltipDisabled]="sidebarState != 'compacted'"
         >
           <nb-user 
             size="small" 
             shape="rectangle" 
             [name]="profile.display_name"
             [picture]="profileService.getProfileImagePath(profile.image_filename)"
-            [onlyPicture]="sidebarState != 'expanded'"
+            [onlyPicture]="sidebarState == 'compacted'"
           ></nb-user>
         </nb-list-item>
       </nb-list>

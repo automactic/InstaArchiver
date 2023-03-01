@@ -14,6 +14,7 @@ import {
   NbSelectModule,
   NbSidebarModule,
   NbThemeModule,
+  NbTooltipModule,
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
@@ -39,6 +40,7 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
     NbSelectModule,
     NbSidebarModule.forRoot(),
     NbThemeModule.forRoot({ name: window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'default' }),
+    NbTooltipModule,
     NbUserModule,
     NbEvaIconsModule
   ],
