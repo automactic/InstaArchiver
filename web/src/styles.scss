@@ -1,12 +1,13 @@
 @use 'themes' as *;
+
 @use '@nebular/theme/styles/globals' as *;
+
 @include nb-install() {
   @include nb-theme-global();
-}
+};
 
-.nb-theme-default nb-sidebar .scrollable {
-    padding: 0;
-}
-.nb-theme-dark nb-sidebar .scrollable {
-  padding: 0;
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+  }
 }

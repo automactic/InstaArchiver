@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PostsComponent } from './posts/posts.component';
+import { PostsGridComponent } from './posts-grid/posts-grid.component';
 
 const routes: Routes = [
-  { path: 'posts', component: PostsComponent },
-  { path: '',   redirectTo: '/posts', pathMatch: 'full' },
+  { path: 'posts', component: PostsGridComponent },
+  { path: ':username', component: PostsGridComponent },
+  { path: '**', redirectTo: '/posts'},
 ];
 
 @NgModule({
@@ -13,4 +14,3 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
- 

@@ -10,6 +10,7 @@ export interface Post {
   shortcode: string
   username: string
   timestamp: Date
+  type: string
   caption: string
 	items: PostItem[]
 }
@@ -57,7 +58,7 @@ export class PostService {
     return this.httpClient.get<ListPostsResponse>(url, {params: params}).pipe(
       tap(response => {
         this.posts.clear()
-        response.posts.forEach(post => { this.posts.set(post.shortcode, post) })
+        response.posts.forEach(post => this.posts.set(post.shortcode, post))
         this.shortcodes = response.posts.map(post => post.shortcode)
       })
     );
@@ -67,32 +68,45 @@ export class PostService {
     return this.posts.get(shortcode)
   }
 
-  delete(shortcode: string, itemIndex: number) {
-    let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
-    return this.httpClient.delete(url).pipe(
-      tap(_ => {
-        let post = this.posts.get(shortcode)
-        if (post?.items.length == 1) {
-          this.posts.delete(shortcode)
-          this.shortcodes.forEach((item, index, array) => {
-            if (item == shortcode) {
-              array.splice(index, 1)
-            }
-          })
-          this.router.navigate([], { 
-            relativeTo: this.route, 
-            queryParams: { selected: null }, 
-            queryParamsHandling: 'merge' 
-          })
-        } else {
-          post?.items.forEach((item, index, array) => {
-            if (item.index == itemIndex) {
-              array.splice(index, 1)
-            }
-          })
+  deletePost(shortcode: string) {
+    let url = `${environment.apiRoot}/api/posts/${shortcode}/`;
+    this.httpClient.delete(url).subscribe(_ => {
+      this.posts.delete(shortcode)
+      this.shortcodes.forEach((item, index, array) => {
+        if (item == shortcode) {
+          array.splice(index, 1)
+          if (index == array.length - 1) {
+            this.router.navigate([], { 
+              relativeTo: this.route, 
+              queryParams: { selected: null }, 
+              queryParamsHandling: 'merge' 
+            })
+          } else {
+            this.router.navigate([], { 
+              relativeTo: this.route, 
+              queryParams: { selected: this.shortcodes[index + 1] }, 
+              queryParamsHandling: 'merge' 
+            })
+          }
         }
       })
-    )
+    })
+  }
+
+  deleteItem(shortcode: string, itemIndex: number) {
+    let post = this.posts.get(shortcode)
+    if (post?.items.length == 1) {
+      this.deletePost(shortcode)
+    } else {
+      let url = `${environment.apiRoot}/api/posts/${shortcode}/${itemIndex}/`;
+      this.httpClient.delete(url).subscribe(_ => {
+        post?.items.forEach((item, index, array) => {
+          if (item.index == itemIndex) {
+            array.splice(index, 1)
+          }
+        })
+      })
+    }
   }
 
   getMediaPath(username: string, filename: string): string {
