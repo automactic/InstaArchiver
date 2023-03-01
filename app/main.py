@@ -13,7 +13,7 @@ from fastapi.responses import Response, FileResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
-from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest
+from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
@@ -101,6 +101,14 @@ def create_post_from_saved(request: PostArchiveRequest.FromSaved, background_tas
     service = PostService(database, http_session)
     background_tasks.add_task(service.archive_saved, request.count)
     return Response(status_code=HTTPStatus.ACCEPTED)
+
+
+@app.patch('/api/posts/{shortcode:str}/')
+async def update_post(shortcode: str, request: PostUpdateRequest):
+    try:
+        await PostService(database, http_session).update_username(shortcode, request.username)
+    except PostNotFound:
+        return Response(status_code=HTTPStatus.NOT_FOUND)
 
 
 @app.delete('/api/posts/{shortcode:str}/')
