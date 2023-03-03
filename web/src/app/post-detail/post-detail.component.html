@@ -42,8 +42,8 @@
       <p>This action is not recoverable.</p>
     </nb-card-body>
     <nb-card-footer class="confirmation">
-      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
       <button nbButton status="danger" size="small" (click)="deleteItem(ref, data.shortcode, data.itemIndex)">Delete</button>
+      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
     </nb-card-footer>
   </nb-card>
 </ng-template>
