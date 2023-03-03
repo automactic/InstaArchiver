@@ -16,7 +16,7 @@ export class PostsGridComponent {
   year?: string
   month?: string
   response$: Observable<ListPostsResponse>
-  selectedPost$: Observable<Post>
+  selectedPost$: Observable<Post | null>
   postService: PostService;
 
   constructor(private route: ActivatedRoute, postService: PostService) {
@@ -51,7 +51,7 @@ export class PostsGridComponent {
             return this.postService.getPost(selectedShortcode)
           }
         } else {
-          return new Observable<Post>()
+          return new BehaviorSubject(null)
         }
       })
     )
