@@ -33,18 +33,18 @@ class PostService(BaseService):
         offset: int = 0,
         limit: int = 10,
         username: Optional[str] = None,
-        shortcode: Optional[str] = None,
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
+        shortcode: Optional[str] = None,
     ) -> PostListResult:
         """List posts.
 
         :param offset: the number of posts to skip
         :param limit: the number of posts to fetch
         :param username: username of post owner to filter
-        :param shortcode: shortcode of post to filter
         :param start_time: the start of creation time to filter posts
         :param end_time: the end of creation time to filter posts
+        :param shortcode: shortcode of post to filter
         :return: the list query result
         """
 
@@ -52,14 +52,14 @@ class PostService(BaseService):
         condition = []
         if username:
             condition.append(schema.posts.c.username == username)
-        if shortcode:
-            condition.append(schema.posts.c.shortcode == shortcode)
         if start_time:
             start_time = datetime.utcfromtimestamp(start_time.timestamp())
             condition.append(schema.posts.c.timestamp >= start_time)
         if end_time:
             end_time = datetime.utcfromtimestamp(end_time.timestamp())
             condition.append(schema.posts.c.timestamp < end_time)
+        if shortcode:
+            condition.append(schema.posts.c.shortcode == shortcode)
         base_cte = schema.posts.select().where(*condition).cte('base')
 
         # build post and count cte
