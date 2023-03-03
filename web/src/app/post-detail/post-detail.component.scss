@@ -25,9 +25,13 @@ nb-card {
     border-radius: 4px 4px 0 0;
   }
 
-  nb-card-header {
+  nb-card-header.media {
     display: flex;
     justify-content: space-between;
+  }
+
+  nb-card-body.media {
+    overflow-wrap: anywhere;
   }
 
   nb-card-footer.media {

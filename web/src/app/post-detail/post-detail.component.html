@@ -14,11 +14,11 @@
     </nb-card-footer>
   </nb-card>
   <nb-card>
-    <nb-card-header>
+    <nb-card-header class="media">
       <div>{{ post.username }}</div>
       <div>{{ post.timestamp | date }}</div>
     </nb-card-header>
-    <nb-card-body>{{ post.caption }}</nb-card-body>
+    <nb-card-body class="media">{{ post.caption }}</nb-card-body>
     <nb-card-footer class="media">
       <div class="shortcode">{{ post.shortcode }}</div>
       <button 
