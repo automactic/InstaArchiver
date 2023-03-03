@@ -1,5 +1,5 @@
 <div class="container">
-  <div *ngIf="response$ | async as response" class="grid">
+  <div *ngIf="response$ | async as response; else loading" class="grid">
     <ng-template ngFor let-shortcode [ngForOf]="postService.shortcodes">
       <div 
         *ngIf="postService.getCached(shortcode) as post"
@@ -25,6 +25,14 @@
       <div *ngFor="let i of [].constructor(10)"></div>
     </ng-template>
   </div>
+  <ng-template #loading>
+    <div class="loading">
+      <nb-card [nbSpinner]="true" nbSpinnerSize="medium" nbSpinnerStatus="info">
+        <nb-card-body></nb-card-body>
+      </nb-card>
+      <h5>Loading Posts ...</h5>
+    </div>
+  </ng-template>
   <div class="detail">
     <post-detail *ngIf="selectedPost$ | async as selectedPost" [post]="selectedPost"></post-detail>
   </div>

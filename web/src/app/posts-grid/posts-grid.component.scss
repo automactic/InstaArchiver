@@ -50,6 +50,19 @@ div.container {
   }
 }
 
+div.loading {
+  flex: 13;
+  height: calc(100vh - 5rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+
+  nb-card {
+    padding: 0.5rem 0;
+  }
+}
+
 div.detail {
   flex: 7;
   min-width: 30rem;
