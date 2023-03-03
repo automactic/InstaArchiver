@@ -2,9 +2,9 @@
   <div *ngIf="response$ | async as response" class="grid">
     <ng-template ngFor let-shortcode [ngForOf]="postService.shortcodes">
       <div 
-        *ngIf="postService.get(shortcode) as post"
+        *ngIf="postService.getCached(shortcode) as post"
         [routerLink]="[]"
-        [queryParams]="{selected: post.shortcode}" 
+        [queryParams]="{selected: post.shortcode}"
         queryParamsHandling="merge"
         routerLinkActive="active"
         class="item"

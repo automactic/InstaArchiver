@@ -64,7 +64,12 @@ export class PostService {
     );
   }
 
-  get(shortcode: string) {
+  getPost(shortcode: string) {
+    let url = `${environment.apiRoot}/api/posts/${shortcode}/`
+    return this.httpClient.get<Post>(url)
+  }
+
+  getCached(shortcode: string) {
     return this.posts.get(shortcode)
   }
 
