@@ -16,6 +16,9 @@ nb-layout-header {
     @media (max-width: 1500px) {
       width: 12.25rem;
     }
+    @media (max-width: 75rem) {
+      display: none;
+    }
   }
 
   div.filter {
