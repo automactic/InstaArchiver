@@ -5,8 +5,6 @@ div.container {
   align-items: flex-start;
 }
 
-
-
 @include nb-install-component() {
   div.grid {
     display: grid;
