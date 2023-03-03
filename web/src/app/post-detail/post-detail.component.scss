@@ -35,9 +35,13 @@ nb-card {
     align-items: center;
     justify-content: space-between;
     padding: 0.25rem 1rem;
+    div.shortcode {
+      padding-left: 0.5rem;
+    }
   }
 
-  div.shortcode {
-    padding-left: 0.5rem;
-  }
+  nb-card-footer.confirmation {
+    display: flex;
+    justify-content: space-between;
+  }  
 }

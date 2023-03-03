@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, TemplateRef } from '@angular/core';
 
-import { NbDialogService } from '@nebular/theme';
+import { NbDialogService, NbDialogRef } from '@nebular/theme';
 
 import { Post, PostService } from '../services/post.service';
 
@@ -17,7 +17,11 @@ export class PostDetailComponent {
     this.postService = postService
   }
 
-  deleteItem(shortcode: string, itemIndex: number) {
-    // this.dialogService.open(DialogTemplateComponent)
+  showDeleteItemConfirmation(dialog: TemplateRef<any>, shortcode: string, itemIndex: number) {
+    this.dialogService.open(dialog, { context: {shortcode: shortcode, itemIndex: itemIndex} });
+  }
+
+  deleteItem(dialogRef: NbDialogRef<TemplateRef<any>>, shortcode: string, itemIndex: number) {
+    dialogRef.close()
   }
 }

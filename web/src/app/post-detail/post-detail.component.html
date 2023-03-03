@@ -7,7 +7,10 @@
     <nb-card-footer class="media">
       <button nbButton ghost><nb-icon icon="star"></nb-icon></button>
       <div>Index: {{ index }}</div>
-      <button nbButton ghost status="danger" (click)="deleteItem(post.shortcode, item.index)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <button 
+        nbButton ghost status="danger" 
+        (click)="showDeleteItemConfirmation(deletePostItemConfirmation, post.shortcode, item.index)"
+      ><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
   <nb-card>
@@ -30,4 +33,17 @@
       </nb-card-body>
     </nb-card>
   </div>
+</ng-template>
+<ng-template #deletePostItemConfirmation let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Delete Confirmation</nb-card-header>
+    <nb-card-body>
+      <p>Do you want to delete item {{ data.itemIndex }} of post {{ data.shortcode }}?</p>
+      <p>This action is not recoverable.</p>
+    </nb-card-body>
+    <nb-card-footer class="confirmation">
+      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
+      <button nbButton status="danger" size="small" (click)="deleteItem(ref, data.shortcode, data.itemIndex)">Delete</button>
+    </nb-card-footer>
+  </nb-card>
 </ng-template>
