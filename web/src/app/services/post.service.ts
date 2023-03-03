@@ -84,7 +84,7 @@ export class PostService {
           } else {
             this.router.navigate([], { 
               relativeTo: this.route, 
-              queryParams: { selected: this.shortcodes[index + 1] }, 
+              queryParams: { selected: this.shortcodes[index] }, 
               queryParamsHandling: 'merge' 
             })
           }

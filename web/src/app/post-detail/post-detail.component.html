@@ -21,7 +21,10 @@
     <nb-card-body>{{ post.caption }}</nb-card-body>
     <nb-card-footer class="media">
       <div class="shortcode">{{ post.shortcode }}</div>
-      <button nbButton ghost status="danger" (click)="postService.deletePost(post.shortcode)"><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <button 
+        nbButton ghost status="danger" 
+        (click)="showDeletePostConfirmation(deletePostConfirmation, post.shortcode)"
+      ><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
 </div>
@@ -33,6 +36,19 @@
       </nb-card-body>
     </nb-card>
   </div>
+</ng-template>
+<ng-template #deletePostConfirmation let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Delete Confirmation</nb-card-header>
+    <nb-card-body>
+      <p>Do you want to delete post {{ data.shortcode }}?</p>
+      <p>This action is not recoverable.</p>
+    </nb-card-body>
+    <nb-card-footer class="confirmation">
+      <button nbButton status="danger" size="small" (click)="deletePost(ref, data.shortcode)">Delete</button>
+      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
 </ng-template>
 <ng-template #deletePostItemConfirmation let-data let-ref="dialogRef">
   <nb-card>

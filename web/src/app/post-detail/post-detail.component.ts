@@ -17,6 +17,15 @@ export class PostDetailComponent {
     this.postService = postService
   }
 
+  showDeletePostConfirmation(dialog: TemplateRef<any>, shortcode: string) {
+    this.dialogService.open(dialog, { hasScroll: true, context: {shortcode: shortcode} });
+  }
+
+  deletePost(dialogRef: NbDialogRef<TemplateRef<any>>, shortcode: string) {
+    this.postService.deletePost(shortcode)
+    dialogRef.close()
+  }
+
   showDeleteItemConfirmation(dialog: TemplateRef<any>, shortcode: string, itemIndex: number) {
     this.dialogService.open(dialog, { hasScroll: true, context: {shortcode: shortcode, itemIndex: itemIndex} });
   }
