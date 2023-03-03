@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   NbButtonModule,
   NbCardModule,
+  NbDialogModule,
   NbIconModule,
   NbLayoutModule,
   NbListModule,
@@ -34,6 +35,7 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
     BrowserAnimationsModule,
     NbButtonModule,
     NbCardModule,
+    NbDialogModule.forRoot(),
     NbIconModule,
     NbLayoutModule,
     NbListModule,
