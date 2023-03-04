@@ -11,20 +11,6 @@ export interface Profile {
 	display_name: string
 	biography: string
   image_filename: string
-	auto_archive: boolean
-	last_archive_timestamp?: Date
-	posts?: PostsSummary
-}
-
-export interface PostsSummary {
-  count: number
-	earliest_timestamp?: Date
-	latest_timestamp?: Date
-}
-
-export class ProfileConfiguration {
-  display_name = ""
-  auto_archive = false
 }
 
 export interface ListProfilesResponse {
@@ -41,14 +27,7 @@ export class ProfileService {
   profiles: Profile[] = []
   display_names = new Map<string, string>();
 
-  constructor(private httpClient: HttpClient) {
-    this.list().subscribe(response_data => {
-      this.profiles = response_data.profiles
-      response_data.profiles.forEach(profile => {
-        this.display_names.set(profile.username, profile.display_name);
-      })
-    })
-  }
+  constructor(private httpClient: HttpClient) {}
 
   list() {
     let url = `${environment.apiRoot}/api/profiles/?limit=200`;

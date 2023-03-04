@@ -1,0 +1,39 @@
+@use '../themes.scss' as *;
+
+nb-layout-header {
+  h4 {
+    width: 12.75rem;
+    @media (max-width: 1500px) {
+      width: 12.25rem;
+    }
+    @media (max-width: 75rem) {
+      display: none;
+    }
+  }
+
+  div.filter {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+@include nb-install-component() {
+  nb-sidebar nb-list-item:hover {
+    background-color: nb-theme(color-primary-transparent-hover);
+  }
+    
+  nb-sidebar nb-list-item.active {
+    background-color: nb-theme(color-primary-transparent-active);
+  }
+}
+
+nb-sidebar nb-list-item.all-posts {
+  nb-icon {
+    margin: 0.25rem;
+  }
+  div {
+    margin-left: 0.25rem;
+    font-size: 15px;
+    font-weight: 600;
+  }
+}

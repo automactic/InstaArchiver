@@ -35,6 +35,7 @@ class PostService(BaseService):
         username: Optional[str] = None,
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
+        shortcode: Optional[str] = None,
     ) -> PostListResult:
         """List posts.
 
@@ -43,6 +44,7 @@ class PostService(BaseService):
         :param username: username of post owner to filter
         :param start_time: the start of creation time to filter posts
         :param end_time: the end of creation time to filter posts
+        :param shortcode: shortcode of post to filter
         :return: the list query result
         """
 
@@ -56,35 +58,37 @@ class PostService(BaseService):
         if end_time:
             end_time = datetime.utcfromtimestamp(end_time.timestamp())
             condition.append(schema.posts.c.timestamp < end_time)
-        base_query = schema.posts.select().where(sa.and_(*condition)).cte('base_query')
+        if shortcode:
+            condition.append(schema.posts.c.shortcode == shortcode)
+        base_cte = schema.posts.select().where(*condition).cte('base')
 
-        # build post and count query
-        posts_query = base_query.select().order_by(base_query.c.timestamp.desc()) \
-            .offset(offset).limit(limit).cte('posts_query')
-        count_query = sa.select(sa.func.count().label('total_count')).select_from(base_query).cte('count_query')
+        # build post and count cte
+        posts_cte = base_cte.select().order_by(base_cte.c.timestamp.desc()) \
+            .offset(offset).limit(limit).cte('posts')
+        count_cte = sa.select(sa.func.count().label('total_count')).select_from(base_cte).cte('count')
 
         # build final query
         query = sa.select(
-            posts_query.c.shortcode.label('shortcode'),
-            posts_query.c.username.label('username'),
-            posts_query.c.timestamp.label('timestamp'),
-            posts_query.c.type.label('type'),
-            posts_query.c.caption.label('caption'),
-            posts_query.c.caption_hashtags.label('caption_hashtags'),
-            posts_query.c.caption_mentions.label('caption_mentions'),
+            posts_cte.c.shortcode,
+            posts_cte.c.username,
+            posts_cte.c.timestamp,
+            posts_cte.c.type,
+            posts_cte.c.caption,
+            posts_cte.c.caption_hashtags,
+            posts_cte.c.caption_mentions,
             schema.post_items.c.index.label('item_index'),
             schema.post_items.c.type.label('item_type'),
             schema.post_items.c.duration.label('item_duration'),
             schema.post_items.c.filename.label('item_filename'),
             schema.post_items.c.thumb_image_filename.label('item_thumb_image_filename'),
-            count_query.c.total_count.label('total_count'),
+            count_cte.c.total_count.label('total_count'),
         ).select_from(
-            posts_query.outerjoin(
+            posts_cte.outerjoin(
                 schema.post_items,
-                posts_query.c.shortcode == schema.post_items.c.shortcode,
+                posts_cte.c.shortcode == schema.post_items.c.shortcode,
                 full=False,
-            ).outerjoin(count_query, sa.sql.true(), full=True)
-        ).order_by(posts_query.c.timestamp.desc(), schema.post_items.c.index.asc())
+            ).outerjoin(count_cte, sa.sql.true(), full=True)
+        ).order_by(posts_cte.c.timestamp.desc(), schema.post_items.c.index.asc())
 
         # format the results
         posts, count = [], 0
@@ -111,6 +115,16 @@ class PostService(BaseService):
 
         return PostListResult(posts=posts, limit=limit, offset=offset, count=count)
 
+    async def get(self, shortcode: str) -> Optional[Post]:
+        """Retrieve post.
+
+        :param shortcode: shortcode of post to retrieve
+        :return: the retrieved post
+        """
+
+        result = await self.list(shortcode=shortcode)
+        return result.posts[0] if result.posts else None
+
     async def exists(self, shortcode: str) -> bool:
         """Check if a post exists.
 
@@ -118,8 +132,8 @@ class PostService(BaseService):
         :return: if the post exists
         """
 
-        statement = sa.select([schema.posts.c.shortcode]).where(schema.posts.c.shortcode == shortcode)
-        exists_statement = sa.select([sa.exists(statement)])
+        select_statement = sa.select(schema.posts.c.shortcode).where(schema.posts.c.shortcode == shortcode)
+        exists_statement = sa.select(sa.exists(select_statement))
         return await self.database.fetch_val(query=exists_statement)
 
     async def update_username(self, shortcode: str, username: str):

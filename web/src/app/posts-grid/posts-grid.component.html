@@ -1,14 +1,39 @@
 <div class="container">
-  <ng-template ngFor let-shortcode [ngForOf]="postService.shortcodes">
-    <div 
-      *ngIf="postService.get(shortcode) as post"
-      [routerLink]="['/posts']"
-      [queryParams]="{selected: shortcode}" 
-      [queryParamsHandling]="'merge'"
-      routerLinkActive="active"
-    >
-      <img *ngIf="post.items[0].type == 'image'" loading="lazy" [src]="postService.getMediaPath(post.username, post.items[0].filename)">
-      <img *ngIf="post.items[0].type == 'video'" loading="lazy" [src]="postService.getPosterPath(post.username, post.items[0].thumb_image_filename)">  
+  <div *ngIf="response$ | async as response; else loading" class="grid">
+    <ng-template ngFor let-shortcode [ngForOf]="postService.shortcodes">
+      <div 
+        *ngIf="postService.getCached(shortcode) as post"
+        [routerLink]="[]"
+        [queryParams]="{selected: post.shortcode}"
+        queryParamsHandling="merge"
+        routerLinkActive="active"
+        class="item"
+      >
+        <img *ngIf="post.items[0].type == 'image'" loading="lazy"
+          [src]="postService.getMediaPath(post.username, post.items[0].filename)">
+        <img *ngIf="post.items[0].type == 'video'" loading="lazy"
+          [src]="postService.getPosterPath(post.username, post.items[0].thumb_image_filename)">
+        <div class="overlay" *ngIf="post.type == 'video'">
+          <nb-icon status="basic" icon="film-outline"></nb-icon>
+        </div>
+        <div class="overlay" *ngIf="post.type == 'sidecar'">
+          <nb-icon status="basic" icon="layers-outline"></nb-icon>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template [ngIf]="response.posts.length < 5">
+      <div *ngFor="let i of [].constructor(10)"></div>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <div class="loading">
+      <nb-card [nbSpinner]="true" nbSpinnerSize="medium" nbSpinnerStatus="info">
+        <nb-card-body></nb-card-body>
+      </nb-card>
+      <h5>Loading Posts ...</h5>
     </div>
   </ng-template>
+  <div class="detail">
+    <post-detail *ngIf="selectedPost$ | async as selectedPost" [post]="selectedPost"></post-detail>
+  </div>
 </div>

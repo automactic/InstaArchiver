@@ -8,9 +8,6 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
-        },
-        "@schematics/angular:application": {
-          "strict": true
         }
       },
       "root": "",
@@ -31,7 +28,6 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@nebular/theme/styles/prebuilt/default.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -41,8 +37,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1mb",
-                  "maximumError": "2mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -107,6 +103,5 @@
         }
       }
     }
-  },
-  "defaultProject": "InstaArchiver"
+  }
 }

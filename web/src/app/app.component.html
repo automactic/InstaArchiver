@@ -1,1 +1,80 @@
-<router-outlet></router-outlet>
+<nb-layout>
+  <nb-layout-header fixed>
+    <button nbButton ghost status="primary" size="large" (click)="toggle()">
+      <nb-icon icon="menu-outline"></nb-icon>
+    </button>
+    <h4>InstaArchiver</h4>
+    <div class="filter">
+      <nb-select 
+        placeholder="All Years" 
+        [(selected)]="year" 
+        (selectedChange)="selectedYearChanged($event)"
+      >
+        <nb-option>All Years</nb-option>
+        <nb-option value="2023">2023</nb-option>
+        <nb-option value="2022">2022</nb-option>
+        <nb-option value="2021">2021</nb-option>
+        <nb-option value="2020">2020</nb-option>
+        <nb-option value="2019">2019</nb-option>
+        <nb-option value="2018">2018</nb-option>
+      </nb-select>
+      <nb-select 
+        placeholder="All Months"
+        [disabled]="year == undefined"
+        [(selected)]="month"
+        (selectedChange)="selectedMonthChanged($event)"
+      >
+        <nb-option>All Months</nb-option>
+        <nb-option value="1">January</nb-option>
+        <nb-option value="2">February</nb-option>
+        <nb-option value="3">March</nb-option>
+        <nb-option value="4">April</nb-option>
+        <nb-option value="5">May</nb-option>
+        <nb-option value="6">June</nb-option>
+        <nb-option value="7">July</nb-option>
+        <nb-option value="8">August</nb-option>
+        <nb-option value="9">September</nb-option>
+        <nb-option value="10">October</nb-option>
+        <nb-option value="11">November</nb-option>
+        <nb-option value="12">December</nb-option>
+      </nb-select>
+    </div>
+  </nb-layout-header>
+  <nb-layout-column><router-outlet></router-outlet></nb-layout-column>
+  <nb-sidebar responsive [(state)]="sidebarState">
+    <div *ngIf="response$ | async as response">
+      <nb-list>
+        <nb-list-item 
+          routerLink="/posts"
+          [queryParams]="{selected: null}" 
+          queryParamsHandling="merge"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          nbTooltip="All Posts"
+          [nbTooltipDisabled]="sidebarState != 'compacted'"
+          class="all-posts"
+        >
+          <nb-icon icon="grid"></nb-icon>
+          <div *ngIf="sidebarState != 'compacted'">All Posts</div>
+        </nb-list-item>
+        <nb-list-item 
+          *ngFor="let profile of response.profiles"
+          [routerLink]="['/', profile.username]"
+          [queryParams]="{selected: null}" 
+          queryParamsHandling="merge"
+          routerLinkActive="active"
+          [nbTooltip]="profile.display_name"
+          [nbTooltipDisabled]="sidebarState != 'compacted'"
+        >
+          <nb-user 
+            size="small" 
+            shape="rectangle" 
+            [name]="profile.display_name"
+            [picture]="profileService.getProfileImagePath(profile.image_filename)"
+            [onlyPicture]="sidebarState == 'compacted'"
+          ></nb-user>
+        </nb-list-item>
+      </nb-list>
+    </div>
+  </nb-sidebar>
+ </nb-layout>

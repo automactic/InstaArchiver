@@ -13,7 +13,7 @@ from fastapi.responses import Response, FileResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
-from entities.posts import PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
+from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
 from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
@@ -73,13 +73,18 @@ async def get_profile_statistics():
 
 @app.get('/api/posts/', response_model=PostListResult)
 async def list_posts(
-    offset: Optional[int] = 0,
+    offset: int = 0,
     limit: int = 10,
     username: Optional[str] = None,
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
 ):
     return await PostService(database, http_session).list(offset, limit, username, start_time, end_time)
+
+
+@app.get('/api/posts/{shortcode:str}/', response_model=Post)
+async def get_post(shortcode: str):
+    return await PostService(database, http_session).get(shortcode)
 
 
 @app.post('/api/posts/from_shortcode/')

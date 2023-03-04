@@ -1,40 +1,59 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { filter, switchMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { filter, combineLatestWith, switchMap, tap, map } from 'rxjs/operators';
 
-import { PostService } from '../services/post.service';
+import { PostService, ListPostsResponse, Post } from '../services/post.service';
+
 
 @Component({
-  selector: 'posts-grid',
+  selector: 'app-posts-grid',
   templateUrl: './posts-grid.component.html',
   styleUrls: ['./posts-grid.component.scss']
 })
 export class PostsGridComponent {
-  postService: PostService
-
   username?: string
   year?: string
   month?: string
+  response$: Observable<ListPostsResponse>
+  selectedPost$: Observable<Post | null>
+  postService: PostService;
 
-  constructor(
-    private route: ActivatedRoute,
-    postService: PostService,
-  ) {
+  constructor(private route: ActivatedRoute, postService: PostService) {
     this.postService = postService
-    this.route.queryParamMap.pipe(
-      filter(queryParams => {
+    this.response$ = this.route.paramMap.pipe(
+      combineLatestWith(this.route.queryParamMap),
+      filter(([params, queryParams]) => {
         return (
-          queryParams.get('username') != this.username ||
+          this.username == undefined || 
+          params.get('username') != this.username || 
           queryParams.get('year') != this.year ||
           queryParams.get('month') != this.month
         )
       }),
-      switchMap(queryParams => {
-        this.username = queryParams.get('username') ?? undefined
+      tap(([params, queryParams]) => {
+        this.username = params.get('username') ?? undefined
         this.year = queryParams.get('year') ?? undefined
         this.month = queryParams.get('month') ?? undefined
-        return this.postService.list(0, 96, this.username, this.year, this.month)
+      }),
+      switchMap(_ => {
+        return postService.list(0, 100, this.username, this.year, this.month)
       })
-    ).subscribe()
+    )
+    this.selectedPost$ = this.route.queryParamMap.pipe(
+      switchMap(queryParams => {
+        let selectedShortcode = queryParams.get('selected')
+        if (selectedShortcode) {
+          let cachedPost = this.postService.getCached(selectedShortcode)
+          if (cachedPost) {
+            return new BehaviorSubject<Post>(cachedPost)
+          } else {
+            return this.postService.getPost(selectedShortcode)
+          }
+        } else {
+          return new BehaviorSubject(null)
+        }
+      })
+    )
   }
 }

@@ -3,11 +3,20 @@
 @use '@nebular/theme/styles/themes/default';
 @use '@nebular/theme/styles/themes/dark';
 
-$nb-themes: nb-register-theme(
-  (
-    color-basic-hover: color-basic-700,
-    color-basic-active: color-basic-600,
-  ),
-  dark,
-  dark
-);
+$nb-themes: nb-register-theme((
+  card-margin-bottom: 0,
+  layout-padding: 0,  
+  list-item-padding: 0.75rem,
+  user-name-text-font-weight: 600,
+  user-small-name-text-font-size: 15px,
+  sidebar-padding: 0,
+), default, default);
+
+$nb-themes: nb-register-theme((
+  card-margin-bottom: 0,
+  layout-padding: 0,
+  list-item-padding: 0.75rem,
+  user-name-text-font-weight: 600,
+  user-small-name-text-font-size: 15px,
+  sidebar-padding: 0,
+), dark, dark);
