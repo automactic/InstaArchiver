@@ -8,11 +8,11 @@ div.container {
 @include nb-install-component() {
   div.grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
     overflow: scroll;
     padding: 1rem;
     gap: 1rem;
-    flex: 13;
+    flex: 12;
   
     @media (max-width: 1500px) {
       padding: 0.5rem;
@@ -51,7 +51,7 @@ div.container {
 }
 
 div.loading {
-  flex: 13;
+  flex: 12;
   height: calc(100vh - 5rem);
   display: flex;
   justify-content: center;
@@ -64,7 +64,7 @@ div.loading {
 }
 
 div.detail {
-  flex: 7;
+  flex: 8;
   min-width: 30rem;
   max-width: 45rem;
 }
