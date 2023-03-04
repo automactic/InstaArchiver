@@ -45,6 +45,19 @@
     <div *ngIf="response$ | async as response">
       <nb-list>
         <nb-list-item 
+          routerLink="/posts"
+          [queryParams]="{selected: null}" 
+          queryParamsHandling="merge"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          nbTooltip="All Posts"
+          [nbTooltipDisabled]="sidebarState != 'compacted'"
+          class="all-posts"
+        >
+          <nb-icon icon="grid"></nb-icon>
+          <div>All Posts</div>
+        </nb-list-item>
+        <nb-list-item 
           *ngFor="let profile of response.profiles"
           [routerLink]="['/', profile.username]"
           [queryParams]="{selected: null}" 
