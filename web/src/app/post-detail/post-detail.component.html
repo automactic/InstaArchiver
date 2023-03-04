@@ -21,10 +21,16 @@
     <nb-card-body class="media">{{ post.caption }}</nb-card-body>
     <nb-card-footer class="media">
       <div class="shortcode">{{ post.shortcode }}</div>
-      <button 
-        nbButton ghost status="danger" 
-        (click)="showDeletePostConfirmation(deletePostConfirmation, post.shortcode)"
-      ><nb-icon icon="trash-2-outline"></nb-icon></button>
+      <div class="buttons">
+        <button 
+          nbButton ghost status="warning" 
+          (click)="showUpdatePostUsernameConfirmation(updatePostUsernameConfirmation, post.shortcode)"
+        ><nb-icon icon="edit-2-outline"></nb-icon></button>
+        <button 
+          nbButton ghost status="danger" 
+          (click)="showDeletePostConfirmation(deletePostConfirmation, post.shortcode)"
+        ><nb-icon icon="trash-2-outline"></nb-icon></button>
+      </div>
     </nb-card-footer>
   </nb-card>
 </div>
@@ -59,6 +65,17 @@
     </nb-card-body>
     <nb-card-footer class="confirmation">
       <button nbButton status="danger" size="small" (click)="deleteItem(ref, data.shortcode, data.itemIndex)">Delete</button>
+      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
+<ng-template #updatePostUsernameConfirmation let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Change User</nb-card-header>
+    <nb-card-body>
+      <p>Do you want to associate post <i>{{ data.shortcode }}</i> with a different user?</p>
+    </nb-card-body>
+    <nb-card-footer class="confirmation">
       <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
     </nb-card-footer>
   </nb-card>

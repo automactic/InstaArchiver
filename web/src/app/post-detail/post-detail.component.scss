@@ -38,9 +38,10 @@ nb-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.25rem 1rem;
-    div.shortcode {
-      padding-left: 0.5rem;
+    padding: 0.25rem 1rem 0.25rem 1.5rem;
+    div.buttons {
+      display: flex;
+      gap: 0.25rem;
     }
   }
 

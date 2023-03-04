@@ -34,4 +34,8 @@ export class PostDetailComponent {
     this.postService.deleteItem(shortcode, itemIndex)
     dialogRef.close()
   }
+
+  showUpdatePostUsernameConfirmation(dialog: TemplateRef<any>, shortcode: string) {
+    this.dialogService.open(dialog, { hasScroll: true, context: {shortcode: shortcode} });
+  }
 }
