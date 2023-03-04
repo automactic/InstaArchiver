@@ -11,7 +11,6 @@ import { ProfileService, ListProfilesResponse } from './services/profile.service
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'InstaArchiver'
   sidebarState: NbSidebarState = 'expanded'
   year?: string
   month?: string

@@ -55,7 +55,7 @@
           class="all-posts"
         >
           <nb-icon icon="grid"></nb-icon>
-          <div>All Posts</div>
+          <div *ngIf="sidebarState != 'compacted'">All Posts</div>
         </nb-list-item>
         <nb-list-item 
           *ngFor="let profile of response.profiles"

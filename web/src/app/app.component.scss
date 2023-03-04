@@ -35,8 +35,5 @@ nb-sidebar nb-list-item.all-posts {
     margin-left: 0.25rem;
     font-size: 15px;
     font-weight: 600;
-    @media (max-width: 75rem) {
-      display: none;
-    }
   }
 }
