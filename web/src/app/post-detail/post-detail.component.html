@@ -9,7 +9,7 @@
       <div>Index: {{ index }}</div>
       <button 
         nbButton ghost status="danger" 
-        (click)="showDeleteItemConfirmation(deletePostItemConfirmation, post.shortcode, item.index)"
+        (click)="showConfirmation(deletePostItemConfirmation, post.shortcode, item.index)"
       ><nb-icon icon="trash-2-outline"></nb-icon></button>
     </nb-card-footer>
   </nb-card>
@@ -24,11 +24,11 @@
       <div class="buttons">
         <button 
           nbButton ghost status="warning" 
-          (click)="showUpdatePostUsernameConfirmation(updatePostUsernameConfirmation, post.shortcode)"
+          (click)="showConfirmation(updatePostUsernameConfirmation, post.shortcode)"
         ><nb-icon icon="edit-2-outline"></nb-icon></button>
         <button 
           nbButton ghost status="danger" 
-          (click)="showDeletePostConfirmation(deletePostConfirmation, post.shortcode)"
+          (click)="showConfirmation(deletePostConfirmation, post.shortcode)"
         ><nb-icon icon="trash-2-outline"></nb-icon></button>
       </div>
     </nb-card-footer>
