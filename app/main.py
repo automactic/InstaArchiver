@@ -14,7 +14,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
 from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
-from entities.profiles import ProfileWithStats, ProfileListResult, ProfileUpdates
+from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates, ProfileWithStats
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
