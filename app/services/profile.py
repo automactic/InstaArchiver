@@ -58,8 +58,8 @@ class ProfileService(BaseService):
         :return: if the profile exists
         """
 
-        statement = sa.select([schema.profiles.c.username]).where(schema.profiles.c.username == username)
-        exists_statement = sa.select([sa.exists(statement)])
+        statement = sa.select(schema.profiles.c.username).where(schema.profiles.c.username == username)
+        exists_statement = sa.select(sa.exists(statement))
         return await self.database.fetch_val(query=exists_statement)
 
     async def list(self, search: Optional[str] = None, offset: int = 0, limit: int = 100) -> ProfileListResult:
@@ -81,16 +81,16 @@ class ProfileService(BaseService):
             ]
             base_query = base_query.where(sa.or_(*conditions))
         base_query = base_query.cte('base_query')
-        count_query = sa.select([sa.func.count().label('total_count')]).select_from(base_query).cte('count_query')
-        query = sa.select([
+        count_query = sa.select(sa.func.count().label('total_count')).select_from(base_query).cte('count_query')
+        query = sa.select(
             base_query.c.username,
             base_query.c.full_name,
             base_query.c.display_name,
             base_query.c.biography,
             base_query.c.image_filename,
             count_query.c.total_count
-        ]).select_from(
-            sa.outerjoin(base_query, count_query, onclause=sa.sql.true(), full=True)
+        ).select_from(
+            base_query.outerjoin(count_query, onclause=sa.sql.true(), full=True)
         ).order_by(base_query.c.display_name).offset(offset).limit(limit)
         rows = await self.database.fetch_all(query)
 
