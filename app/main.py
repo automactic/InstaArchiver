@@ -14,7 +14,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
 from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
-from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
+from entities.profiles import ProfileWithStats, ProfileListResult, ProfileUpdates
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
@@ -46,7 +46,7 @@ async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0,
     return await ProfileService(database, http_session).list(search, offset, limit)
 
 
-@app.get('/api/profiles/{username:str}/', response_model=ProfileDetail)
+@app.get('/api/profiles/{username:str}/', response_model=ProfileWithStats)
 async def get_profile(username: str):
     profile = await ProfileService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
