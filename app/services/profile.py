@@ -175,8 +175,13 @@ class ProfileService(BaseService):
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
 
-    async def get_statistics(self):
+    async def get_statistics(self, username: Optional[str] = None):
         """Get profile statistics."""
+
+        # build conditions
+        conditions = []
+        if username:
+            conditions.append(schema.profiles.c.username == username)
 
         # get data
         profiles = sa.select(
@@ -190,7 +195,7 @@ class ProfileService(BaseService):
             sa.func.count().label('total_count')
         ).select_from(
             schema.profiles.join(schema.posts, schema.profiles.c.username == schema.posts.c.username)
-        ).group_by(schema.profiles.c.username).cte('profiles')
+        ).where(*conditions).group_by(schema.profiles.c.username).cte('profiles')
         quarters = sa.select(
             schema.posts.c.username,
             sa.func.cast(sa.func.date_part('year', schema.posts.c.timestamp), sa.INT).label('year'),
