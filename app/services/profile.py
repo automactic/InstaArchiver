@@ -2,7 +2,7 @@ import asyncio
 import logging
 import shutil
 from datetime import timezone
-from typing import Optional
+from typing import Dict, Optional
 
 import instaloader
 import sqlalchemy as sa
@@ -101,43 +101,10 @@ class ProfileService(BaseService):
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
 
     async def get(self, username: str) -> Optional[ProfileDetail]:
-        """Get a single profile.
+        """Get a single profile."""
 
-        :param username: the username of the profile to get.
-        :return: the profile query result
-        """
-
-        statement = sa.select([
-            schema.profiles.c.username,
-            schema.profiles.c.full_name,
-            schema.profiles.c.display_name,
-            schema.profiles.c.biography,
-            schema.profiles.c.image_filename,
-            sa.func.count(schema.posts.c.shortcode).label('post_count'),
-            sa.func.min(schema.posts.c.timestamp).label('earliest_timestamp'),
-            sa.func.max(schema.posts.c.timestamp).label('latest_timestamp'),
-        ]).select_from(
-            schema.profiles.join(
-                schema.posts, schema.profiles.c.username == schema.posts.c.username
-            )
-        ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
-        result = await self.database.fetch_one(query=statement)
-
-        if result:
-            return ProfileDetail(
-                username=result['username'],
-                full_name=result['full_name'],
-                display_name=result['display_name'],
-                biography=result['biography'],
-                image_filename=result['image_filename'],
-                posts=PostsSummary(
-                    count=result['post_count'],
-                    earliest_timestamp=result['earliest_timestamp'].replace(tzinfo=timezone.utc),
-                    latest_timestamp=result['latest_timestamp'].replace(tzinfo=timezone.utc),
-                )
-            )
-        else:
-            return None
+        profiles = await self.get_statistics(username)
+        return profiles.get(username)
 
     async def update(self, username: str, updates: ProfileUpdates):
         """Update a profile
@@ -175,7 +142,7 @@ class ProfileService(BaseService):
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
 
-    async def get_statistics(self, username: Optional[str] = None):
+    async def get_statistics(self, username: Optional[str] = None) -> Dict[str, ProfileWithStats]:
         """Get profile statistics."""
 
         # build conditions
@@ -183,8 +150,8 @@ class ProfileService(BaseService):
         if username:
             conditions.append(schema.profiles.c.username == username)
 
-        # get data
-        profiles = sa.select(
+        # build profiles and quarters cte
+        profiles_cte = sa.select(
             schema.profiles.c.username,
             schema.profiles.c.full_name,
             schema.profiles.c.display_name,
@@ -196,7 +163,7 @@ class ProfileService(BaseService):
         ).select_from(
             schema.profiles.join(schema.posts, schema.profiles.c.username == schema.posts.c.username)
         ).where(*conditions).group_by(schema.profiles.c.username).cte('profiles')
-        quarters = sa.select(
+        quarters_cte = sa.select(
             schema.posts.c.username,
             sa.func.cast(sa.func.date_part('year', schema.posts.c.timestamp), sa.INT).label('year'),
             sa.func.cast(sa.func.date_part('quarter', schema.posts.c.timestamp), sa.INT).label('quarter'),
@@ -204,30 +171,32 @@ class ProfileService(BaseService):
         ).select_from(schema.posts).group_by(
             schema.posts.c.username, sa.literal_column('year'), sa.literal_column('quarter')
         ).cte('quarters')
+
+        # build query and get data
         statement = sa.select(
-            profiles.c.username,
-            profiles.c.full_name,
-            profiles.c.display_name,
-            profiles.c.biography,
-            profiles.c.image_filename,
-            profiles.c.first_post_timestamp,
-            profiles.c.last_post_timestamp,
-            profiles.c.total_count,
-            quarters.c.year,
-            quarters.c.quarter,
-            quarters.c.count,
+            profiles_cte.c.username,
+            profiles_cte.c.full_name,
+            profiles_cte.c.display_name,
+            profiles_cte.c.biography,
+            profiles_cte.c.image_filename,
+            profiles_cte.c.first_post_timestamp,
+            profiles_cte.c.last_post_timestamp,
+            profiles_cte.c.total_count,
+            quarters_cte.c.year,
+            quarters_cte.c.quarter,
+            quarters_cte.c.count,
         ).select_from(
-            profiles.join(quarters, quarters.c.username == profiles.c.username)
-        ).order_by(profiles.c.display_name)
+            profiles_cte.join(quarters_cte, quarters_cte.c.username == profiles_cte.c.username)
+        ).order_by(profiles_cte.c.display_name)
         rows = await self.database.fetch_all(statement)
 
         # format result
-        statistics = {}
+        profiles = {}
         for row in rows:
             username = row['username']
-            if username not in statistics:
-                statistics[username] = ProfileWithStats(
-                    username=row['username'],
+            if username not in profiles:
+                profiles[username] = ProfileWithStats(
+                    username=username,
                     full_name=row['full_name'],
                     display_name=row['display_name'],
                     biography=row['biography'],
@@ -237,6 +206,6 @@ class ProfileService(BaseService):
                     total_count=row['total_count'],
                     counts={},
                 )
-            statistics[username].counts[f'{row["year"]}-Q{row["quarter"]}'] = row['count']
+            profiles[username].counts[f'{row["year"]}-Q{row["quarter"]}'] = row['count']
 
-        return list(statistics.values())
+        return profiles
