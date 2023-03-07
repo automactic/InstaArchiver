@@ -1,0 +1,7 @@
+div.container {
+  padding: 1rem;
+
+  @media (max-width: 1500px) {
+    padding: 0.5rem;
+  }
+}
