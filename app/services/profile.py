@@ -3,7 +3,7 @@ import logging
 import shutil
 from datetime import timezone
 from typing import Dict, Optional
-
+from collections import defaultdict
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
@@ -204,8 +204,8 @@ class ProfileService(BaseService):
                     first_post_timestamp=row['first_post_timestamp'].replace(tzinfo=timezone.utc),
                     last_post_timestamp=row['last_post_timestamp'].replace(tzinfo=timezone.utc),
                     total_count=row['total_count'],
-                    counts={},
+                    counts=defaultdict(dict),
                 )
-            profiles[username].counts[f'{row["year"]}-Q{row["quarter"]}'] = row['count']
+            profiles[username].counts[str(row['year'])][f'Q{row["quarter"]}'] = row['count']
 
         return profiles
