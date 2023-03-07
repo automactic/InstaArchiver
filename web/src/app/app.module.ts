@@ -17,6 +17,7 @@ import {
   NbSpinnerModule,
   NbThemeModule,
   NbTooltipModule,
+  NbTreeGridModule,
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
@@ -47,6 +48,7 @@ import { ProfileInfoComponent } from './profile-info/profile-info.component';
     NbSpinnerModule,
     NbThemeModule.forRoot({ name: window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'default' }),
     NbTooltipModule,
+    NbTreeGridModule,
     NbUserModule,
     NbEvaIconsModule
   ],

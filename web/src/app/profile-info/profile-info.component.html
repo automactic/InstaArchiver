@@ -1,11 +1,34 @@
 <div class="container">
-  <nb-card>
-    <nb-card-header>Nebula</nb-card-header>
+  <nb-card *ngIf="profile else notFound">
+    <nb-card-header>{{ profile.display_name }}</nb-card-header>
     <nb-card-body>
-      A nebula is an interstellar cloud of dust, hydrogen, helium and other ionized gases.
-      Originally, nebula was a name for any diffuse astronomical object,
-      including galaxies beyond the Milky Way.
+      <table>
+        <tr>
+          <th>Year</th>
+          <th>Q4</th> 
+          <th>Country</th>
+        </tr>
+        <tr>
+          <td>Alfreds Futterkiste</td>
+          <td>Maria Anders</td> 
+          <td>Germany</td>
+        </tr>
+        <tr>
+          <td>Centro comercial Moctezuma</td>
+          <td>Francisco Chang</td> 
+          <td>Mexico</td>
+        </tr>
+      </table>
     </nb-card-body>
-    <nb-card-footer>By Wikipedia</nb-card-footer>
+    <nb-card-footer>{{ profile.username }}</nb-card-footer>
   </nb-card>
 </div>
+<ng-template #notFound>
+  <div class="container">
+    <nb-card>
+      <nb-card-body>
+        Post cannot be found
+      </nb-card-body>
+    </nb-card>
+  </div>
+</ng-template>

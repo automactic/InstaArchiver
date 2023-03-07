@@ -11,6 +11,7 @@ export interface Profile {
 	display_name: string
 	biography: string
   image_filename: string
+  counts: Object
 }
 
 export interface ListProfilesResponse {

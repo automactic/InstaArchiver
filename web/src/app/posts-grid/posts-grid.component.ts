@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { filter, combineLatestWith, switchMap, tap, map } from 'rxjs/operators';
 
 import { PostService, ListPostsResponse, Post } from '../services/post.service';
+import { Profile, ProfileService } from '../services/profile.service';
 
 
 @Component({
@@ -17,9 +18,10 @@ export class PostsGridComponent {
   month?: string
   response$: Observable<ListPostsResponse>
   selectedPost$: Observable<Post | null>
+  selectedProfile$: Observable<Profile | null>
   postService: PostService;
 
-  constructor(private route: ActivatedRoute, postService: PostService) {
+  constructor(private route: ActivatedRoute, postService: PostService, profileService: ProfileService) {
     this.postService = postService
     this.response$ = this.route.paramMap.pipe(
       combineLatestWith(this.route.queryParamMap),
@@ -50,6 +52,17 @@ export class PostsGridComponent {
           } else {
             return this.postService.getPost(selectedShortcode)
           }
+        } else {
+          return new BehaviorSubject(null)
+        }
+      })
+    )
+    this.selectedProfile$ = this.route.paramMap.pipe(
+      switchMap(paramMap => {
+        let selectedUsername = paramMap.get('username')
+        let selectedShortcode = this.route.snapshot.queryParamMap.get('selected')
+        if (selectedUsername && selectedShortcode == null) {
+          return profileService.get(selectedUsername)
         } else {
           return new BehaviorSubject(null)
         }
