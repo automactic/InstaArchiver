@@ -1,7 +1,7 @@
 <div class="container">
   <nb-card *ngIf="profile else notFound">
     <nb-card-header>{{ profile.display_name }}</nb-card-header>
-    <nb-card-body>
+    <nb-card-body class="table-container">
       <table [nbTreeGrid]="postCounts" equalColumnsWidth>
         <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
         <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: allColumns"></tr>
