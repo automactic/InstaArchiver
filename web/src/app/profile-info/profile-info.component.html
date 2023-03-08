@@ -2,22 +2,19 @@
   <nb-card *ngIf="profile else notFound">
     <nb-card-header>{{ profile.display_name }}</nb-card-header>
     <nb-card-body>
-      <table>
-        <tr>
-          <th>Year</th>
-          <th>Q4</th> 
-          <th>Country</th>
-        </tr>
-        <tr>
-          <td>Alfreds Futterkiste</td>
-          <td>Maria Anders</td> 
-          <td>Germany</td>
-        </tr>
-        <tr>
-          <td>Centro comercial Moctezuma</td>
-          <td>Francisco Chang</td> 
-          <td>Mexico</td>
-        </tr>
+      <table [nbTreeGrid]="postCounts" equalColumnsWidth>
+        <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
+        <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: allColumns"></tr>
+        <ng-container nbTreeGridColumnDef="Year">
+          <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{ allColumns[0] }}</th>
+          <td nbTreeGridCell *nbTreeGridCellDef="let row">
+            {{ row.data.year }}
+          </td>
+        </ng-container>
+        <ng-container *ngFor="let column of allColumns.slice(1)" [nbTreeGridColumnDef]="column">
+          <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{column}}</th>
+          <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data[column] }}</td>
+        </ng-container>
       </table>
     </nb-card-body>
     <nb-card-footer>{{ profile.username }}</nb-card-footer>

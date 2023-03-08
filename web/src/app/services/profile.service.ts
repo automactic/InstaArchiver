@@ -11,7 +11,7 @@ export interface Profile {
 	display_name: string
 	biography: string
   image_filename: string
-  counts: Object
+  counts: {[index: string]: {[index: string]: number}}
 }
 
 export interface ListProfilesResponse {
