@@ -40,7 +40,9 @@
       </nb-select>
     </div>
     <div class="trailing">
-      <button nbButton shape="round" size="small" status="info"><nb-icon icon="close"></nb-icon></button>
+      <button nbButton shape="round" size="small" status="info" *ngIf="selectedPost" (click)="deselectPost()">
+        <nb-icon icon="close"></nb-icon>
+      </button>
     </div>
   </nb-layout-header>
   <nb-layout-column><router-outlet></router-outlet></nb-layout-column>

@@ -14,6 +14,7 @@ export class AppComponent {
   sidebarState: NbSidebarState = 'expanded'
   year?: string
   month?: string
+  selectedPost?: string
 
   response$?: Observable<ListProfilesResponse>
   profileService: ProfileService
@@ -34,6 +35,7 @@ export class AppComponent {
     this.route.queryParamMap.subscribe(queryParams => {
       this.year = queryParams.get('year') ?? undefined
       this.month = queryParams.get('month') ?? undefined
+      this.selectedPost = queryParams.get('selected') ?? undefined
     })
     this.response$ = profileService.list()
     this.profileService = profileService
@@ -61,5 +63,9 @@ export class AppComponent {
       queryParams: { month: month }, 
       queryParamsHandling: 'merge' 
     });
+  }
+
+  deselectPost() {
+    this.router.navigate([], {queryParams: {'selected': null}, queryParamsHandling: 'merge'})
   }
 }
