@@ -1,15 +1,13 @@
 <div class="container">
-  <nb-card *ngIf="profile else notFound">
-    <nb-card-header>{{ profile.display_name }}</nb-card-header>
-    <nb-card-body class="table-container">
+  <nb-card *ngIf="profile else notFound" class="post-stats">
+    <nb-card-header>Post Stats</nb-card-header>
+    <nb-card-body>
       <table [nbTreeGrid]="postCounts" equalColumnsWidth>
         <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
         <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: allColumns"></tr>
         <ng-container nbTreeGridColumnDef="Year">
           <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{ allColumns[0] }}</th>
-          <td nbTreeGridCell *nbTreeGridCellDef="let row">
-            {{ row.data.year }}
-          </td>
+          <td nbTreeGridCell *nbTreeGridCellDef="let row"><b>{{ row.data.year }}</b></td>
         </ng-container>
         <ng-container *ngFor="let column of allColumns.slice(1)" [nbTreeGridColumnDef]="column">
           <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{column}}</th>
@@ -17,7 +15,23 @@
         </ng-container>
       </table>
     </nb-card-body>
-    <nb-card-footer>{{ profile.username }}</nb-card-footer>
+    <nb-card-footer>
+      <nb-list>
+        <nb-list-item>
+          <div><b>Total Count</b></div>{{ profile.total_count | number }}
+        </nb-list-item>
+        <nb-list-item>
+          <div><b>Earliest</b></div>{{ profile.first_post_timestamp | date }}
+        </nb-list-item>
+        <nb-list-item>
+          <div><b>Latest</b></div>{{ profile.last_post_timestamp | date }}
+        </nb-list-item>
+      </nb-list>
+    </nb-card-footer>
+  </nb-card>
+  <nb-card *ngIf="profile else notFound">
+    <nb-card-header>Biography</nb-card-header>
+    <nb-card-body>{{ profile.biography }}</nb-card-body>
   </nb-card>
 </div>
 <ng-template #notFound>

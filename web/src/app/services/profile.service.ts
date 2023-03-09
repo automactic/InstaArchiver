@@ -11,6 +11,9 @@ export interface Profile {
 	display_name: string
 	biography: string
   image_filename: string
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
   counts: {[index: string]: {[index: string]: number}}
 }
 

@@ -13,10 +13,32 @@ div.container {
   }
 }
 
-nb-card-body.table-container {
-  padding: 0;
+nb-card.post-stats {
+  nb-card-body, nb-card-footer {
+    padding: 0;
+  }
+
+  th, td {
+    text-align: center;
+  }
+  
+  table {
+    border-style: hidden;
+  }
+
+  nb-list-item:first-child {
+    border-top: 0;
+  }
+
+  nb-list-item:last-child {
+    border-bottom: 0;
+  }
+
+  nb-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
-th, td {
-  text-align: center;
-}
