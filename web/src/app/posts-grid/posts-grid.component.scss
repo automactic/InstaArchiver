@@ -10,7 +10,7 @@ div.container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
     overflow: scroll;
-    padding: 1rem;
+    padding: 1rem 0.25rem 1rem 1rem;
     gap: 1rem;
     flex: 12;
   
