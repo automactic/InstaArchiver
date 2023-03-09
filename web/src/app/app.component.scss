@@ -1,6 +1,8 @@
 @use '../themes.scss' as *;
 
 nb-layout-header {
+  display: flex;
+
   h4 {
     width: 12.75rem;
     @media (max-width: 1500px) {
@@ -14,6 +16,12 @@ nb-layout-header {
   div.filter {
     display: flex;
     gap: 0.5rem;
+  }
+
+  div.trailing {
+    display: flex;
+    flex-direction: row-reverse;
+    flex: 1;
   }
 }
 
