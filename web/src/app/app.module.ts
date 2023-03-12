@@ -21,6 +21,8 @@ import {
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { TimePastPipe } from 'ng-time-past-pipe';
+
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { ProfileInfoComponent } from './profile-info/profile-info.component';
@@ -30,7 +32,7 @@ import { ProfileInfoComponent } from './profile-info/profile-info.component';
     AppComponent,
     PostsGridComponent,
     PostDetailComponent,
-    ProfileInfoComponent
+    ProfileInfoComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,7 +52,8 @@ import { ProfileInfoComponent } from './profile-info/profile-info.component';
     NbTooltipModule,
     NbTreeGridModule,
     NbUserModule,
-    NbEvaIconsModule
+    NbEvaIconsModule,
+    TimePastPipe,
   ],
   providers: [],
   bootstrap: [AppComponent]
