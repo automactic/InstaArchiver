@@ -59,13 +59,19 @@ class TaskCRUDService(BaseService):
         return tasks
 
     async def list(
-        self, offset: int = 0, limit: int = 10, status: List[TaskStatus] = None, is_ascending: bool = True
+        self,
+        offset: int = 0,
+        limit: int = 10,
+        status: List[TaskStatus] = None,
+        username: Optional[str] = None,
+        is_ascending: bool = True,
     ):
         """List tasks.
 
         :param offset: the number of tasks to skip
         :param limit: the number of tasks to fetch
         :param status: task status to filter
+        :param username: task username to filter
         :param is_ascending: if task created earlier should appear in the list first
         :return: list task result
         """
@@ -74,30 +80,32 @@ class TaskCRUDService(BaseService):
         condition = []
         if status:
             condition.append(schema.tasks.c.status.in_(status))
-        base_query = schema.tasks.select().where(*condition).cte('base_query')
+        if username:
+            condition.append(schema.tasks.c.username == username)
+        base_cte = schema.tasks.select().where(*condition).cte('base')
 
         # build count query
-        count_query = sa.select(sa.func.count().label('total_count')).select_from(base_query).cte('count_query')
+        count_cte = sa.select(sa.func.count().label('total_count')).select_from(base_cte).cte('count')
 
         # build final query
-        order_by_clause = base_query.c.created.asc() if is_ascending else base_query.c.created.desc()
+        order_by_clause = base_cte.c.created.asc() if is_ascending else base_cte.c.created.desc()
         query = sa.select(
-            base_query.c.id,
-            base_query.c.username,
+            base_cte.c.id,
+            base_cte.c.username,
             schema.profiles.c.display_name.label('user_display_name'),
-            base_query.c.type,
-            base_query.c.status,
-            base_query.c.created,
-            base_query.c.started,
-            base_query.c.completed,
-            base_query.c.post_count,
-            base_query.c.time_range_start,
-            base_query.c.time_range_end,
-            count_query.c.total_count,
+            base_cte.c.type,
+            base_cte.c.status,
+            base_cte.c.created,
+            base_cte.c.started,
+            base_cte.c.completed,
+            base_cte.c.post_count,
+            base_cte.c.time_range_start,
+            base_cte.c.time_range_end,
+            count_cte.c.total_count,
         ).select_from(
-            base_query.outerjoin(
-                schema.profiles, base_query.c.username == schema.profiles.c.username, full=False
-            ).outerjoin(count_query, sa.sql.true(), full=True)
+            base_cte.outerjoin(
+                schema.profiles, base_cte.c.username == schema.profiles.c.username, full=False
+            ).outerjoin(count_cte, sa.sql.true(), full=True)
         ).order_by(order_by_clause).offset(offset).limit(limit)
 
         # format result

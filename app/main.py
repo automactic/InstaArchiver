@@ -143,8 +143,10 @@ async def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundT
 
 
 @app.get('/api/tasks/', response_model=TaskListResponse)
-async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100):
-    return await TaskCRUDService(database, http_session).list(offset, limit, is_ascending=False)
+async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100, username: Optional[str] = None):
+    return await TaskCRUDService(database, http_session).list(
+        offset, limit, username=username, is_ascending=False
+    )
 
 
 @app.get('/media/{path:path}')
