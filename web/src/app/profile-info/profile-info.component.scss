@@ -13,6 +13,13 @@ div.container {
   }
 }
 
+nb-list-item {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
 nb-card.post-stats {
   nb-card-body, nb-card-footer {
     padding: 0;
@@ -33,12 +40,4 @@ nb-card.post-stats {
   nb-list-item:last-child {
     border-bottom: 0;
   }
-
-  nb-list-item {
-    display: flex;
-    justify-content: space-between;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
 }
-
