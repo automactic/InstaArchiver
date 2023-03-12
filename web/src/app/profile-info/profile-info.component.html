@@ -1,5 +1,5 @@
-<div class="container">
-  <nb-card *ngIf="profile else notFound" class="post-stats">
+<div class="container" *ngIf="profile else notFound">
+  <nb-card class="post-stats">
     <nb-card-header>Post Stats</nb-card-header>
     <nb-card-body>
       <table [nbTreeGrid]="postCounts" equalColumnsWidth>
@@ -29,16 +29,25 @@
       </nb-list>
     </nb-card-footer>
   </nb-card>
-  <nb-card *ngIf="profile else notFound">
+  <nb-card>
+    <nb-card-header>Tasks</nb-card-header>
+    <nb-list>
+      <nb-list-item *ngFor="let fruit of allColumns">
+        {{ fruit }}
+      </nb-list-item>
+    </nb-list>
+  </nb-card>
+  <nb-card>
     <nb-card-header>Biography</nb-card-header>
     <nb-card-body>{{ profile.biography }}</nb-card-body>
   </nb-card>
 </div>
 <ng-template #notFound>
   <div class="container">
-    <nb-card>
+    <nb-card accent="danger" style="width: 100%">
+      <nb-card-header>Error</nb-card-header>
       <nb-card-body>
-        Post cannot be found
+        Profile cannot be found
       </nb-card-body>
     </nb-card>
   </div>
