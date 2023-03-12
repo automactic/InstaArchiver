@@ -33,12 +33,9 @@ class ProfileUpdates(BaseModel):
     display_name: Optional[str]
 
 
-class ProfileWithStats(BaseModel):
+class ProfileStats(BaseModel):
     username: str
-    full_name: str
     display_name: str
-    biography: Optional[str] = None
-    image_filename: str
     first_post_timestamp: Optional[datetime]
     last_post_timestamp: Optional[datetime]
     total_count: int

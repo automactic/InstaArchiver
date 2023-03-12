@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import aiofiles
 import aiohttp
@@ -14,7 +14,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
 from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
-from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates, ProfileWithStats
+from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStats
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
@@ -46,7 +46,7 @@ async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0,
     return await ProfileService(database, http_session).list(search, offset, limit)
 
 
-@app.get('/api/profiles/{username:str}/', response_model=ProfileWithStats)
+@app.get('/api/profiles/{username:str}/', response_model=ProfileStats)
 async def get_profile(username: str):
     profile = await ProfileService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
@@ -66,9 +66,9 @@ async def delete_profile(username: str):
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
-@app.get('/api/profile_statistics/')
-async def get_profile_statistics():
-    stats = await ProfileService(database, http_session).get_statistics()
+@app.get('/api/stats/', response_model=List[ProfileStats])
+async def get_profile_statistics(username: Optional[str] = None):
+    stats = await ProfileService(database, http_session).get_stats(username=username)
     return list(stats.values())
 
 

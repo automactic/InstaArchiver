@@ -1,14 +1,15 @@
 import asyncio
 import logging
 import shutil
+from collections import defaultdict
 from datetime import timezone
 from typing import Dict, Optional
-from collections import defaultdict
+
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileWithStats
+from entities.profiles import Profile, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStats
 from services import schema
 from services.base import BaseService
 
@@ -103,7 +104,7 @@ class ProfileService(BaseService):
     async def get(self, username: str) -> Optional[ProfileDetail]:
         """Get a single profile."""
 
-        profiles = await self.get_statistics(username)
+        profiles = await self.get_stats(username)
         return profiles.get(username)
 
     async def update(self, username: str, updates: ProfileUpdates):
@@ -142,8 +143,8 @@ class ProfileService(BaseService):
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
 
-    async def get_statistics(self, username: Optional[str] = None) -> Dict[str, ProfileWithStats]:
-        """Get profile statistics."""
+    async def get_stats(self, username: Optional[str] = None) -> Dict[str, ProfileStats]:
+        """Get profile stats."""
 
         # build conditions
         conditions = []
@@ -153,10 +154,7 @@ class ProfileService(BaseService):
         # build profiles and quarters cte
         profiles_cte = sa.select(
             schema.profiles.c.username,
-            schema.profiles.c.full_name,
             schema.profiles.c.display_name,
-            schema.profiles.c.biography,
-            schema.profiles.c.image_filename,
             sa.func.min(schema.posts.c.timestamp).label('first_post_timestamp'),
             sa.func.max(schema.posts.c.timestamp).label('last_post_timestamp'),
             sa.func.count().label('total_count')
@@ -175,10 +173,7 @@ class ProfileService(BaseService):
         # build query and get data
         statement = sa.select(
             profiles_cte.c.username,
-            profiles_cte.c.full_name,
             profiles_cte.c.display_name,
-            profiles_cte.c.biography,
-            profiles_cte.c.image_filename,
             profiles_cte.c.first_post_timestamp,
             profiles_cte.c.last_post_timestamp,
             profiles_cte.c.total_count,
@@ -187,25 +182,24 @@ class ProfileService(BaseService):
             quarters_cte.c.count,
         ).select_from(
             profiles_cte.join(quarters_cte, quarters_cte.c.username == profiles_cte.c.username)
-        ).order_by(profiles_cte.c.display_name)
+        ).order_by(profiles_cte.c.display_name, quarters_cte.c.year, quarters_cte.c.quarter)
         rows = await self.database.fetch_all(statement)
 
         # format result
         profiles = {}
         for row in rows:
             username = row['username']
-            if username not in profiles:
-                profiles[username] = ProfileWithStats(
+            stats = profiles.get(
+                username,
+                ProfileStats(
                     username=username,
-                    full_name=row['full_name'],
                     display_name=row['display_name'],
-                    biography=row['biography'],
-                    image_filename=row['image_filename'],
                     first_post_timestamp=row['first_post_timestamp'].replace(tzinfo=timezone.utc),
                     last_post_timestamp=row['last_post_timestamp'].replace(tzinfo=timezone.utc),
                     total_count=row['total_count'],
                     counts=defaultdict(dict),
                 )
-            profiles[username].counts[str(row['year'])][f'Q{row["quarter"]}'] = row['count']
-
+            )
+            stats.counts[str(row['year'])][f'Q{row["quarter"]}'] = row['count']
+            profiles[username] = stats
         return profiles
