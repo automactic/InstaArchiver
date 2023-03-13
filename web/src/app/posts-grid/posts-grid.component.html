@@ -36,7 +36,7 @@
   <div class="detail">
     <post-detail *ngIf="selectedPost$ | async as selectedPost; else profileInfo" [post]="selectedPost"></post-detail>
     <ng-template #profileInfo>
-      <profile-info *ngIf="selectedProfile$ | async as selectedProfile" [profile]="selectedProfile"></profile-info>
+      <profile-info *ngIf="selectedUsername$ | async as selectedUsername" [username]="selectedUsername"></profile-info>
     </ng-template>
   </div>
 </div>

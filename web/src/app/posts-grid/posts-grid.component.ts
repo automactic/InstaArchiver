@@ -18,7 +18,7 @@ export class PostsGridComponent {
   month?: string
   response$: Observable<ListPostsResponse>
   selectedPost$: Observable<Post | null>
-  selectedProfile$: Observable<Profile | null>
+  selectedUsername$: Observable<String | null>
   postService: PostService;
 
   constructor(private route: ActivatedRoute, postService: PostService, profileService: ProfileService) {
@@ -57,16 +57,8 @@ export class PostsGridComponent {
         }
       })
     )
-    this.selectedProfile$ = this.route.paramMap.pipe(
-      switchMap(paramMap => {
-        let selectedUsername = paramMap.get('username')
-        let selectedShortcode = this.route.snapshot.queryParamMap.get('selected')
-        if (selectedUsername && selectedShortcode == null) {
-          return profileService.get(selectedUsername)
-        } else {
-          return new BehaviorSubject(null)
-        }
-      })
+    this.selectedUsername$ = this.route.paramMap.pipe(
+      map(paramMap => paramMap.get('username'))
     )
   }
 }

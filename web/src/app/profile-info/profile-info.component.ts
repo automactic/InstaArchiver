@@ -28,7 +28,7 @@ export class ProfileInfoComponent {
   profileService: ProfileService
   taskService: TaskService
   
-  @Input() profile?: Profile
+  @Input() username?: String
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   stats$: Observable<PostStatNode<PostCount>[]> = new BehaviorSubject([]) 
   tasks$: Observable<ListTasksResponse | null> = new BehaviorSubject(null)
@@ -39,9 +39,9 @@ export class ProfileInfoComponent {
   }
 
   ngOnChanges(changes: any) {
-    let profile = changes.profile.currentValue
-    if (profile) {
-      this.stats$ = this.profileService.getStats(profile.username).pipe(
+    let username = changes.username.currentValue
+    if (username) {
+      this.stats$ = this.profileService.getStats(username).pipe(
         map(stats => {
           if (stats.length > 0) {
             return Object.keys(stats[0].counts).map(key => {
@@ -61,7 +61,7 @@ export class ProfileInfoComponent {
           }
         })
       )
-      this.tasks$ = this.taskService.list(0, 5, profile.username)
+      this.tasks$ = this.taskService.list(0, 5, username)
     } else {
       this.stats$ = new BehaviorSubject([])
       this.tasks$ = new BehaviorSubject(null)
