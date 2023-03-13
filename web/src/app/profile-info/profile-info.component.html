@@ -1,8 +1,8 @@
 <div class="container" *ngIf="profile else notFound">
   <nb-card class="post-stats">
     <nb-card-header>Post Stats</nb-card-header>
-    <nb-card-body>
-      <table [nbTreeGrid]="postCounts" equalColumnsWidth>
+    <nb-card-body *ngIf="stats$ | async as stats">
+      <table [nbTreeGrid]="stats" equalColumnsWidth>
         <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
         <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: allColumns"></tr>
         <ng-container nbTreeGridColumnDef="Year">

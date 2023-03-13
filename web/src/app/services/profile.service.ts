@@ -24,9 +24,17 @@ export interface ListProfilesResponse {
   count: number
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface ProfileStats {
+	username: string
+	display_name: string
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
+  counts: {[index: string]: {[index: string]: number}}
+}
+
+
+@Injectable({providedIn: 'root'})
 export class ProfileService {
   profiles: Profile[] = []
   display_names = new Map<string, string>();
@@ -53,6 +61,15 @@ export class ProfileService {
       }
       this.display_names.set(profile.username, profile.display_name);
     });
+  }
+
+  getStats(username?: string): Observable<[ProfileStats]> {
+    let url = `${environment.apiRoot}/api/stats/`
+    let params: Record<string, string> = {}
+    if (username) { 
+      params['username'] = username 
+    }
+    return this.httpClient.get<[ProfileStats]>(url, {params: params})
   }
 
   getProfileImagePath(filename: string): string {
