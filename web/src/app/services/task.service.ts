@@ -6,6 +6,8 @@ import { environment } from '../../environments/environment'
 export interface Task {
   id: string
   username?: string
+  type: string
+  status: string
   completed? :Date
   post_count?: number
 }

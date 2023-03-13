@@ -26,6 +26,7 @@ import { TimePastPipe } from 'ng-time-past-pipe';
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { ProfileInfoComponent } from './profile-info/profile-info.component';
+import { TaskStatusIconComponent } from './tasks/task-status-icon.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ProfileInfoComponent } from './profile-info/profile-info.component';
     PostsGridComponent,
     PostDetailComponent,
     ProfileInfoComponent,
+    TaskStatusIconComponent,
   ],
   imports: [
     BrowserModule,

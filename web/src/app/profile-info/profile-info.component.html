@@ -33,7 +33,10 @@
     <nb-card-header>Tasks</nb-card-header>
     <nb-list *ngIf="tasks$ | async as tasks">
       <nb-list-item *ngFor="let task of tasks.tasks">
-        <div *ngIf="task.completed">{{ task.completed | timePast }}</div>
+        <div *ngIf="task.completed">
+          <task-status-icon [status]="task.status"></task-status-icon>
+          {{ task.completed | timePast }}
+        </div>
         <div>{{ task.post_count }}</div>
       </nb-list-item>
       <nb-list-item *ngIf="tasks.tasks.length == 0">No Task</nb-list-item>
