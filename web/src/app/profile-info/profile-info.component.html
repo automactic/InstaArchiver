@@ -35,7 +35,7 @@
       <nb-list-item *ngFor="let task of tasks.tasks">
         <div *ngIf="task.completed">
           <task-status-icon [status]="task.status"></task-status-icon>
-          {{ task.completed | timePast }}
+          {{ task.type }} - {{ task.completed | timePast }}
         </div>
         <div>{{ task.post_count }}</div>
       </nb-list-item>
