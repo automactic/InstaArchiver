@@ -24,6 +24,15 @@ export interface ListProfilesResponse {
   count: number
 }
 
+export interface ProfileWithDetails {
+	username: string
+	display_name: string
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
+  counts: {[index: string]: {[index: string]: number}}
+}
+
 export interface ProfileStats {
 	username: string
 	display_name: string
@@ -46,9 +55,9 @@ export class ProfileService {
     return this.httpClient.get<ListProfilesResponse>(url);
   }
 
-  get(username: string): Observable<Profile> {
+  get(username: string): Observable<ProfileWithDetails> {
     let url = `${environment.apiRoot}/api/profiles/${username}/`;
-    return this.httpClient.get<Profile>(url);
+    return this.httpClient.get<ProfileWithDetails>(url);
   }
 
   update(username: string, display_name: string) {
