@@ -14,13 +14,14 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
 from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
-from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStats
+from entities.profiles import ProfileWithDetail, ProfileListResult, ProfileUpdates, ProfileStats
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
-from services.task import TaskCRUDService, TaskExecutor
+from services.task import TaskExecutor
+from services.crud import TaskCRUDService
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
@@ -52,7 +53,7 @@ async def get_profile(username: str):
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
-@app.patch('/api/profiles/{username:str}/', response_model=ProfileDetail)
+@app.patch('/api/profiles/{username:str}/', response_model=ProfileWithDetail)
 async def update_profile(username: str, updates: ProfileUpdates):
     service = ProfileService(database, http_session)
     await service.update(username, updates)

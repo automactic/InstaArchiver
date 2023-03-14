@@ -9,9 +9,12 @@ import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.profiles import Profile, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStats
+from entities.profiles import Profile, BaseStats, ProfileWithDetail, ProfileStats, ProfileListResult, ProfileUpdates
+from entities.tasks import BaseTask
 from services import schema
 from services.base import BaseService
+from services.crud import TaskCRUDService
+
 
 logger = logging.getLogger(__name__)
 
@@ -101,47 +104,27 @@ class ProfileService(BaseService):
 
         return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
 
-    async def get(self, username: str) -> Optional[ProfileDetail]:
+    async def get(self, username: str) -> Optional[ProfileWithDetail]:
         """Get a single profile."""
 
-        profiles = await self.get_stats(username)
-        return profiles.get(username)
+        query = sa.select(
+            schema.profiles.c.username,
+            schema.profiles.c.full_name,
+            schema.profiles.c.display_name,
+            schema.profiles.c.biography,
+            schema.profiles.c.image_filename,
+        ).select_from(schema.profiles).where(schema.profiles.c.username == username)
 
-    async def update(self, username: str, updates: ProfileUpdates):
-        """Update a profile
+        profile_info = await self.database.fetch_one(query)
+        stats = await self.get_stats(username)
+        tasks = await TaskCRUDService(self.database, self.http_session).list(limit=5, username=username)
 
-        :param username: username of the profile to update
-        :param updates: the updates to perform
-        """
-
-        updates = {key: value for key, value in updates if value is not None}
-        if not updates:
-            return
-        statement = sa.update(schema.profiles) \
-            .where(schema.profiles.c.username == username) \
-            .values(**updates)
-        await self.database.execute(statement)
-
-    async def delete(self, username: str):
-        """Delete a profile.
-
-        :param username: username of the profile to delete
-        """
-
-        # delete files
-        try:
-            self.delete_file(self.profile_images_dir, f'{username}.jpg')
-            shutil.rmtree(self.thumb_images_dir.joinpath(username))
-            shutil.rmtree(self.post_dir.joinpath(username))
-        except FileNotFoundError:
-            pass
-
-        # delete records in database
-        schema.profiles.delete()
-        statement = sa.delete(schema.profiles) \
-            .where(schema.profiles.c.username == username) \
-            .returning(schema.profiles.c.username)
-        await self.database.execute(statement)
+        profile = ProfileWithDetail(
+            **dict(profile_info),
+            stats=BaseStats(**stats[username].dict()),
+            tasks=[BaseTask(**task.dict()) for task in tasks.tasks],
+        )
+        return profile
 
     async def get_stats(self, username: Optional[str] = None) -> Dict[str, ProfileStats]:
         """Get profile stats."""
@@ -186,10 +169,10 @@ class ProfileService(BaseService):
         rows = await self.database.fetch_all(statement)
 
         # format result
-        profiles = {}
+        profile_stats = {}
         for row in rows:
             username = row['username']
-            stats = profiles.get(
+            stats = profile_stats.get(
                 username,
                 ProfileStats(
                     username=username,
@@ -201,5 +184,41 @@ class ProfileService(BaseService):
                 )
             )
             stats.counts[str(row['year'])][f'Q{row["quarter"]}'] = row['count']
-            profiles[username] = stats
-        return profiles
+            profile_stats[username] = stats
+        return profile_stats
+
+    async def update(self, username: str, updates: ProfileUpdates):
+        """Update a profile
+
+        :param username: username of the profile to update
+        :param updates: the updates to perform
+        """
+
+        updates = {key: value for key, value in updates if value is not None}
+        if not updates:
+            return
+        statement = sa.update(schema.profiles) \
+            .where(schema.profiles.c.username == username) \
+            .values(**updates)
+        await self.database.execute(statement)
+
+    async def delete(self, username: str):
+        """Delete a profile.
+
+        :param username: username of the profile to delete
+        """
+
+        # delete files
+        try:
+            self.delete_file(self.profile_images_dir, f'{username}.jpg')
+            shutil.rmtree(self.thumb_images_dir.joinpath(username))
+            shutil.rmtree(self.post_dir.joinpath(username))
+        except FileNotFoundError:
+            pass
+
+        # delete records in database
+        schema.profiles.delete()
+        statement = sa.delete(schema.profiles) \
+            .where(schema.profiles.c.username == username) \
+            .returning(schema.profiles.c.username)
+        await self.database.execute(statement)
