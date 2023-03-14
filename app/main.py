@@ -44,7 +44,7 @@ async def shutdown():
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0, limit: Optional[int] = 100):
-    return await ProfileService(database, http_session).list(search, offset, limit)
+    return await ProfileCRUDService(database, http_session).list(search, offset, limit)
 
 
 @app.get('/api/profiles/{username:str}/', response_model=ProfileStats)
