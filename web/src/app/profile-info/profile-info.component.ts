@@ -44,8 +44,8 @@ export class ProfileInfoComponent {
     if (username) {
       this.profile$ = this.profileService.get(username).pipe(
         tap(profile => {
-          this.stats = Object.keys(profile.counts).map(key => {
-            let count = profile.counts[key] ?? {}
+          this.stats = Object.keys(profile.stats.counts).map(key => {
+            let count = profile.stats.counts[key] ?? {}
             return {
               data: {
                 year: key,

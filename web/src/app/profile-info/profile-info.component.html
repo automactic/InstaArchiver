@@ -18,13 +18,13 @@
     <nb-card-footer>
       <nb-list>
         <nb-list-item>
-          <div><b>Total Count</b></div>{{ profile.total_count | number }}
+          <b>Total Count</b>{{ profile.stats.total_count | number }}
         </nb-list-item>
         <nb-list-item>
-          <div><b>Earliest</b></div>{{ profile.first_post_timestamp | date }}
+          <b>Earliest</b>{{ profile.stats.first_post_timestamp | date }}
         </nb-list-item>
         <nb-list-item>
-          <div><b>Latest</b></div>{{ profile.last_post_timestamp | date }}
+          <b>Latest</b>{{ profile.stats.last_post_timestamp | date }}
         </nb-list-item>
       </nb-list>
     </nb-card-footer>
@@ -44,7 +44,7 @@
   </nb-card>
   <nb-card>
     <nb-card-header>Biography</nb-card-header>
-    <!-- <nb-card-body>{{ profile.biography }}</nb-card-body> -->
+    <nb-card-body>{{ profile.biography }}</nb-card-body>
   </nb-card>
 </div>
 <ng-template #notFound>

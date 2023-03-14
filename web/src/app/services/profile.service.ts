@@ -24,24 +24,19 @@ export interface ListProfilesResponse {
   count: number
 }
 
+export interface ProfileStats {
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
+  counts: {[index: string]: {[index: string]: number}}
+}
+
 export interface ProfileWithDetails {
 	username: string
 	display_name: string
-  first_post_timestamp: Date
-  last_post_timestamp: Date
-  total_count: number
-  counts: {[index: string]: {[index: string]: number}}
+  biography: string
+  stats: ProfileStats
 }
-
-export interface ProfileStats {
-	username: string
-	display_name: string
-  first_post_timestamp: Date
-  last_post_timestamp: Date
-  total_count: number
-  counts: {[index: string]: {[index: string]: number}}
-}
-
 
 @Injectable({providedIn: 'root'})
 export class ProfileService {
