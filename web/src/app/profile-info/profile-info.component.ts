@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 
 import { ProfileWithDetails, ProfileService } from '../services/profile.service';
-import { ListTasksResponse, TaskService } from '../services/task.service';
+import { TaskService } from '../services/task.service';
 
 
 interface PostStatNode<T> {
@@ -31,8 +31,7 @@ export class ProfileInfoComponent {
   @Input() username?: String
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   stats: PostStatNode<PostCount>[] = []
-  profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null) 
-  tasks$: Observable<ListTasksResponse | null> = new BehaviorSubject(null)
+  profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null)
 
   constructor(profileService: ProfileService, taskService: TaskService) {
     this.profileService = profileService
@@ -58,11 +57,9 @@ export class ProfileInfoComponent {
           }).sort((lhs, rhs) => lhs.data.year < rhs.data.year ? 1 : -1)
         })
       )
-      this.tasks$ = this.taskService.list(0, 5, username)
     } else {
       this.stats = []
       this.profile$ = new BehaviorSubject(null)
-      this.tasks$ = new BehaviorSubject(null)
     }
   }
 }

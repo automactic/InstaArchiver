@@ -31,15 +31,15 @@
   </nb-card>
   <nb-card class="task-list">
     <nb-card-header>Tasks</nb-card-header>
-    <nb-list *ngIf="tasks$ | async as tasks">
-      <nb-list-item *ngFor="let task of tasks.tasks">
+    <nb-list>
+      <nb-list-item *ngFor="let task of profile.tasks">
         <div *ngIf="task.completed">
           <task-status-icon [status]="task.status"></task-status-icon>
           {{ task.type }} - {{ task.completed | timePast }}
         </div>
         <div>{{ task.post_count }}</div>
       </nb-list-item>
-      <nb-list-item *ngIf="tasks.tasks.length == 0">No Task</nb-list-item>
+      <nb-list-item *ngIf="profile.tasks.length == 0">No Task</nb-list-item>
     </nb-list>
   </nb-card>
   <nb-card>

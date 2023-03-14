@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
+import { Task } from '../services/task.service';
 
 
 export interface Profile {
@@ -36,6 +37,7 @@ export interface ProfileWithDetails {
 	display_name: string
   biography: string
   stats: ProfileStats
+  tasks: Task[]
 }
 
 @Injectable({providedIn: 'root'})
