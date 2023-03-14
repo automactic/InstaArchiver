@@ -47,7 +47,7 @@ async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0,
     return await ProfileCRUDService(database, http_session).list(search, offset, limit)
 
 
-@app.get('/api/profiles/{username:str}/', response_model=ProfileStats)
+@app.get('/api/profiles/{username:str}/', response_model=ProfileWithDetail)
 async def get_profile(username: str):
     profile = await ProfileCRUDService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
