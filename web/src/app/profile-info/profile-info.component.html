@@ -30,7 +30,12 @@
     </nb-card-footer>
   </nb-card>
   <nb-card class="task-list">
-    <nb-card-header>Tasks</nb-card-header>
+    <nb-card-header>
+      Tasks
+      <button nbButton ghost status="warning" [nbContextMenu]="taskActions" nbContextMenuTag="task-actions">
+        <nb-icon icon="plus-circle"></nb-icon>
+      </button>
+    </nb-card-header>
     <nb-list>
       <nb-list-item *ngFor="let task of profile.tasks">
         <div *ngIf="task.completed">

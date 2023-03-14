@@ -41,3 +41,12 @@ nb-card.post-stats {
     border-bottom: 0;
   }
 }
+
+nb-card.task-list {
+  nb-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem 0.5rem 1.5rem;
+  }
+}

@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { NbMenuService } from '@nebular/theme';
+import { Observable, BehaviorSubject, filter, map, tap } from 'rxjs';
 
 import { ProfileWithDetails, ProfileService } from '../services/profile.service';
 import { TaskService } from '../services/task.service';
@@ -30,12 +31,23 @@ export class ProfileInfoComponent {
   
   @Input() username?: String
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
+  taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
   stats: PostStatNode<PostCount>[] = []
   profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null)
 
-  constructor(profileService: ProfileService, taskService: TaskService) {
+  constructor(
+    private nbMenuService: NbMenuService, 
+    profileService: ProfileService, 
+    taskService: TaskService
+  ) {
     this.profileService = profileService
     this.taskService = taskService
+    this.nbMenuService.onItemClick()
+      .pipe(
+        filter(menu => menu.tag === 'task-actions'),
+        map(menu => menu.item.title),
+      )
+      .subscribe(title => this.handleTaskAction(title));
   }
 
   ngOnChanges(changes: any) {
@@ -61,5 +73,9 @@ export class ProfileInfoComponent {
       this.stats = []
       this.profile$ = new BehaviorSubject(null)
     }
+  }
+
+  handleTaskAction(title: String): void {
+    console.log(title)
   }
 }
