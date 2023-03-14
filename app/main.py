@@ -21,7 +21,7 @@ from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
 from services.task import TaskExecutor
-from services.crud import TaskCRUDService
+from services.crud import TaskCRUDService, ProfileCRUDService
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
@@ -49,16 +49,14 @@ async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0,
 
 @app.get('/api/profiles/{username:str}/', response_model=ProfileStats)
 async def get_profile(username: str):
-    profile = await ProfileService(database, http_session).get(username)
+    profile = await ProfileCRUDService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
 @app.patch('/api/profiles/{username:str}/', response_model=ProfileWithDetail)
 async def update_profile(username: str, updates: ProfileUpdates):
-    service = ProfileService(database, http_session)
-    await service.update(username, updates)
-    profile = await service.get(username)
-    return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
+    await ProfileService(database, http_session).update(username, updates)
+    return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
 @app.delete('/api/profiles/{username:str}/')
@@ -69,7 +67,7 @@ async def delete_profile(username: str):
 
 @app.get('/api/stats/', response_model=List[ProfileStats])
 async def get_profile_statistics(username: Optional[str] = None):
-    stats = await ProfileService(database, http_session).get_stats(username=username)
+    stats = await ProfileCRUDService(database, http_session).get_stats(username=username)
     return list(stats.values())
 
 
