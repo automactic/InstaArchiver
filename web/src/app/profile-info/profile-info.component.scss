@@ -52,6 +52,7 @@ nb-card.task-list {
 
   nb-list-item > div {
     display: flex;
+    align-items: center;
     gap: 0.25rem;
   }
 }
