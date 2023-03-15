@@ -4,6 +4,8 @@ import { Component, Input } from '@angular/core';
   selector: 'task-status-icon',
   template: `
     <container-element [ngSwitch]="status">
+      <nb-icon *ngSwitchCase="'pending'" icon="radio-button-off" status="basic" nbTooltip="Pending"></nb-icon>
+      <nb-icon *ngSwitchCase="'in_progress'" icon="radio-button-on" status="info" nbTooltip="In Progress"></nb-icon>
       <nb-icon *ngSwitchCase="'succeeded'" icon="checkmark-circle-2" status="success" nbTooltip="Succeeded"></nb-icon>
       <nb-icon *ngSwitchCase="'failed'" icon="alert-circle" status="danger" nbTooltip="Failed"></nb-icon>
       <nb-icon *ngSwitchDefault icon="question-mark-circle"></nb-icon>

@@ -8,7 +8,9 @@ export interface Task {
   username?: string
   type: string
   status: string
-  completed? :Date
+  created: Date
+  started?: Date
+  completed?: Date
   post_count?: number
 }
 
