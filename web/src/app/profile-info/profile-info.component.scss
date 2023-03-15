@@ -49,4 +49,9 @@ nb-card.task-list {
     justify-content: space-between;
     padding: 0.5rem 1rem 0.5rem 1.5rem;
   }
+
+  nb-list-item > div {
+    display: flex;
+    gap: 0.25rem;
+  }
 }

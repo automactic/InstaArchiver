@@ -33,16 +33,18 @@
     <nb-card-header>
       Tasks
       <button nbButton ghost status="warning" [nbContextMenu]="taskActions" nbContextMenuTag="task-actions">
-        <nb-icon icon="plus-circle"></nb-icon>
+        <nb-icon icon="plus"></nb-icon>
       </button>
     </nb-card-header>
     <nb-list>
       <nb-list-item *ngFor="let task of profile.tasks">
         <div *ngIf="task.completed">
-          <task-status-icon [status]="task.status"></task-status-icon>
           {{ task.type }} - {{ task.completed | timePast }}
         </div>
-        <div>{{ task.post_count }}</div>
+        <div *ngIf="task.post_count">
+          <nb-tag status="info" appearance="outline" size="tiny" [text]="task.post_count.toString()"></nb-tag>
+          <task-status-icon [status]="task.status"></task-status-icon>
+        </div>
       </nb-list-item>
       <nb-list-item *ngIf="profile.tasks.length == 0">No Task</nb-list-item>
     </nb-list>
