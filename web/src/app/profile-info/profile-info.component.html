@@ -38,11 +38,19 @@
     </nb-card-header>
     <nb-list>
       <nb-list-item *ngFor="let task of profile.tasks">
-        <div *ngIf="task.completed">
-          {{ task.type }} - {{ task.completed | timePast }}
+        <div>{{ task.type }} - 
+          <div *ngIf="task.started == null && task.completed == null">
+            Created {{ task.created | timePast }}
+          </div>
+          <div *ngIf="task.started && task.completed == null">
+            Started {{ task.started | timePast }}
+          </div>
+          <div *ngIf="task.started && task.completed">
+            Completed {{ task.completed | timePast }}
+          </div>
         </div>
-        <div *ngIf="task.post_count">
-          <nb-tag status="info" appearance="outline" size="tiny" [text]="task.post_count.toString()"></nb-tag>
+        <div>
+          <nb-tag *ngIf="task.post_count" status="info" appearance="outline" size="tiny" [text]="task.post_count.toString()"></nb-tag>
           <task-status-icon [status]="task.status"></task-status-icon>
         </div>
       </nb-list-item>
