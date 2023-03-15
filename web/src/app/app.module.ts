@@ -30,6 +30,7 @@ import { PostsGridComponent } from './posts-grid/posts-grid.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { ProfileInfoComponent } from './profile-info/profile-info.component';
 import { TaskStatusIconComponent } from './tasks/task-status-icon.component';
+import { TaskTypeIconComponent } from './tasks/task-type-icon.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TaskStatusIconComponent } from './tasks/task-status-icon.component';
     PostDetailComponent,
     ProfileInfoComponent,
     TaskStatusIconComponent,
+    TaskTypeIconComponent,
   ],
   imports: [
     BrowserModule,
