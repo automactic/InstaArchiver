@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 
 import { environment } from '../../environments/environment'
+import { Observable } from 'rxjs'
 
 export interface Task {
   id: string
@@ -32,5 +33,11 @@ export class TaskService {
       params['username'] = username 
     }
     return this.httpClient.get<ListTasksResponse>(url, {params: params})
+  }
+
+  catch_up(usernames: [String]): Observable<null> {
+    let url = `${environment.apiRoot}/api/tasks/`
+    let payload = { type: 'catch_up', 'usernames': usernames }
+    return this.httpClient.post<null>(url, payload)
   }
 }

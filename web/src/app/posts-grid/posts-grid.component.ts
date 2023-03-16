@@ -18,7 +18,7 @@ export class PostsGridComponent {
   month?: string
   response$: Observable<ListPostsResponse>
   selectedPost$: Observable<Post | null>
-  selectedUsername$: Observable<String | null>
+  selectedUsername$: Observable<string | null>
   postService: PostService;
 
   constructor(private route: ActivatedRoute, postService: PostService, profileService: ProfileService) {

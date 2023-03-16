@@ -29,7 +29,7 @@ export class ProfileInfoComponent {
   profileService: ProfileService
   taskService: TaskService
   
-  @Input() username?: String
+  @Input() username?: string
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
   stats: PostStatNode<PostCount>[] = []
@@ -51,7 +51,10 @@ export class ProfileInfoComponent {
   }
 
   ngOnChanges(changes: any) {
-    let username = changes.username.currentValue
+    this.refresh(changes.username.currentValue)
+  }
+
+  refresh(username?: string) {
     if (username) {
       this.profile$ = this.profileService.get(username).pipe(
         tap(profile => {
@@ -77,5 +80,10 @@ export class ProfileInfoComponent {
 
   handleTaskAction(title: String): void {
     console.log(title)
+    if (title == 'Catch Up' && this.username) {
+      this.taskService.catch_up([this.username]).subscribe(_ => {
+        this.refresh(this.username)
+      }) 
+    }
   }
 }
