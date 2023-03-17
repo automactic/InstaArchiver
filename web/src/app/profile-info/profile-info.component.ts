@@ -1,6 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild, TemplateRef } from '@angular/core';
 import { NbMenuService } from '@nebular/theme';
 import { Observable, BehaviorSubject, filter, map, tap } from 'rxjs';
+
+import { NbDialogService, NbDialogRef } from '@nebular/theme';
 
 import { ProfileWithDetails, ProfileService } from '../services/profile.service';
 import { TaskService } from '../services/task.service';
@@ -30,6 +32,7 @@ export class ProfileInfoComponent {
   taskService: TaskService
   
   @Input() username?: string
+  @ViewChild('timeRangeTaskCreationDialog') timeRangeTaskCreationDialog?: TemplateRef<any>
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
   stats: PostStatNode<PostCount>[] = []
@@ -37,6 +40,7 @@ export class ProfileInfoComponent {
 
   constructor(
     private nbMenuService: NbMenuService, 
+    private dialogService: NbDialogService,
     profileService: ProfileService, 
     taskService: TaskService
   ) {
@@ -84,6 +88,8 @@ export class ProfileInfoComponent {
       this.taskService.catch_up([this.username]).subscribe(_ => {
         this.refresh(this.username)
       }) 
+    } else if (title == 'Time Range' && this.username && this.timeRangeTaskCreationDialog) {
+      this.dialogService.open(this.timeRangeTaskCreationDialog)
     }
   }
 }

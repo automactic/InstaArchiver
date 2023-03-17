@@ -73,3 +73,14 @@
     </nb-card>
   </div>
 </ng-template>
+<ng-template #timeRangeTaskCreationDialog let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Create Job: Time Range</nb-card-header>
+    <nb-card-body>
+      <p>Do you want to associate post with a different user?</p>
+    </nb-card-body>
+    <nb-card-footer class="confirmation">
+      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
