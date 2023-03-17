@@ -56,3 +56,15 @@ nb-card.task-list {
     gap: 0.25rem;
   }
 }
+
+nb-card.task-creation-time-range {
+  nb-card-body {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  nb-card-body > div {
+    height: 24.5rem;
+    width: 20rem;
+  }
+}

@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   NbButtonModule,
+  NbCalendarRangeModule,
   NbCardModule,
   NbContextMenuModule,
   NbDialogModule,
@@ -47,6 +48,7 @@ import { TaskTypeIconComponent } from './tasks/task-type-icon.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     NbButtonModule,
+    NbCalendarRangeModule,
     NbCardModule,
     NbContextMenuModule,
     NbDialogModule.forRoot(),
