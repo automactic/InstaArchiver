@@ -89,7 +89,7 @@ class ProfileCRUDService(BaseService):
             self.database.fetch_one(query),
             self.get_stats(username),
             TaskCRUDService(self.database, self.http_session).list(
-                limit=5, username=username
+                limit=5, username=username, is_ascending=False
             ),
         )
 
