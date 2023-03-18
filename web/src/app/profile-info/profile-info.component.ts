@@ -35,8 +35,8 @@ export class ProfileInfoComponent {
   @ViewChild('timeRangeTaskCreationDialog') timeRangeTaskCreationDialog?: TemplateRef<any>
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
-  userDisplayName?: String
-  timeRange: NbCalendarRange<Date> = {start: new Date()}
+  userDisplayName?: string
+  timeRange: NbCalendarRange<Date> = { start: new Date() }
   stats: PostStatNode<PostCount>[] = []
   profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null)
 
@@ -57,12 +57,12 @@ export class ProfileInfoComponent {
   }
 
   ngOnChanges(changes: any) {
-    this.refresh(changes.username.currentValue)
+    this.refresh()
   }
 
-  refresh(username?: string) {
-    if (username) {
-      this.profile$ = this.profileService.get(username).pipe(
+  private refresh() {
+    if (this.username) {
+      this.profile$ = this.profileService.get(this.username).pipe(
         tap(profile => {
           this.userDisplayName = profile.display_name
           this.stats = Object.keys(profile.stats.counts).map(key => {
@@ -86,10 +86,14 @@ export class ProfileInfoComponent {
     }
   }
 
+  showDialog(dialog: TemplateRef<any>): void {
+    this.dialogService.open(dialog, { hasScroll: true })
+  }
+
   handleTaskAction(title: String): void {
     if (title == 'Catch Up' && this.username) {
       this.taskService.createCatchUpTask([this.username]).subscribe(_ => {
-        this.refresh(this.username)
+        this.refresh()
       }) 
     } else if (title == 'Time Range' && this.timeRangeTaskCreationDialog) {
       let context = { userDisplayName: this.userDisplayName }
@@ -100,13 +104,22 @@ export class ProfileInfoComponent {
   createTimeRangeTask(dialogRef: NbDialogRef<TemplateRef<any>>): void {
     if (this.username && this.timeRange.end) {
       this.taskService.createTimeRangeTask(this.username, this.timeRange.start, this.timeRange.end).subscribe(_ => {
-        this.refresh(this.username)
+        this.refresh()
+        dialogRef.close()
       })
     }
-    dialogRef.close()
   }
 
-  copyUsername() {
+  changeDisplayName(dialogRef: NbDialogRef<TemplateRef<any>>): void {
+    if (this.username && this.userDisplayName) {
+      this.profileService.updateDisplayName(this.username, this.userDisplayName).subscribe(_ => {
+        this.refresh()
+        dialogRef.close()
+      })
+    }
+  }
+
+  copyUsername(): void {
     if (this.username) {
       navigator.clipboard.writeText(this.username)
     }

@@ -69,7 +69,7 @@
         <b>Display Name</b>
         <div>
           <div>{{ profile.display_name }}</div>
-          <button nbButton ghost status="warning" size="small"><nb-icon icon="edit-2"></nb-icon></button>
+          <button nbButton ghost status="warning" size="small" (click)="showDialog(changeDisplayNameDialog)"><nb-icon icon="edit-2"></nb-icon></button>
         </div>
       </nb-list-item>
       <nb-list-item>
@@ -96,9 +96,21 @@
         </ul>
       </div>
     </nb-card-body>
-    <nb-card-footer class="confirmation">
+    <nb-card-footer class="dialog">
       <button nbButton status="primary" (click)="createTimeRangeTask(ref)" [disabled]="timeRange.end == null">Create</button>
-      <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
+      <button nbButton status="basic" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
+<ng-template #changeDisplayNameDialog let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Enter Display Name</nb-card-header>
+    <nb-card-body>
+      <input type="text" nbInput [(ngModel)]="userDisplayName" placeholder="New Display Name">
+    </nb-card-body>
+    <nb-card-footer class="dialog">
+      <button nbButton status="primary" (click)="changeDisplayName(ref)" [disabled]="userDisplayName == null">Save</button>
+      <button nbButton status="basic" (click)="ref.close()">Cancel</button>
     </nb-card-footer>
   </nb-card>
 </ng-template>

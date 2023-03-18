@@ -69,6 +69,12 @@ export class ProfileService {
     });
   }
 
+  updateDisplayName(username: string, displayName: string): Observable<null> {
+    let url = `${environment.apiRoot}/api/profiles/${username}/`;
+    let payload = { display_name: displayName }
+    return this.httpClient.patch<null>(url, payload)
+  }
+
   getStats(username?: string): Observable<[ProfileStats]> {
     let url = `${environment.apiRoot}/api/stats/`
     let params: Record<string, string> = {}

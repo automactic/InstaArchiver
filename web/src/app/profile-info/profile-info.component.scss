@@ -26,6 +26,12 @@ nb-list-item {
   }
 }
 
+nb-card-footer.dialog {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
 nb-card.post-stats {
   nb-card-body, nb-card-footer {
     padding: 0;
@@ -66,11 +72,5 @@ nb-card.task-creation-time-range {
   nb-card-body > div {
     height: 24.5rem;
     width: 20rem;
-  }
-
-  nb-card-footer.confirmation {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
   }
 }
