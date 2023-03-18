@@ -35,8 +35,8 @@ export class ProfileInfoComponent {
   @ViewChild('timeRangeTaskCreationDialog') timeRangeTaskCreationDialog?: TemplateRef<any>
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
-  user_display_name?: String
-  timeRangeTaskRange: NbCalendarRange<Date> = {start: new Date()}
+  userDisplayName?: String
+  timeRange: NbCalendarRange<Date> = {start: new Date()}
   stats: PostStatNode<PostCount>[] = []
   profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null)
 
@@ -64,7 +64,7 @@ export class ProfileInfoComponent {
     if (username) {
       this.profile$ = this.profileService.get(username).pipe(
         tap(profile => {
-          this.user_display_name = profile.display_name
+          this.userDisplayName = profile.display_name
           this.stats = Object.keys(profile.stats.counts).map(key => {
             let count = profile.stats.counts[key] ?? {}
             return {
@@ -80,21 +80,32 @@ export class ProfileInfoComponent {
         })
       )
     } else {
-      this.user_display_name = undefined
+      this.userDisplayName = undefined
       this.stats = []
       this.profile$ = new BehaviorSubject(null)
     }
   }
 
   handleTaskAction(title: String): void {
-    console.log(title)
-    if (title == 'Catch Up' && this.username) {
-      this.taskService.catch_up([this.username]).subscribe(_ => {
+    if (title == 'Catch Up') {
+      this.createCatchUpTask()
+    } else if (title == 'Time Range' && this.timeRangeTaskCreationDialog) {
+      let context = { userDisplayName: this.userDisplayName }
+      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
+    }
+  }
+
+  createCatchUpTask(): void {
+    if (this.username) {
+      this.taskService.create_catch_up_task([this.username]).subscribe(_ => {
         this.refresh(this.username)
       }) 
-    } else if (title == 'Time Range' && this.username && this.timeRangeTaskCreationDialog) {
-      let context = { user_display_name: this.user_display_name }
-      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
+    }
+  }
+
+  createTimeRangeTask(): void {
+    if (this.username && this.timeRange.end) {
+      this.taskService.create_time_range_task(this.username, this.timeRange.start, this.timeRange.end)
     }
   }
 }

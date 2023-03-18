@@ -77,18 +77,18 @@
   <nb-card class="task-creation-time-range">
     <nb-card-header>Create Task: Time Range</nb-card-header>
     <nb-card-body>
-      <nb-calendar-range [(range)]="timeRangeTaskRange"></nb-calendar-range>
+      <nb-calendar-range [(range)]="timeRange"></nb-calendar-range>
       <div>
         <b>Task Detail:</b>
         <ul>
-          <li><b>Profile:</b> {{ data.user_display_name }}</li>
-          <li><b>Start From:</b> {{ this.timeRangeTaskRange.start | date }}</li>
-          <li><b>End Before:</b> {{ this.timeRangeTaskRange.end | date }}</li>
+          <li><b>Profile:</b> {{ data.userDisplayName }}</li>
+          <li><b>Start From:</b> {{ this.timeRange.start | date }}</li>
+          <li><b>End Before:</b> {{ this.timeRange.end | date }}</li>
         </ul>
       </div>
     </nb-card-body>
     <nb-card-footer class="confirmation">
-      <button nbButton status="primary">Submit</button>
+      <button nbButton status="primary" (click)="createTimeRangeTask()">Create</button>
       <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
     </nb-card-footer>
   </nb-card>

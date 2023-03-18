@@ -35,9 +35,16 @@ export class TaskService {
     return this.httpClient.get<ListTasksResponse>(url, {params: params})
   }
 
-  catch_up(usernames: [String]): Observable<null> {
+  create_catch_up_task(usernames: [String]): Observable<null> {
     let url = `${environment.apiRoot}/api/tasks/`
     let payload = { type: 'catch_up', 'usernames': usernames }
     return this.httpClient.post<null>(url, payload)
+  }
+
+  create_time_range_task(username: String, start: Date, end: Date) {
+    let url = `${environment.apiRoot}/api/tasks/`
+    let payload = { type: 'time_range', 'usernames': [username], time_range_start: start, time_range_end: end }
+    console.log(payload)
+    // return this.httpClient.post<null>(url, payload)
   }
 }
