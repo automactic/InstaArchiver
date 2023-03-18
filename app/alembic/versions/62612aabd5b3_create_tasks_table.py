@@ -23,9 +23,9 @@ def upgrade():
         Column('username', String, ForeignKey('profiles.username', ondelete='CASCADE'), index=True, nullable=True),
         Column('type', String, index=True),
         Column('status', String, index=True, nullable=False),
-        Column('created', DateTime, index=True, nullable=False),
-        Column('started', DateTime, nullable=True),
-        Column('completed', DateTime, nullable=True),
+        Column('created', DateTime(timezone=True), index=True, nullable=False),
+        Column('started', DateTime(timezone=True), nullable=True),
+        Column('completed', DateTime(timezone=True), nullable=True),
     )
 
 

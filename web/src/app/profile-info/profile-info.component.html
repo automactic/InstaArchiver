@@ -1,0 +1,116 @@
+<div class="container" *ngIf="profile$ | async as profile">
+  <nb-card class="post-stats">
+    <nb-card-header>Post Stats</nb-card-header>
+    <nb-card-body *ngIf="stats.length > 0">
+      <table [nbTreeGrid]="stats" equalColumnsWidth>
+        <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
+        <tr nbTreeGridRow *nbTreeGridRowDef="let row; columns: allColumns"></tr>
+        <ng-container nbTreeGridColumnDef="Year">
+          <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{ allColumns[0] }}</th>
+          <td nbTreeGridCell *nbTreeGridCellDef="let row"><b>{{ row.data.year }}</b></td>
+        </ng-container>
+        <ng-container *ngFor="let column of allColumns.slice(1)" [nbTreeGridColumnDef]="column">
+          <th nbTreeGridHeaderCell *nbTreeGridHeaderCellDef>{{column}}</th>
+          <td nbTreeGridCell *nbTreeGridCellDef="let row">{{ row.data[column] }}</td>
+        </ng-container>
+      </table>
+    </nb-card-body>
+    <nb-card-footer>
+      <nb-list>
+        <nb-list-item>
+          <b>Total Count</b>{{ profile.stats.total_count | number }}
+        </nb-list-item>
+        <nb-list-item>
+          <b>Earliest</b>{{ profile.stats.first_post_timestamp | date }}
+        </nb-list-item>
+        <nb-list-item>
+          <b>Latest</b>{{ profile.stats.last_post_timestamp | date }}
+        </nb-list-item>
+      </nb-list>
+    </nb-card-footer>
+  </nb-card>
+  <nb-card class="task-list">
+    <nb-card-header>
+      Tasks
+      <button nbButton ghost status="warning" [nbContextMenu]="taskActions" nbContextMenuTag="task-actions">
+        <nb-icon icon="plus"></nb-icon>
+      </button>
+    </nb-card-header>
+    <nb-list>
+      <nb-list-item *ngFor="let task of profile.tasks">
+        <div>
+          <task-type-icon [type]="task.type"></task-type-icon>
+          <div *ngIf="task.started == null && task.completed == null">
+            Created {{ task.created | timePast }}
+          </div>
+          <div *ngIf="task.started && task.completed == null">
+            Started {{ task.started | timePast }}
+          </div>
+          <div *ngIf="task.started && task.completed">
+            Completed {{ task.completed | timePast }}
+          </div>
+        </div>
+        <div>
+          <nb-tag *ngIf="task.post_count" status="info" appearance="outline" size="tiny" text="{{task.post_count}}" nbTooltip="Saved Post Count: {{task.post_count}}"></nb-tag>
+          <task-status-icon [status]="task.status"></task-status-icon>
+        </div>
+      </nb-list-item>
+      <nb-list-item *ngIf="profile.tasks.length == 0">No Task</nb-list-item>
+    </nb-list>
+  </nb-card>
+  <nb-card>
+    <nb-card-header>Biography</nb-card-header>
+    <nb-card-body>{{ profile.biography }}</nb-card-body>
+  </nb-card>
+  <nb-card>
+    <nb-card-header>Name</nb-card-header>
+    <nb-list>
+      <nb-list-item>
+        <b>Display Name</b>
+        <div>
+          <div>{{ profile.display_name }}</div>
+          <button nbButton ghost status="warning" size="small" (click)="showDialog(changeDisplayNameDialog)"><nb-icon icon="edit-2"></nb-icon></button>
+        </div>
+      </nb-list-item>
+      <nb-list-item>
+        <b>Username</b>
+        <div>
+          <div>{{ profile.username }}</div>
+          <button nbButton ghost status="primary" size="small" (click)="copyUsername()"><nb-icon icon="clipboard-outline"></nb-icon></button>
+        </div>
+      </nb-list-item>
+    </nb-list>
+  </nb-card>
+  <ng-template #timeRangeTaskCreationDialog let-data let-ref="dialogRef">
+    <nb-card class="task-creation-time-range">
+      <nb-card-header>Create Task: Time Range</nb-card-header>
+      <nb-card-body>
+        <nb-calendar-range [(range)]="timeRange"></nb-calendar-range>
+        <div>
+          <b>Task Detail:</b>
+          <ul>
+            <li><b>Profile:</b> {{ profile.display_name }}</li>
+            <li><b>Start From:</b> {{ this.timeRange.start | date }}</li>
+            <li><b>End Before:</b> {{ this.timeRange.end | date }}</li>
+          </ul>
+        </div>
+      </nb-card-body>
+      <nb-card-footer class="dialog">
+        <button nbButton status="primary" (click)="createTimeRangeTask(ref)" [disabled]="timeRange.end == null">Create</button>
+        <button nbButton status="basic" (click)="ref.close()">Cancel</button>
+      </nb-card-footer>
+    </nb-card>
+  </ng-template>
+  <ng-template #changeDisplayNameDialog let-data let-ref="dialogRef">
+    <nb-card>
+      <nb-card-header>Enter Display Name</nb-card-header>
+      <nb-card-body>
+        <input type="text" nbInput [(ngModel)]="newDisplayName" placeholder="New Display Name">
+      </nb-card-body>
+      <nb-card-footer class="dialog">
+        <button nbButton status="primary" (click)="changeDisplayName(ref)" [disabled]="newDisplayName == null">Save</button>
+        <button nbButton status="basic" (click)="ref.close()">Cancel</button>
+      </nb-card-footer>
+    </nb-card>
+  </ng-template>
+</div>

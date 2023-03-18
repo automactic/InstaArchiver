@@ -10,7 +10,7 @@ div.container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
     overflow: scroll;
-    padding: 1rem;
+    padding: 1rem 0.25rem 1rem 1rem;
     gap: 1rem;
     flex: 12;
   
@@ -41,6 +41,7 @@ div.container {
       background-color: nb-theme(color-basic-400);
     }
   }
+
   .active {
     border: none;
     border-radius: 0.25rem;
@@ -56,6 +57,7 @@ div.loading {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 1rem 0.25rem 1rem 1rem;
   gap: 0.5rem;
 
   nb-card {

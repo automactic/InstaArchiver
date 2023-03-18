@@ -7,10 +7,8 @@ from pydantic import BaseModel
 from .enums import TaskType, TaskStatus
 
 
-class Task(BaseModel):
+class BaseTask(BaseModel):
     id: UUID
-    username: Optional[str]
-    user_display_name: Optional[str]
     type: TaskType
     status: TaskStatus
     created: datetime
@@ -19,6 +17,10 @@ class Task(BaseModel):
     post_count: Optional[int] = None
     time_range_start: Optional[datetime] = None
     time_range_end: Optional[datetime] = None
+
+class Task(BaseTask):
+    username: Optional[str]
+    user_display_name: Optional[str]
 
     def __str__(self):
         parts = [f'Task {self.type}', self.status]

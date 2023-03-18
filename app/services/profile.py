@@ -1,14 +1,12 @@
 import asyncio
 import logging
 import shutil
-from datetime import timezone
-from typing import Optional
 
 import instaloader
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
-from entities.profiles import Profile, PostsSummary, ProfileDetail, ProfileListResult, ProfileUpdates, ProfileStatistics
+from entities.profiles import ProfileUpdates
 from services import schema
 from services.base import BaseService
 
@@ -58,86 +56,9 @@ class ProfileService(BaseService):
         :return: if the profile exists
         """
 
-        statement = sa.select([schema.profiles.c.username]).where(schema.profiles.c.username == username)
-        exists_statement = sa.select([sa.exists(statement)])
+        statement = sa.select(schema.profiles.c.username).where(schema.profiles.c.username == username)
+        exists_statement = sa.select(sa.exists(statement))
         return await self.database.fetch_val(query=exists_statement)
-
-    async def list(self, search: Optional[str] = None, offset: int = 0, limit: int = 100) -> ProfileListResult:
-        """List profiles.
-
-        :param search: search text filter list of profiles
-        :param offset: the number of profiles to skip
-        :param limit: the number of profiles to fetch
-        :return: the list query result
-        """
-
-        # fetch data
-        base_query = schema.profiles.select()
-        if search:
-            conditions = [
-                schema.profiles.c.username.ilike(f'%{search}%'),
-                schema.profiles.c.full_name.ilike(f'%{search}%'),
-                schema.profiles.c.display_name.ilike(f'%{search}%'),
-            ]
-            base_query = base_query.where(sa.or_(*conditions))
-        base_query = base_query.cte('base_query')
-        count_query = sa.select([sa.func.count().label('total_count')]).select_from(base_query).cte('count_query')
-        query = sa.select([
-            base_query.c.username,
-            base_query.c.full_name,
-            base_query.c.display_name,
-            base_query.c.biography,
-            base_query.c.image_filename,
-            count_query.c.total_count
-        ]).select_from(
-            sa.outerjoin(base_query, count_query, onclause=sa.sql.true(), full=True)
-        ).order_by(base_query.c.display_name).offset(offset).limit(limit)
-        rows = await self.database.fetch_all(query)
-
-        # process result
-        total_count = rows[0]['total_count']
-        profiles = [Profile(**dict(row)) for row in rows] if total_count > 0 else []
-
-        return ProfileListResult(profiles=profiles, limit=limit, offset=offset, count=total_count)
-
-    async def get(self, username: str) -> Optional[ProfileDetail]:
-        """Get a single profile.
-
-        :param username: the username of the profile to get.
-        :return: the profile query result
-        """
-
-        statement = sa.select([
-            schema.profiles.c.username,
-            schema.profiles.c.full_name,
-            schema.profiles.c.display_name,
-            schema.profiles.c.biography,
-            schema.profiles.c.image_filename,
-            sa.func.count(schema.posts.c.shortcode).label('post_count'),
-            sa.func.min(schema.posts.c.timestamp).label('earliest_timestamp'),
-            sa.func.max(schema.posts.c.timestamp).label('latest_timestamp'),
-        ]).select_from(
-            schema.profiles.join(
-                schema.posts, schema.profiles.c.username == schema.posts.c.username
-            )
-        ).where(schema.profiles.c.username == username).group_by(schema.profiles.c.username)
-        result = await self.database.fetch_one(query=statement)
-
-        if result:
-            return ProfileDetail(
-                username=result['username'],
-                full_name=result['full_name'],
-                display_name=result['display_name'],
-                biography=result['biography'],
-                image_filename=result['image_filename'],
-                posts=PostsSummary(
-                    count=result['post_count'],
-                    earliest_timestamp=result['earliest_timestamp'].replace(tzinfo=timezone.utc),
-                    latest_timestamp=result['latest_timestamp'].replace(tzinfo=timezone.utc),
-                )
-            )
-        else:
-            return None
 
     async def update(self, username: str, updates: ProfileUpdates):
         """Update a profile
@@ -174,60 +95,3 @@ class ProfileService(BaseService):
             .where(schema.profiles.c.username == username) \
             .returning(schema.profiles.c.username)
         await self.database.execute(statement)
-
-    async def get_statistics(self):
-        """Get profile statistics."""
-
-        # get data
-        profiles = sa.select([
-            schema.profiles.c.username,
-            schema.profiles.c.full_name,
-            schema.profiles.c.display_name,
-            sa.func.min(schema.posts.c.timestamp).label('first_post_timestamp'),
-            sa.func.max(schema.posts.c.timestamp).label('last_post_timestamp'),
-            sa.func.count().label('total_count')
-        ]).select_from(
-            schema.profiles.join(schema.posts, schema.profiles.c.username == schema.posts.c.username)
-        ).group_by(
-            schema.profiles.c.username
-        ).alias('profiles')
-        quarters = sa.select([
-            schema.posts.c.username,
-            sa.func.cast(sa.func.date_part('year', schema.posts.c.timestamp), sa.INT).label('year'),
-            sa.func.cast(sa.func.date_part('quarter', schema.posts.c.timestamp), sa.INT).label('quarter'),
-            sa.func.count().label('count'),
-        ]).select_from(schema.posts).group_by(
-            schema.posts.c.username, sa.literal_column('year'), sa.literal_column('quarter')
-        ).alias('quarters')
-        statement = sa.select([
-            profiles.c.username,
-            profiles.c.full_name,
-            profiles.c.display_name,
-            profiles.c.first_post_timestamp,
-            profiles.c.last_post_timestamp,
-            profiles.c.total_count,
-            quarters.c.year,
-            quarters.c.quarter,
-            quarters.c.count,
-        ]).select_from(
-            quarters.outerjoin(profiles, quarters.c.username == profiles.c.username)
-        ).order_by(profiles.c.display_name)
-        rows = await self.database.fetch_all(statement)
-
-        # format result
-        statistics = {}
-        for row in rows:
-            username = row['username']
-            if username not in statistics:
-                statistics[username] = ProfileStatistics(
-                    username=row['username'],
-                    full_name=row['full_name'],
-                    display_name=row['display_name'],
-                    first_post_timestamp=row['first_post_timestamp'].replace(tzinfo=timezone.utc),
-                    last_post_timestamp=row['last_post_timestamp'].replace(tzinfo=timezone.utc),
-                    total_count=row['total_count'],
-                    counts={},
-                )
-            statistics[username].counts[f'{row["year"]}-{row["quarter"]}'] = row['count']
-
-        return list(statistics.values())

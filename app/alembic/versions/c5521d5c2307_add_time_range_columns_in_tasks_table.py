@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('tasks', sa.Column('time_range_start', sa.DateTime(), nullable=True))
-    op.add_column('tasks', sa.Column('time_range_end', sa.DateTime(), nullable=True))
+    op.add_column('tasks', sa.Column('time_range_start', sa.DateTime(timezone=True), nullable=True))
+    op.add_column('tasks', sa.Column('time_range_end', sa.DateTime(timezone=True), nullable=True))
     op.alter_column('tasks', 'type', nullable=False)
 
 

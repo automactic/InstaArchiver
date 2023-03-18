@@ -32,6 +32,7 @@ nb-card {
 
   nb-card-body.media {
     overflow-wrap: anywhere;
+    white-space: pre-wrap;
   }
 
   nb-card-footer.media {
@@ -49,5 +50,5 @@ nb-card {
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
-  }  
+  }
 }

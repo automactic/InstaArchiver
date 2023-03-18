@@ -3,6 +3,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
+from .tasks import BaseTask
 
 class Profile(BaseModel):
     username: str
@@ -12,14 +13,21 @@ class Profile(BaseModel):
     image_filename: str
 
 
-class PostsSummary(BaseModel):
-    count: int
-    earliest_timestamp: Optional[datetime]
-    latest_timestamp: Optional[datetime]
+class BaseStats(BaseModel):
+    first_post_timestamp: Optional[datetime]
+    last_post_timestamp: Optional[datetime]
+    total_count: int
+    counts: dict
 
 
-class ProfileDetail(Profile):
-    posts: PostsSummary
+class ProfileWithDetail(Profile):
+    stats: BaseStats
+    tasks: List[BaseTask] = []
+
+
+class ProfileStats(BaseStats):
+    username: str
+    display_name: str
 
 
 class ProfileListResult(BaseModel):
@@ -31,13 +39,3 @@ class ProfileListResult(BaseModel):
 
 class ProfileUpdates(BaseModel):
     display_name: Optional[str]
-
-
-class ProfileStatistics(BaseModel):
-    username: str
-    full_name: str
-    display_name: str
-    first_post_timestamp: Optional[datetime]
-    last_post_timestamp: Optional[datetime]
-    total_count: int
-    counts: dict

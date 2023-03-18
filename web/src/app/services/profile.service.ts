@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
+import { Task } from '../services/task.service';
 
 
 export interface Profile {
@@ -11,6 +12,10 @@ export interface Profile {
 	display_name: string
 	biography: string
   image_filename: string
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
+  counts: {[index: string]: {[index: string]: number}}
 }
 
 export interface ListProfilesResponse {
@@ -20,9 +25,22 @@ export interface ListProfilesResponse {
   count: number
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface ProfileStats {
+  first_post_timestamp: Date
+  last_post_timestamp: Date
+  total_count: number
+  counts: {[index: string]: {[index: string]: number}}
+}
+
+export interface ProfileWithDetails {
+	username: string
+	display_name: string
+  biography: string
+  stats: ProfileStats
+  tasks: Task[]
+}
+
+@Injectable({providedIn: 'root'})
 export class ProfileService {
   profiles: Profile[] = []
   display_names = new Map<string, string>();
@@ -34,9 +52,9 @@ export class ProfileService {
     return this.httpClient.get<ListProfilesResponse>(url);
   }
 
-  get(username: string): Observable<Profile> {
+  get(username: string): Observable<ProfileWithDetails> {
     let url = `${environment.apiRoot}/api/profiles/${username}/`;
-    return this.httpClient.get<Profile>(url);
+    return this.httpClient.get<ProfileWithDetails>(url);
   }
 
   update(username: string, display_name: string) {
@@ -49,6 +67,21 @@ export class ProfileService {
       }
       this.display_names.set(profile.username, profile.display_name);
     });
+  }
+
+  updateDisplayName(username: string, displayName: string): Observable<null> {
+    let url = `${environment.apiRoot}/api/profiles/${username}/`;
+    let payload = { display_name: displayName }
+    return this.httpClient.patch<null>(url, payload)
+  }
+
+  getStats(username?: string): Observable<[ProfileStats]> {
+    let url = `${environment.apiRoot}/api/stats/`
+    let params: Record<string, string> = {}
+    if (username) { 
+      params['username'] = username 
+    }
+    return this.httpClient.get<[ProfileStats]>(url, {params: params})
   }
 
   getProfileImagePath(filename: string): string {

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import aiofiles
 import aiohttp
@@ -14,13 +14,14 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from entities.enums import TaskStatus
 from entities.posts import Post, PostListResult, PostCreationFromShortcode, PostArchiveRequest, PostUpdateRequest
-from entities.profiles import ProfileDetail, ProfileListResult, ProfileUpdates
+from entities.profiles import ProfileWithDetail, ProfileListResult, ProfileUpdates, ProfileStats
 from entities.tasks import TaskCreateRequest, TaskListResponse
 from services import schema
 from services.exceptions import PostNotFound
 from services.post import PostService
 from services.profile import ProfileService
-from services.task import TaskCRUDService, TaskExecutor
+from services.task import TaskExecutor
+from services.crud import TaskCRUDService, ProfileCRUDService
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
@@ -43,21 +44,19 @@ async def shutdown():
 
 @app.get('/api/profiles/', response_model=ProfileListResult)
 async def list_profiles(search: Optional[str] = None, offset: Optional[int] = 0, limit: Optional[int] = 100):
-    return await ProfileService(database, http_session).list(search, offset, limit)
+    return await ProfileCRUDService(database, http_session).list(search, offset, limit)
 
 
-@app.get('/api/profiles/{username:str}/', response_model=ProfileDetail)
+@app.get('/api/profiles/{username:str}/', response_model=ProfileWithDetail)
 async def get_profile(username: str):
-    profile = await ProfileService(database, http_session).get(username)
+    profile = await ProfileCRUDService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
 
-@app.patch('/api/profiles/{username:str}/', response_model=ProfileDetail)
+@app.patch('/api/profiles/{username:str}/', response_model=ProfileWithDetail)
 async def update_profile(username: str, updates: ProfileUpdates):
-    service = ProfileService(database, http_session)
-    await service.update(username, updates)
-    profile = await service.get(username)
-    return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
+    await ProfileService(database, http_session).update(username, updates)
+    return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
 @app.delete('/api/profiles/{username:str}/')
@@ -66,9 +65,10 @@ async def delete_profile(username: str):
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
-@app.get('/api/profile_statistics/')
-async def get_profile_statistics():
-    return await ProfileService(database, http_session).get_statistics()
+@app.get('/api/stats/', response_model=List[ProfileStats])
+async def get_profile_statistics(username: Optional[str] = None):
+    stats = await ProfileCRUDService(database, http_session).get_stats(username=username)
+    return list(stats.values())
 
 
 @app.get('/api/posts/', response_model=PostListResult)
@@ -142,8 +142,10 @@ async def create_tasks(request: TaskCreateRequest, background_tasks: BackgroundT
 
 
 @app.get('/api/tasks/', response_model=TaskListResponse)
-async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100):
-    return await TaskCRUDService(database, http_session).list(offset, limit, is_ascending=False)
+async def list_tasks(offset: Optional[int] = 0, limit: Optional[int] = 100, username: Optional[str] = None):
+    return await TaskCRUDService(database, http_session).list(
+        offset, limit, username=username, is_ascending=False
+    )
 
 
 @app.get('/media/{path:path}')
