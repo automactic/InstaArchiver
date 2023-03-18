@@ -4,7 +4,7 @@ import os
 import random
 
 import instaloader
-
+from datetime import timezone
 from entities.enums import TaskType
 from entities.tasks import Task
 from services.post import PostService
@@ -45,7 +45,7 @@ class TaskExecutor(BaseService):
     async def _sleep(self):
         """Sleep for a random amount of time."""
 
-        max_sleep = os.environ.get('MAX_SLEEP', 60)
+        max_sleep = os.environ.get('MAX_SLEEP', 30)
         await asyncio.sleep(random.randint(0, max_sleep))
 
     async def _get_profile(self, username) -> instaloader.Profile:
@@ -160,12 +160,12 @@ class TaskExecutor(BaseService):
                 continue
 
             # if post is later than the end date, that means we have yet to reach posts within the time range
-            if post.date_utc >= task.time_range_end:
+            if post.date_utc >= task.time_range_end.astimezone(timezone.utc):
                 logger.debug(f'Post date {post.date_utc} is later than the end date.')
                 continue
 
             # if post is earlier than the start date, that means we have iterated through posts within the time range
-            if post.date_utc < task.time_range_start:
+            if post.date_utc < task.time_range_start.astimezone(timezone.utc):
                 logger.debug(f'Post date {post.date_utc} is earlier than the start date.')
                 break
 
