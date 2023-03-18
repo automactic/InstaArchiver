@@ -64,25 +64,44 @@ export class PostService {
   deletePost(shortcode: string) {
     let url = `${environment.apiRoot}/api/posts/${shortcode}/`;
     this.httpClient.delete(url).subscribe(_ => {
+      let iterator = this.posts.entries()
+      var result = iterator.next()
+      while(!result.done && result.value[0] != shortcode) {
+        result = iterator.next()
+      }
+      if (!result.done) {
+        let nextPost = iterator.next().value[1]
+        this.router.navigate([], { 
+          relativeTo: this.route, 
+          queryParams: { selected: nextPost.shortcode }, 
+          queryParamsHandling: 'merge' 
+        })
+      } else {
+        this.router.navigate([], { 
+          relativeTo: this.route, 
+          queryParams: { selected: null }, 
+          queryParamsHandling: 'merge' 
+        })
+      }
       this.posts.delete(shortcode)
-      this.shortcodes.forEach((item, index, array) => {
-        if (item == shortcode) {
-          array.splice(index, 1)
-          if (index == array.length - 1) {
-            this.router.navigate([], { 
-              relativeTo: this.route, 
-              queryParams: { selected: null }, 
-              queryParamsHandling: 'merge' 
-            })
-          } else {
-            this.router.navigate([], { 
-              relativeTo: this.route, 
-              queryParams: { selected: this.shortcodes[index] }, 
-              queryParamsHandling: 'merge' 
-            })
-          }
-        }
-      })
+      // this.shortcodes.forEach((item, index, array) => {
+      //   if (item == shortcode) {
+      //     array.splice(index, 1)
+      //     if (index == array.length - 1) {
+      //       this.router.navigate([], { 
+      //         relativeTo: this.route, 
+      //         queryParams: { selected: null }, 
+      //         queryParamsHandling: 'merge' 
+      //       })
+      //     } else {
+      //       this.router.navigate([], { 
+      //         relativeTo: this.route, 
+      //         queryParams: { selected: this.shortcodes[index] }, 
+      //         queryParamsHandling: 'merge' 
+      //       })
+      //     }
+      //   }
+      // })
     })
   }
 

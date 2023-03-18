@@ -13,11 +13,10 @@ import { PostService, Post } from '../services/post.service';
 })
 export class PostsGridComponent {
   postService: PostService;
-  
+
   username?: string
   year?: string
   month?: string
-  posts = new Map<String, Post>()
   selectedPost$: Observable<Post | null>
   selectedUsername$: Observable<string | null>
 
@@ -37,13 +36,13 @@ export class PostsGridComponent {
       this.username = params.get('username') ?? undefined
       this.year = queryParams.get('year') ?? undefined
       this.month = queryParams.get('month') ?? undefined
-      this.posts.clear()
+      this.postService.posts.clear()
       this.getNextPage()
     })
     this.selectedPost$ = this.route.queryParamMap.pipe(
       switchMap(queryParams => {
         let selectedShortcode = queryParams.get('selected')
-        let post = this.posts.get(selectedShortcode ?? '')
+        let post = this.postService.posts.get(selectedShortcode ?? '')
         if (post) {
           return new BehaviorSubject<Post>(post)
         } else if (selectedShortcode) {
@@ -59,9 +58,9 @@ export class PostsGridComponent {
   }
 
   getNextPage() {
-    this.postService.list(this.posts.size, 100, this.username, this.year, this.month).subscribe(response => {
+    this.postService.list(this.postService.posts.size, 100, this.username, this.year, this.month).subscribe(response => {
       response.posts.forEach(post => {
-        this.posts.set(post.shortcode, post)
+        this.postService.posts.set(post.shortcode, post)
       })
     })
   }

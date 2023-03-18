@@ -1,6 +1,6 @@
 <div class="container">
   <div class="grid" infiniteScroll (scrolled)="getNextPage()">
-    <ng-template ngFor let-post [ngForOf]="posts.values()">
+    <ng-template ngFor let-post [ngForOf]="postService.posts.values()">
       <div 
         [routerLink]="[]"
         [queryParams]="{selected: post.shortcode}"
