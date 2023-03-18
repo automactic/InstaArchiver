@@ -87,19 +87,13 @@ export class ProfileInfoComponent {
   }
 
   handleTaskAction(title: String): void {
-    if (title == 'Catch Up') {
-      this.createCatchUpTask()
-    } else if (title == 'Time Range' && this.timeRangeTaskCreationDialog) {
-      let context = { userDisplayName: this.userDisplayName }
-      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
-    }
-  }
-
-  createCatchUpTask(): void {
-    if (this.username) {
+    if (title == 'Catch Up' && this.username) {
       this.taskService.createCatchUpTask([this.username]).subscribe(_ => {
         this.refresh(this.username)
       }) 
+    } else if (title == 'Time Range' && this.timeRangeTaskCreationDialog) {
+      let context = { userDisplayName: this.userDisplayName }
+      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
     }
   }
 
