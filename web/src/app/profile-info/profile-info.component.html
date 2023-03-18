@@ -88,7 +88,7 @@
       </div>
     </nb-card-body>
     <nb-card-footer class="confirmation">
-      <button nbButton status="primary" (click)="createTimeRangeTask(ref)">Create</button>
+      <button nbButton status="primary" (click)="createTimeRangeTask(ref)" [disabled]="timeRange.end == null">Create</button>
       <button nbButton status="basic" size="small" (click)="ref.close()">Cancel</button>
     </nb-card-footer>
   </nb-card>
