@@ -70,6 +70,8 @@ nb-card.task-creation-time-range {
   }
 
   nb-card-body > div {
+    /* Make the confirmation dialog taller so the overall size does not change 
+    when switching between months that has different number of weeks. */
     height: 24.5rem;
     width: 20rem;
   }
