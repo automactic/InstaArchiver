@@ -160,12 +160,12 @@ class TaskExecutor(BaseService):
                 continue
 
             # if post is later than the end date, that means we have yet to reach posts within the time range
-            if post.date_utc >= task.time_range_end.astimezone(timezone.utc):
+            if post.date_utc.replace(tzinfo=timezone.utc) >= task.time_range_end:
                 logger.debug(f'Post date {post.date_utc} is later than the end date.')
                 continue
 
             # if post is earlier than the start date, that means we have iterated through posts within the time range
-            if post.date_utc < task.time_range_start.astimezone(timezone.utc):
+            if post.date_utc.replace(tzinfo=timezone.utc) < task.time_range_start:
                 logger.debug(f'Post date {post.date_utc} is earlier than the start date.')
                 break
 
