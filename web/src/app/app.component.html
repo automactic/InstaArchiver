@@ -12,7 +12,7 @@
         (selectedChange)="selectedYearChanged($event)"
       >
         <nb-option >All Years</nb-option>
-        <nb-option *ngFor='let item of [].constructor(10); let i = index' [value]="2023 - i">{{ 2023 - i }}</nb-option>
+        <nb-option *ngFor='let item of [].constructor(10); let i = index' [value]="(2023 - i).toString()">{{ 2023 - i }}</nb-option>
       </nb-select>
       <nb-select 
         placeholder="All Months"
