@@ -61,4 +61,8 @@ export class PostsGridComponent {
       map(paramMap => paramMap.get('username'))
     )
   }
+
+  onScroll() {
+    console.log('scrolled!!');
+  }
 }

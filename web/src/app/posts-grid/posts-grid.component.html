@@ -1,5 +1,12 @@
 <div class="container">
-  <div *ngIf="response$ | async as response; else loading" class="grid">
+  <div 
+    *ngIf="response$ | async as response; else loading" 
+    class="grid" 
+    infiniteScroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="50"
+    (scrolled)="onScroll()"
+  >
     <ng-template ngFor let-shortcode [ngForOf]="postService.shortcodes">
       <div 
         *ngIf="postService.getCached(shortcode) as post"
