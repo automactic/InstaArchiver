@@ -36,6 +36,7 @@ export class PostsGridComponent {
       this.username = params.get('username') ?? undefined
       this.year = queryParams.get('year') ?? undefined
       this.month = queryParams.get('month') ?? undefined
+      this.postService.shortcodes = []
       this.postService.posts.clear()
       this.getNextPage()
     })
@@ -60,6 +61,7 @@ export class PostsGridComponent {
   getNextPage() {
     this.postService.list(this.postService.posts.size, 100, this.username, this.year, this.month).subscribe(response => {
       response.posts.forEach(post => {
+        this.postService.shortcodes.push(post.shortcode)
         this.postService.posts.set(post.shortcode, post)
       })
     })
