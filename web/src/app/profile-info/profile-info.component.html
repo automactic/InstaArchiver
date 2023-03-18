@@ -81,36 +81,36 @@
       </nb-list-item>
     </nb-list>
   </nb-card>
+  <ng-template #timeRangeTaskCreationDialog let-data let-ref="dialogRef">
+    <nb-card class="task-creation-time-range">
+      <nb-card-header>Create Task: Time Range</nb-card-header>
+      <nb-card-body>
+        <nb-calendar-range [(range)]="timeRange"></nb-calendar-range>
+        <div>
+          <b>Task Detail:</b>
+          <ul>
+            <li><b>Profile:</b> {{ profile.display_name }}</li>
+            <li><b>Start From:</b> {{ this.timeRange.start | date }}</li>
+            <li><b>End Before:</b> {{ this.timeRange.end | date }}</li>
+          </ul>
+        </div>
+      </nb-card-body>
+      <nb-card-footer class="dialog">
+        <button nbButton status="primary" (click)="createTimeRangeTask(ref)" [disabled]="timeRange.end == null">Create</button>
+        <button nbButton status="basic" (click)="ref.close()">Cancel</button>
+      </nb-card-footer>
+    </nb-card>
+  </ng-template>
+  <ng-template #changeDisplayNameDialog let-data let-ref="dialogRef">
+    <nb-card>
+      <nb-card-header>Enter Display Name</nb-card-header>
+      <nb-card-body>
+        <input type="text" nbInput [(ngModel)]="newDisplayName" placeholder="New Display Name">
+      </nb-card-body>
+      <nb-card-footer class="dialog">
+        <button nbButton status="primary" (click)="changeDisplayName(ref)" [disabled]="newDisplayName == null">Save</button>
+        <button nbButton status="basic" (click)="ref.close()">Cancel</button>
+      </nb-card-footer>
+    </nb-card>
+  </ng-template>
 </div>
-<ng-template #timeRangeTaskCreationDialog let-data let-ref="dialogRef">
-  <nb-card class="task-creation-time-range">
-    <nb-card-header>Create Task: Time Range</nb-card-header>
-    <nb-card-body>
-      <nb-calendar-range [(range)]="timeRange"></nb-calendar-range>
-      <div>
-        <b>Task Detail:</b>
-        <ul>
-          <li><b>Profile:</b> {{ data.userDisplayName }}</li>
-          <li><b>Start From:</b> {{ this.timeRange.start | date }}</li>
-          <li><b>End Before:</b> {{ this.timeRange.end | date }}</li>
-        </ul>
-      </div>
-    </nb-card-body>
-    <nb-card-footer class="dialog">
-      <button nbButton status="primary" (click)="createTimeRangeTask(ref)" [disabled]="timeRange.end == null">Create</button>
-      <button nbButton status="basic" (click)="ref.close()">Cancel</button>
-    </nb-card-footer>
-  </nb-card>
-</ng-template>
-<ng-template #changeDisplayNameDialog let-data let-ref="dialogRef">
-  <nb-card>
-    <nb-card-header>Enter Display Name</nb-card-header>
-    <nb-card-body>
-      <input type="text" nbInput [(ngModel)]="userDisplayName" placeholder="New Display Name">
-    </nb-card-body>
-    <nb-card-footer class="dialog">
-      <button nbButton status="primary" (click)="changeDisplayName(ref)" [disabled]="userDisplayName == null">Save</button>
-      <button nbButton status="basic" (click)="ref.close()">Cancel</button>
-    </nb-card-footer>
-  </nb-card>
-</ng-template>

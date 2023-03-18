@@ -35,7 +35,7 @@ export class ProfileInfoComponent {
   @ViewChild('timeRangeTaskCreationDialog') timeRangeTaskCreationDialog?: TemplateRef<any>
   allColumns = ['Year', 'Q4', 'Q3', 'Q2', 'Q1']
   taskActions = [{ title: 'Catch Up', icon: 'flash' }, { title: 'Time Range', icon: 'calendar' }];
-  userDisplayName?: string
+  newDisplayName?: string
   timeRange: NbCalendarRange<Date> = { start: new Date() }
   stats: PostStatNode<PostCount>[] = []
   profile$: Observable<ProfileWithDetails | null> = new BehaviorSubject(null)
@@ -64,7 +64,7 @@ export class ProfileInfoComponent {
     if (this.username) {
       this.profile$ = this.profileService.get(this.username).pipe(
         tap(profile => {
-          this.userDisplayName = profile.display_name
+          this.newDisplayName = profile.display_name
           this.stats = Object.keys(profile.stats.counts).map(key => {
             let count = profile.stats.counts[key] ?? {}
             return {
@@ -80,7 +80,7 @@ export class ProfileInfoComponent {
         })
       )
     } else {
-      this.userDisplayName = undefined
+      this.newDisplayName = undefined
       this.stats = []
       this.profile$ = new BehaviorSubject(null)
     }
@@ -94,10 +94,9 @@ export class ProfileInfoComponent {
     if (title == 'Catch Up' && this.username) {
       this.taskService.createCatchUpTask([this.username]).subscribe(_ => {
         this.refresh()
-      }) 
+      })
     } else if (title == 'Time Range' && this.timeRangeTaskCreationDialog) {
-      let context = { userDisplayName: this.userDisplayName }
-      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
+      this.showDialog(this.timeRangeTaskCreationDialog)
     }
   }
 
@@ -111,8 +110,8 @@ export class ProfileInfoComponent {
   }
 
   changeDisplayName(dialogRef: NbDialogRef<TemplateRef<any>>): void {
-    if (this.username && this.userDisplayName) {
-      this.profileService.updateDisplayName(this.username, this.userDisplayName).subscribe(_ => {
+    if (this.username && this.newDisplayName) {
+      this.profileService.updateDisplayName(this.username, this.newDisplayName).subscribe(_ => {
         this.refresh()
         dialogRef.close()
       })
