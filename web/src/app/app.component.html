@@ -44,7 +44,7 @@
   </nb-layout-header>
   <nb-layout-column><router-outlet></router-outlet></nb-layout-column>
   <nb-sidebar responsive [(state)]="sidebarState">
-    <div *ngIf="response$ | async as response">
+    <nb-sidebar-header>
       <nb-list>
         <nb-list-item 
           routerLink="/posts"
@@ -58,6 +58,10 @@
           <nb-icon icon="grid"></nb-icon>
           <div *ngIf="sidebarState != 'compacted'">All Posts</div>
         </nb-list-item>
+      </nb-list>
+    </nb-sidebar-header>
+    <div *ngIf="response$ | async as response">
+      <nb-list>
         <nb-list-item 
           *ngFor="let profile of response.profiles"
           [routerLink]="['/', profile.username]"
