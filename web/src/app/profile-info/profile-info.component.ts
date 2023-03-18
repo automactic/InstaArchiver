@@ -105,4 +105,10 @@ export class ProfileInfoComponent {
     }
     dialogRef.close()
   }
+
+  copyUsername() {
+    if (this.username) {
+      navigator.clipboard.writeText(this.username)
+    }
+  }
 }

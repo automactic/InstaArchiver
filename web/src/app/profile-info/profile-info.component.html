@@ -62,6 +62,25 @@
     <nb-card-header>Biography</nb-card-header>
     <nb-card-body>{{ profile.biography }}</nb-card-body>
   </nb-card>
+  <nb-card>
+    <nb-card-header>Name</nb-card-header>
+    <nb-list>
+      <nb-list-item>
+        <b>Display Name</b>
+        <div>
+          <div>{{ profile.display_name }}</div>
+          <button nbButton ghost status="warning" size="small"><nb-icon icon="edit-2"></nb-icon></button>
+        </div>
+      </nb-list-item>
+      <nb-list-item>
+        <b>Username</b>
+        <div>
+          <div>{{ profile.username }}</div>
+          <button nbButton ghost status="primary" size="small" (click)="copyUsername()"><nb-icon icon="clipboard-outline"></nb-icon></button>
+        </div>
+      </nb-list-item>
+    </nb-list>
+  </nb-card>
 </div>
 <ng-template #timeRangeTaskCreationDialog let-data let-ref="dialogRef">
   <nb-card class="task-creation-time-range">

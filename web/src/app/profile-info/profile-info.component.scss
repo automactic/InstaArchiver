@@ -18,6 +18,12 @@ nb-list-item {
   justify-content: space-between;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
 }
 
 nb-card.post-stats {
@@ -48,12 +54,6 @@ nb-card.task-list {
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 1rem 0.5rem 1.5rem;
-  }
-
-  nb-list-item > div {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
   }
 }
 
