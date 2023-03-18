@@ -94,7 +94,7 @@ export class ProfileInfoComponent {
       }) 
     } else if (title == 'Time Range' && this.username && this.timeRangeTaskCreationDialog) {
       let context = { user_display_name: this.user_display_name }
-      this.dialogService.open(this.timeRangeTaskCreationDialog, { context: context })
+      this.dialogService.open(this.timeRangeTaskCreationDialog, { hasScroll: true, context: context })
     }
   }
 }

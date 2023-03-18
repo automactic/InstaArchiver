@@ -67,4 +67,10 @@ nb-card.task-creation-time-range {
     height: 24.5rem;
     width: 20rem;
   }
+
+  nb-card-footer.confirmation {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
 }
