@@ -35,16 +35,20 @@ export class TaskService {
     return this.httpClient.get<ListTasksResponse>(url, {params: params})
   }
 
-  create_catch_up_task(usernames: [String]): Observable<null> {
+  createCatchUpTask(usernames: [String]): Observable<null> {
     let url = `${environment.apiRoot}/api/tasks/`
     let payload = { type: 'catch_up', 'usernames': usernames }
     return this.httpClient.post<null>(url, payload)
   }
 
-  create_time_range_task(username: String, start: Date, end: Date) {
+  createTimeRangeTask(username: String, start: Date, end: Date) {
     let url = `${environment.apiRoot}/api/tasks/`
-    let payload = { type: 'time_range', 'usernames': [username], time_range_start: start, time_range_end: end }
-    console.log(payload)
-    // return this.httpClient.post<null>(url, payload)
+    let payload = { 
+      type: 'time_range', 
+      usernames: [username], 
+      time_range_start: new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())), 
+      time_range_end: new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate())), 
+    }
+    return this.httpClient.post<null>(url, payload)
   }
 }

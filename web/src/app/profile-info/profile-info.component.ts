@@ -2,7 +2,7 @@ import { Component, Input, ViewChild, TemplateRef } from '@angular/core';
 import { NbMenuService } from '@nebular/theme';
 import { Observable, BehaviorSubject, filter, map, tap } from 'rxjs';
 
-import { NbDialogService, NbCalendarRange } from '@nebular/theme';
+import { NbDialogService, NbDialogRef, NbCalendarRange } from '@nebular/theme';
 
 import { ProfileWithDetails, ProfileService } from '../services/profile.service';
 import { TaskService } from '../services/task.service';
@@ -97,15 +97,18 @@ export class ProfileInfoComponent {
 
   createCatchUpTask(): void {
     if (this.username) {
-      this.taskService.create_catch_up_task([this.username]).subscribe(_ => {
+      this.taskService.createCatchUpTask([this.username]).subscribe(_ => {
         this.refresh(this.username)
       }) 
     }
   }
 
-  createTimeRangeTask(): void {
+  createTimeRangeTask(dialogRef: NbDialogRef<TemplateRef<any>>): void {
     if (this.username && this.timeRange.end) {
-      this.taskService.create_time_range_task(this.username, this.timeRange.start, this.timeRange.end)
+      this.taskService.createTimeRangeTask(this.username, this.timeRange.start, this.timeRange.end).subscribe(_ => {
+        this.refresh(this.username)
+      })
     }
+    dialogRef.close()
   }
 }
