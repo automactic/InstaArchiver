@@ -82,7 +82,7 @@
       </nb-list>
     </div>
     <nb-sidebar-footer>
-      <input type="text" nbInput placeholder="Search">
+      <input type="text" nbInput placeholder="Search" [(ngModel)]="searchText" (input)="loadProfiles()">
     </nb-sidebar-footer>
   </nb-sidebar>
  </nb-layout>

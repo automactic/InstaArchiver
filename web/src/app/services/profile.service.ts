@@ -47,9 +47,13 @@ export class ProfileService {
 
   constructor(private httpClient: HttpClient) {}
 
-  list() {
-    let url = `${environment.apiRoot}/api/profiles/?limit=200`;
-    return this.httpClient.get<ListProfilesResponse>(url);
+  list(search?: string) {
+    let url = `${environment.apiRoot}/api/profiles/?limit=200`
+    let params: Record<string, string> = {}
+    if (search) {
+      params['search'] = search
+    }
+    return this.httpClient.get<ListProfilesResponse>(url, {params: params});
   }
 
   get(username: string): Observable<ProfileWithDetails> {

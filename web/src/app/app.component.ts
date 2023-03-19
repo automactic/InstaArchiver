@@ -15,6 +15,7 @@ export class AppComponent {
   year?: string
   month?: string
   selectedPost?: string
+  searchText?: string
 
   response$?: Observable<ListProfilesResponse>
   profileService: ProfileService
@@ -67,5 +68,9 @@ export class AppComponent {
 
   deselectPost() {
     this.router.navigate([], {queryParams: {'selected': null}, queryParamsHandling: 'merge'})
+  }
+
+  loadProfiles() {
+    this.response$ = this.profileService.list(this.searchText)
   }
 }
