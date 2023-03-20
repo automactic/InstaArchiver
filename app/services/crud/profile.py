@@ -48,9 +48,7 @@ class ProfileCRUDService(BaseService):
         query = (
             sa.select(
                 base_query.c.username,
-                base_query.c.full_name,
                 base_query.c.display_name,
-                base_query.c.biography,
                 base_query.c.image_filename,
                 count_query.c.total_count,
             )
@@ -58,8 +56,8 @@ class ProfileCRUDService(BaseService):
                 base_query.outerjoin(count_query, onclause=sa.sql.true(), full=True)
             )
             .order_by(base_query.c.display_name)
-            .offset(offset)
-            .limit(limit)
+            .offset(offset if offset > 0 else None)
+            .limit(limit if limit > 0 else None)
         )
         rows = await self.database.fetch_all(query)
 
@@ -68,7 +66,7 @@ class ProfileCRUDService(BaseService):
         profiles = [Profile(**dict(row)) for row in rows] if total_count > 0 else []
 
         return ProfileListResult(
-            profiles=profiles, limit=limit, offset=offset, count=total_count
+            data=profiles, limit=limit, offset=offset, count=total_count
         )
 
     async def get(self, username: str) -> Optional[ProfileWithDetail]:
