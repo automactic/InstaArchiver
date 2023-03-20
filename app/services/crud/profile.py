@@ -22,13 +22,7 @@ class ProfileCRUDService(BaseService):
     async def list(
         self, search: Optional[str] = None, offset: int = 0, limit: int = 100
     ) -> ProfileListResult:
-        """List profiles.
-
-        :param search: search text filter list of profiles
-        :param offset: the number of profiles to skip
-        :param limit: the number of profiles to fetch
-        :return: the list query result
-        """
+        """List profiles."""
 
         # fetch data
         base_query = schema.profiles.select()
