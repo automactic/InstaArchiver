@@ -8,18 +8,12 @@ import { Task } from '../services/task.service';
 
 export interface Profile {
 	username: string
-	full_name: string
 	display_name: string
-	biography: string
   image_filename: string
-  first_post_timestamp: Date
-  last_post_timestamp: Date
-  total_count: number
-  counts: {[index: string]: {[index: string]: number}}
 }
 
 export interface ListProfilesResponse {
-  profiles: Profile[]
+  data: Profile[]
   limit: number
   offset: number
   count: number
@@ -48,7 +42,7 @@ export class ProfileService {
   constructor(private httpClient: HttpClient) {}
 
   list(search?: string) {
-    let url = `${environment.apiRoot}/api/profiles/?limit=200`
+    let url = `${environment.apiRoot}/api/profiles/?limit=0`
     let params: Record<string, string> = {}
     if (search) {
       params['search'] = search

@@ -60,10 +60,10 @@
         </nb-list-item>
       </nb-list>
     </nb-sidebar-header>
-    <div *ngIf="response$ | async as response">
+    <div *ngIf="profiles$ | async as profiles">
       <nb-list>
         <nb-list-item 
-          *ngFor="let profile of response.profiles"
+          *ngFor="let profile of profiles.data"
           [routerLink]="['/posts', profile.username]"
           [queryParams]="{selected: null}" 
           queryParamsHandling="merge"
