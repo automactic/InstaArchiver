@@ -65,7 +65,7 @@ async def get_profile(username: str):
     profile = await ProfileCRUDService(database, http_session).get(username)
     return profile if profile else Response(status_code=HTTPStatus.NOT_FOUND)
 
-
+# refactor marker
 @app.patch("/api/profiles/{username:str}/", response_model=ProfileWithDetail)
 async def update_profile(username: str, updates: ProfileUpdates):
     await ProfileService(database, http_session).update(username, updates)
