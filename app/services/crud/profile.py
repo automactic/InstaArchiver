@@ -88,7 +88,7 @@ class ProfileCRUDService(BaseService):
         profile = ProfileWithDetail(
             **dict(profile_info),
             stats=BaseStats(**stats[username].dict()),
-            tasks=[BaseTask(**task.dict()) for task in tasks.tasks],
+            tasks=[BaseTask(**task.dict()) for task in tasks.data],
         )
         return profile
 
