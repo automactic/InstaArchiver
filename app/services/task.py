@@ -46,7 +46,7 @@ class TaskExecutor(BaseService):
         """Sleep for a random amount of time."""
 
         max_sleep = os.environ.get('MAX_SLEEP', 30)
-        await asyncio.sleep(random.randint(0, max_sleep))
+        await asyncio.sleep(random.randint(10, max_sleep))
 
     async def _get_profile(self, username) -> instaloader.Profile:
         """Get instaloader profile for a user.
