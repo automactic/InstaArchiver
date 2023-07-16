@@ -39,7 +39,7 @@ class TaskCreateRequest(BaseModel):
 
 
 class TaskListResponse(BaseModel):
-    tasks: List[Task]
+    data: List[Task]
     limit: int
     offset: int
     count: int

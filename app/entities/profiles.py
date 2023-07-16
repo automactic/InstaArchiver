@@ -7,9 +7,7 @@ from .tasks import BaseTask
 
 class Profile(BaseModel):
     username: str
-    full_name: str
     display_name: str
-    biography: Optional[str] = None
     image_filename: str
 
 
@@ -21,6 +19,8 @@ class BaseStats(BaseModel):
 
 
 class ProfileWithDetail(Profile):
+    full_name: str
+    biography: Optional[str] = None
     stats: BaseStats
     tasks: List[BaseTask] = []
 
@@ -31,7 +31,7 @@ class ProfileStats(BaseStats):
 
 
 class ProfileListResult(BaseModel):
-    profiles: List[Profile]
+    data: List[Profile]
     limit: int
     offset: int
     count: int

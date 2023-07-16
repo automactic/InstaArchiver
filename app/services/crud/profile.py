@@ -22,13 +22,7 @@ class ProfileCRUDService(BaseService):
     async def list(
         self, search: Optional[str] = None, offset: int = 0, limit: int = 100
     ) -> ProfileListResult:
-        """List profiles.
-
-        :param search: search text filter list of profiles
-        :param offset: the number of profiles to skip
-        :param limit: the number of profiles to fetch
-        :return: the list query result
-        """
+        """List profiles."""
 
         # fetch data
         base_query = schema.profiles.select()
@@ -48,9 +42,7 @@ class ProfileCRUDService(BaseService):
         query = (
             sa.select(
                 base_query.c.username,
-                base_query.c.full_name,
                 base_query.c.display_name,
-                base_query.c.biography,
                 base_query.c.image_filename,
                 count_query.c.total_count,
             )
@@ -58,8 +50,8 @@ class ProfileCRUDService(BaseService):
                 base_query.outerjoin(count_query, onclause=sa.sql.true(), full=True)
             )
             .order_by(base_query.c.display_name)
-            .offset(offset)
-            .limit(limit)
+            .offset(offset if offset > 0 else None)
+            .limit(limit if limit > 0 else None)
         )
         rows = await self.database.fetch_all(query)
 
@@ -68,7 +60,7 @@ class ProfileCRUDService(BaseService):
         profiles = [Profile(**dict(row)) for row in rows] if total_count > 0 else []
 
         return ProfileListResult(
-            profiles=profiles, limit=limit, offset=offset, count=total_count
+            data=profiles, limit=limit, offset=offset, count=total_count
         )
 
     async def get(self, username: str) -> Optional[ProfileWithDetail]:
@@ -96,7 +88,7 @@ class ProfileCRUDService(BaseService):
         profile = ProfileWithDetail(
             **dict(profile_info),
             stats=BaseStats(**stats[username].dict()),
-            tasks=[BaseTask(**task.dict()) for task in tasks.tasks],
+            tasks=[BaseTask(**task.dict()) for task in tasks.data],
         )
         return profile
 

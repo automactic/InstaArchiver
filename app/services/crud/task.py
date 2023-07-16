@@ -124,7 +124,7 @@ class TaskCRUDService(BaseService):
             except pydantic.error_wrappers.ValidationError:
                 continue
 
-        return TaskListResponse(tasks=tasks, limit=limit, offset=offset, count=count)
+        return TaskListResponse(data=tasks, limit=limit, offset=offset, count=count)
 
     async def get_next(self) -> Optional[Task]:
         """Get the next task to execute.
@@ -132,10 +132,10 @@ class TaskCRUDService(BaseService):
         :return: next task to execute
         """
 
-        result = await self.list(
+        tasks = await self.list(
             offset=0, limit=1, status=[TaskStatus.PENDING], is_ascending=True
         )
-        return result.tasks[0] if result.tasks else None
+        return tasks.data[0] if tasks.data else None
 
     async def set_in_progress(self, task):
         """Set task status to in_progress.

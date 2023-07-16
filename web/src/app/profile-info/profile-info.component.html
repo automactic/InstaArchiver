@@ -105,7 +105,7 @@
     <nb-card>
       <nb-card-header>Enter Display Name</nb-card-header>
       <nb-card-body>
-        <input type="text" nbInput [(ngModel)]="newDisplayName" placeholder="New Display Name">
+        <input type="text" nbInput placeholder="New Display Name" [(ngModel)]="newDisplayName">
       </nb-card-body>
       <nb-card-footer class="dialog">
         <button nbButton status="primary" (click)="changeDisplayName(ref)" [disabled]="newDisplayName == null">Save</button>

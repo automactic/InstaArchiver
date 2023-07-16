@@ -10,6 +10,7 @@ $nb-themes: nb-register-theme((
   user-name-text-font-weight: 600,
   user-small-name-text-font-size: 15px,
   sidebar-padding: 0,
+  sidebar-header-height: 53px,
 ), default, default);
 
 $nb-themes: nb-register-theme((
@@ -19,4 +20,5 @@ $nb-themes: nb-register-theme((
   user-name-text-font-weight: 600,
   user-small-name-text-font-size: 15px,
   sidebar-padding: 0,
+  sidebar-header-height: 53px,
 ), dark, dark);

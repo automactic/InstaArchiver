@@ -5,7 +5,7 @@ import { PostsGridComponent } from './posts-grid/posts-grid.component';
 
 const routes: Routes = [
   { path: 'posts', component: PostsGridComponent },
-  { path: ':username', component: PostsGridComponent },
+  { path: 'posts/:username', component: PostsGridComponent },
   { path: '**', redirectTo: '/posts'},
 ];
 

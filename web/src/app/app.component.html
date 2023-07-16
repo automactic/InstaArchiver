@@ -60,11 +60,11 @@
         </nb-list-item>
       </nb-list>
     </nb-sidebar-header>
-    <div *ngIf="response$ | async as response">
+    <div *ngIf="profiles$ | async as profiles">
       <nb-list>
         <nb-list-item 
-          *ngFor="let profile of response.profiles"
-          [routerLink]="['/', profile.username]"
+          *ngFor="let profile of profiles.data"
+          [routerLink]="['/posts', profile.username]"
           [queryParams]="{selected: null}" 
           queryParamsHandling="merge"
           routerLinkActive="active"
@@ -81,5 +81,8 @@
         </nb-list-item>
       </nb-list>
     </div>
+    <nb-sidebar-footer *ngIf="sidebarState == 'expanded'">
+      <input type="text" nbInput placeholder="Search" [(ngModel)]="searchText" (input)="loadProfiles()">
+    </nb-sidebar-footer>
   </nb-sidebar>
  </nb-layout>

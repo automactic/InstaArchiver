@@ -2,10 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {
   NbButtonModule,
   NbCalendarRangeModule,
@@ -29,6 +28,8 @@ import {
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { TimePastPipe } from 'ng-time-past-pipe';
 
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
 import { PostsGridComponent } from './posts-grid/posts-grid.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { ProfileInfoComponent } from './profile-info/profile-info.component';
@@ -50,6 +51,7 @@ import { TaskTypeIconComponent } from './tasks/task-type-icon.component';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    InfiniteScrollModule,
     NbButtonModule,
     NbCalendarRangeModule,
     NbCardModule,

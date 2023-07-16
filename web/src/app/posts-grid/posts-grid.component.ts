@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { filter, combineLatestWith, switchMap, tap, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { combineLatestWith, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
-import { PostService, ListPostsResponse, Post } from '../services/post.service';
-import { Profile, ProfileService } from '../services/profile.service';
+import { PostService, Post } from '../services/post.service';
 
 
 @Component({
@@ -13,45 +12,48 @@ import { Profile, ProfileService } from '../services/profile.service';
   styleUrls: ['./posts-grid.component.scss']
 })
 export class PostsGridComponent {
-  username?: string
-  year?: string
-  month?: string
-  response$: Observable<ListPostsResponse>
-  selectedPost$: Observable<Post | null>
-  selectedUsername$: Observable<string | null>
   postService: PostService;
 
-  constructor(private route: ActivatedRoute, postService: PostService, profileService: ProfileService) {
+  private username?: string
+  private year?: string
+  private month?: string
+  selectedPost$: Observable<Post | null>
+  selectedUsername$: Observable<string | null>
+
+  constructor(private route: ActivatedRoute, postService: PostService) {
     this.postService = postService
-    this.response$ = this.route.paramMap.pipe(
+    this.route.paramMap.pipe(
       combineLatestWith(this.route.queryParamMap),
-      filter(([params, queryParams]) => {
+      map(([params, queryParams]) => {
+        return {
+          username: params.get('username'),
+          year: queryParams.get('year'),
+          month: queryParams.get('month'),
+        }
+      }),
+      distinctUntilChanged((previous, current) => {
         return (
-          this.username == undefined || 
-          params.get('username') != this.username || 
-          queryParams.get('year') != this.year ||
-          queryParams.get('month') != this.month
+          previous.username == current.username && 
+          previous.year == current.year && 
+          previous.month == current.month
         )
       }),
-      tap(([params, queryParams]) => {
-        this.username = params.get('username') ?? undefined
-        this.year = queryParams.get('year') ?? undefined
-        this.month = queryParams.get('month') ?? undefined
-      }),
-      switchMap(_ => {
-        return postService.list(0, 100, this.username, this.year, this.month)
-      })
-    )
+    ).subscribe((data) => {
+      this.username = data.username ?? undefined
+      this.year = data.year ?? undefined
+      this.month = data.month ?? undefined
+      this.postService.shortcodes = []
+      this.postService.posts.clear()
+      this.getNextPage()
+    })
     this.selectedPost$ = this.route.queryParamMap.pipe(
       switchMap(queryParams => {
         let selectedShortcode = queryParams.get('selected')
-        if (selectedShortcode) {
-          let cachedPost = this.postService.getCached(selectedShortcode)
-          if (cachedPost) {
-            return new BehaviorSubject<Post>(cachedPost)
-          } else {
-            return this.postService.getPost(selectedShortcode)
-          }
+        let post = this.postService.posts.get(selectedShortcode ?? '')
+        if (post) {
+          return new BehaviorSubject<Post>(post)
+        } else if (selectedShortcode) {
+          return this.postService.getPost(selectedShortcode)
         } else {
           return new BehaviorSubject(null)
         }
@@ -60,5 +62,14 @@ export class PostsGridComponent {
     this.selectedUsername$ = this.route.paramMap.pipe(
       map(paramMap => paramMap.get('username'))
     )
+  }
+
+  getNextPage() {
+    this.postService.list(this.postService.posts.size, 100, this.username, this.year, this.month).subscribe(response => {
+      response.posts.forEach(post => {
+        this.postService.shortcodes.push(post.shortcode)
+        this.postService.posts.set(post.shortcode, post)
+      })
+    })
   }
 }
